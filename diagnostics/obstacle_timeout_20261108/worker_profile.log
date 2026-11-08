@@ -1,0 +1,12 @@
+{
+  "platform": "local Mac, spawned worker with numeric threads=1; not Jetson/DDS",
+  "input_frames": 64,
+  "completed_frames": 63,
+  "post_start_eligible_fraction": 1.0,
+  "submit_p95_s": 4.804369673365724e-05,
+  "worker_duration_p50_s": 0.01760695897974074,
+  "worker_duration_p95_s": 0.018511428899364545,
+  "warm_source_age_p95_s": 0.03540784161305055,
+  "track_resets": 0,
+  "last_unknown_count": 7
+}

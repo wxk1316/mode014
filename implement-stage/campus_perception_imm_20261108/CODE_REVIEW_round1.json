@@ -1,0 +1,45 @@
+{
+  "verdict": "gaps",
+  "scope": "preprocessing and integration; tracker excluded",
+  "review_independence": "same-family",
+  "acceptance_status": "provisional",
+  "findings": [
+    {
+      "id": "F01",
+      "priority": 1,
+      "issue": "Supported vertical poles omitted from ObstacleArray",
+      "fix": "3D extent gate with minimum footprint"
+    },
+    {
+      "id": "F02",
+      "priority": 1,
+      "issue": "NaN TF translation permits healthy empty objects",
+      "fix": "TF and frame finite validation before inference"
+    },
+    {
+      "id": "F03",
+      "priority": 2,
+      "issue": "XY semantic correspondence aliases vertical surfaces",
+      "fix": "XYZ correspondence and float64 map coordinates"
+    },
+    {
+      "id": "F04",
+      "priority": 2,
+      "issue": "Worker age hardcoded 0.4",
+      "fix": "configured max_source_age propagated"
+    },
+    {
+      "id": "F05",
+      "priority": 2,
+      "issue": "Nonfinite HARP logits reported successful",
+      "fix": "full logits/shape/confidence contract validation"
+    },
+    {
+      "id": "F06",
+      "priority": 3,
+      "issue": "CPU upper ROI column may become 480",
+      "fix": "match native clamp0..479"
+    }
+  ],
+  "validation": "CPU with actual Patchwork binding and actual extracted node/backend methods; no ROS/CUDA tested"
+}

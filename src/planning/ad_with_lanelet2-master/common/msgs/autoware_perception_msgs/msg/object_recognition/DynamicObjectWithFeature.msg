@@ -1,0 +1,2 @@
+autoware_perception_msgs/DynamicObject object
+autoware_perception_msgs/Feature feature

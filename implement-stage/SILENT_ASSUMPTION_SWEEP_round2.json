@@ -1,0 +1,194 @@
+{
+  "actual_model_identity": "unknown",
+  "review_independence": "unknown",
+  "acceptance_status": "provisional",
+  "round": 2,
+  "scope_note": "Second and final allowed silent-assumption sweep of the inspected primary source paths and current assumption ledger. This covers interface, result, and control semantics, not style, performance, scientific effectiveness, or final experiment outcomes. F3/F4 and tuning/validation remain unfinished in BUILD_NOTE.md. Unknown actual model identity cannot establish cross-family independence; a clean scoped sweep is not an independent acquittal.",
+  "resolved_round1": [
+    {
+      "id": "R1-U1",
+      "round1_location": "undeclared[0]",
+      "status": "resolved",
+      "rows": [
+        "A-019"
+      ],
+      "site": "diagnostics/multimode_20261108/campaign.py:25,86,183",
+      "resolution": "The ledger explicitly distinguishes synchronous virtual-time tuning from delayed AsyncPlanner result delivery and reports solver wall time separately. DelayedModeWorker uses the existing AsyncPlanner result checks with simulated delivery and makes no claim about real process or ROS scheduling.",
+      "evidence": "Read the implementation and metadata. A submitted result from mode 0 / epoch 1 was rejected after changing to mode 1 / epoch 2 with reason planning_result_stale and stale_causes containing mode_changed. A 0.25-second baseline smoke reproduction instantiated DelayedModeWorker and reported the matching time_model."
+    },
+    {
+      "id": "R1-U2",
+      "round1_location": "undeclared[1]",
+      "status": "resolved",
+      "rows": [
+        "A-023"
+      ],
+      "site": "diagnostics/multimode_20261108/campaign.py:157; src/control/car_ctr/src/car_ctr.cpp:145",
+      "resolution": "The candidate C++ driver policy now receives localization-estimator validity, age, full-plane speed_norm, and omega rather than truth velocity for its stopped predicate.",
+      "evidence": "The candidate call uses estimator.valid, pose age below 0.35 seconds, estimator.speed_norm below 0.035 m/s, and absolute estimator.omega below 0.06 rad/s, matching the production predicate and freshness bounds."
+    },
+    {
+      "id": "R1-U3",
+      "round1_location": "undeclared[2]",
+      "status": "resolved",
+      "rows": [
+        "A-025"
+      ],
+      "site": "src/rda_dwa_real/rda_dwa_real/async_planner.py:28",
+      "resolution": "AsyncPlanner.switch_candidate explicitly copies actuator state, obstacle age, mode, and epoch to its parent-side base planner before delegation.",
+      "evidence": "A read-only probe set wrapper steer=0.8, obstacle_age=0.12, current_acc=0.4, current_steer_rate=0.3, mode=0, and epoch=2; the base candidate received those same values."
+    },
+    {
+      "id": "R1-U4",
+      "round1_location": "undeclared[3]",
+      "status": "resolved",
+      "rows": [
+        "A-018"
+      ],
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:34",
+      "resolution": "Every accepted empty reference clears the previous motion reference when the tracker is running in the requested mode, including dynamic_wait.",
+      "evidence": "The prior dynamic_wait reproduction now leaves zero reference points, selects MODE_NO_REF, and brakes from 0.3 to 0.2992 m/s rather than following the old reference."
+    },
+    {
+      "id": "R1-U5",
+      "round1_location": "undeclared[4]",
+      "status": "resolved",
+      "rows": [
+        "A-022",
+        "A-026"
+      ],
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:62,104,124",
+      "resolution": "SPIN completion requires angular tolerance, outgoing angular speed below 0.03 rad/s, actual valid stopped evidence, and the configured spin_stop_hold. Invalid, stale, and not-ready states clear the hold timer.",
+      "evidence": "The original residual-spin reproduction with target error 0.01 rad and _spin_w=0.2 now outputs 0.184 rad/s without reached. The not-ready interval reproduction also restarts the hold and returns no completion immediately after readiness resumes."
+    },
+    {
+      "id": "R1-U6",
+      "round1_location": "undeclared[5]",
+      "status": "resolved",
+      "rows": [
+        "A-021"
+      ],
+      "site": "src/rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py:48; src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:31",
+      "resolution": "A new goal cancels old SPIN intent and advances the session/epoch. A cancellation arriving during tracker BRAKE or RESET also replaces an unsent SPIN target with the current mode.",
+      "evidence": "The running-SPIN reproduction now publishes ACK with mode_switch_wait and ACK arbitration. In the pending-SPIN reproduction, SPIN epoch 2 was replaced by ACK epoch 3 during BRAKE; every later emitted command remained mode 0 and the tracker returned to RUN with no pending mode."
+    },
+    {
+      "id": "R1-U7",
+      "round1_location": "undeclared[6]",
+      "status": "resolved",
+      "rows": [
+        "A-024"
+      ],
+      "site": "diagnostics/multimode_20261108/campaign.py:163,180",
+      "resolution": "Candidate traces now store the C++ driver.ready value independently of command_in_actual_mode.",
+      "evidence": "The candidate trace ready value is driver_ready, which is assigned from driver.ready; command_in_actual_mode separately records whether the command matches the actual mode. Baseline-specific labels are reviewed separately below."
+    },
+    {
+      "id": "R1-S1",
+      "round1_location": "stale_rows[0]",
+      "status": "resolved",
+      "rows": [
+        "A-009",
+        "A-022"
+      ],
+      "site": "src/control/car_ctr/src/mode_transaction.hpp:24,37; src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:61",
+      "resolution": "Invalid/freshness failures clear driver and tracker stop timers; RESET falls back to BRAKE. Renewed measured motion during driver RESET or SEND also returns to BRAKE.",
+      "evidence": "Valid/stopped at t=0, invalid data at t=0.08 and 0.24, then valid/stopped at t=0.40 remains BRAKE. In a separate compiled-policy check, RESET at t=0.40 followed by stopped=false at t=0.48, 0.64, and 0.80 stayed BRAKE and emitted no mode-switch command."
+    },
+    {
+      "id": "R1-S2",
+      "round1_location": "stale_rows[1]",
+      "status": "resolved",
+      "rows": [
+        "A-013",
+        "A-020"
+      ],
+      "site": "src/rda_dwa/rda_dwa/multimode_planner.py:104; implement-stage/ASSUMPTIONS.md:24",
+      "resolution": "The head-on branch now evaluates forward ACK first and retains a feasible action meeting the declared 0.25 m operational margin. A-013 explicitly says the three-second delay affects the separate CRAB candidate rather than imposing an independent reverse-branch gate.",
+      "evidence": "The prior pedestrian at (7,0), vx=-0.2 reproduction now returns feasible forward ACK at 1.0 m/s with reverse=false. Read the updated margin gate and matching A-013/A-020 declarations."
+    },
+    {
+      "id": "R1-S3",
+      "round1_location": "stale_rows[2]",
+      "status": "resolved",
+      "rows": [
+        "A-013",
+        "A-018"
+      ],
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_supervisor.py:17; src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:40,132",
+      "resolution": "The v2 plan carries direction explicitly, and the tracker also preserves a negative signed zero in its fallback inference. Reverse braking therefore retains the signed reverse execution branch.",
+      "evidence": "Backward reference positions with -0.0 speeds now produce reverse_ref=true and branch ACK_REVERSE."
+    },
+    {
+      "id": "R1-S4",
+      "round1_location": "stale_rows[3]",
+      "status": "resolved",
+      "rows": [
+        "A-011"
+      ],
+      "site": "diagnostics/multimode_20261108/tune.py:5; implement-stage/ASSUMPTIONS.md:16",
+      "resolution": "A-011 explicitly includes campus_planter in the six tuning cases and reserves the other campus geometries, remaining dynamic speeds, and noise seeds for validation.",
+      "evidence": "The six names in the tuning script and current A-011 match. This records the split definition without treating unfinished validation results as final."
+    }
+  ],
+  "resolved_during_round2": [
+    {
+      "id": "R2-F1",
+      "site": "src/control/car_ctr/src/mode_transaction.hpp:37,42",
+      "decision": "Renewed valid motion must invalidate RESET/SEND readiness.",
+      "resolution": "Both phases now return to BRAKE when stopped=false; the compiled policy reproduction emitted only zero-speed Run commands."
+    },
+    {
+      "id": "R2-F2",
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:104",
+      "decision": "A fresh driver state with ready=false must not contribute elapsed time to SPIN completion hold.",
+      "resolution": "MODE_NOT_READY clears both SPIN and mode-transition stop timers; the targeted reproduction restarted the hold."
+    },
+    {
+      "id": "R2-F3",
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:31",
+      "decision": "Cancelling an old SPIN while still braking must cancel the unsent mechanical target.",
+      "resolution": "A new plan matching the actual mode replaces the pending target during BRAKE/RESET; the cancellation reproduction emitted only mode 0."
+    },
+    {
+      "id": "R2-F4",
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:170",
+      "decision": "A-017 promises an immediate braking-tail check for reverse as well as CRAB.",
+      "resolution": "Reverse execution now evaluates a zero-speed rollout with the current actuator state and takes the minimum gap across command and braking forecasts."
+    },
+    {
+      "id": "R2-F5",
+      "site": "diagnostics/multimode_20261108/campaign.py:35",
+      "decision": "A baseline run labeled with worker delay must actually use delayed AsyncPlanner result delivery.",
+      "resolution": "The delay wrapper is applied outside the candidate-only MultiModePlanner branch. The baseline 0.25-second smoke check instantiated DelayedModeWorker and returned matching delay metadata."
+    }
+  ],
+  "undeclared": [
+    {
+      "site": "diagnostics/multimode_20261108/campaign.py:119,147,180,183",
+      "decision": "Baseline runs use the preserved legacy switching model, including truth-speed standstill and a modeled three-second wait, but result.scope still claims execution of the C++ driver timing policy. The candidate actually instantiates DriverPolicy. The ledger and output metadata do not declare this baseline/candidate distinction.",
+      "why_it_matters": "Every baseline result is labeled as if the same C++ policy and estimator-based stop evidence were exercised. Its readiness and switching outcomes instead have the legacy model's meaning. The distinction must be explicit before interpreting later comparisons; this finding does not assume any unfinished experiment outcome.",
+      "class": "semantic"
+    }
+  ],
+  "stale_rows": [
+    {
+      "row": "A-023",
+      "site": "implement-stage/ASSUMPTIONS.md:38; diagnostics/multimode_20261108/campaign.py:147,157",
+      "stated": "The switching policy uses production localization-estimator evidence; truth is only used for motion integration, collision, and evaluation.",
+      "actual": "That statement now holds for the candidate C++ policy, but baseline switching is gated directly by abs(v)<0.035 and abs(omega)<0.06 using integrated truth.",
+      "why_it_matters": "The ledger lacks the baseline exception and therefore overstates which stop-evidence semantics the baseline exercises.",
+      "class": "semantic"
+    },
+    {
+      "row": "A-024",
+      "site": "implement-stage/ASSUMPTIONS.md:39; diagnostics/multimode_20261108/campaign.py:153,180",
+      "stated": "The trace ready field saves C++ driver.ready, with command_in_actual_mode separate.",
+      "actual": "Candidate ready now has the declared meaning. Baseline ready is active, derived from legacy modeled ready_at and command-mode agreement, because the baseline does not instantiate the C++ policy.",
+      "why_it_matters": "The same trace field retains two meanings without a declared baseline exception or per-result driver/readiness label.",
+      "class": "semantic"
+    }
+  ],
+  "semantic_undeclared": 1,
+  "verdict": "gaps"
+}

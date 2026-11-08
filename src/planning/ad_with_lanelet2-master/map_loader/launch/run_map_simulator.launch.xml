@@ -1,0 +1,8 @@
+<launch>
+   <!-- <include file="$(find-pkg-share simple_planning_simulator)/launch/simple_planning_simulator.launch.xml"/> -->
+  <include file="$(find-pkg-share map_loader)/launch/lanelet2_map_loader.launch.xml"/>
+   <!-- <include file="$(find-pkg-share mission_planner)/launch/mission_planning.launch.xml"/> -->
+
+   <!-- Run Rviz -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2" args="-d $(find-pkg-share map_loader)/loader.rviz"/>
+</launch>

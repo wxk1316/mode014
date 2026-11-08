@@ -1,0 +1,1962 @@
+--- a/src/rda_dwa/rda_dwa/local_route.py
++++ b/src/rda_dwa/rda_dwa/local_route.py
+@@ -0,0 +1,57 @@
++"""Bounded static configuration-space guide with complete rectangle occupancy.
++The guide is a heuristic; every executable trajectory still receives timed OBB
++validation. Long road boundaries have no distant-corner escape shortcut.
++"""
++import math,heapq
++import numpy as np
++from .motion_safety import minimum_gaps
++
++
++def route_waypoint(centre,yaw,goal,obs,geometry,margin=.12,resolution=.05,padding=.045):
++ static=[o for o in obs if o.speed<=.1]
++ if not static:return tuple(goal),True
++ sx,sy=centre;gx,gy=goal
++ xmin=min(sx,gx)-2.;xmax=max(sx,gx)+2.;ymin=min(sy,gy)-2.5;ymax=max(sy,gy)+2.5
++ nx=int(math.ceil((xmax-xmin)/resolution))+1;ny=int(math.ceil((ymax-ymin)/resolution))+1
++ if nx*ny>40000:return tuple(goal),False
++ xs=xmin+np.arange(nx)*resolution;ys=ymin+np.arange(ny)*resolution
++ xx,yy=np.meshgrid(xs,ys,indexing='ij');poses=np.c_[xx.ravel(),yy.ravel(),np.full(nx*ny,yaw)]
++ gaps=minimum_gaps(poses[:,None,:],[0.],static,geometry)
++ occupied=(gaps<margin+padding).reshape(nx,ny)
++ def index(x,y):return (max(0,min(nx-1,round((x-xmin)/resolution))),max(0,min(ny-1,round((y-ymin)/resolution))))
++ start=index(sx,sy);end=index(gx,gy)
++ if gaps.reshape(nx,ny)[start]<margin or occupied[end]:return tuple(goal),False
++ occupied[start]=False
++ def point(i):return np.array([xs[i[0]],ys[i[1]]])
++ distance={start:0.};previous={};heap=[(math.dist(start,end),0.,start)];visited=set()
++ moves=[(a,b) for a in (-1,0,1) for b in (-1,0,1) if a or b]
++ while heap:
++  _,cost,i=heapq.heappop(heap)
++  if i in visited:continue
++  visited.add(i)
++  if i==end:break
++  for a,b in moves:
++   j=(i[0]+a,i[1]+b)
++   if j[0]<0 or j[0]>=nx or j[1]<0 or j[1]>=ny or occupied[j]:continue
++   if a and b and (occupied[(i[0]+a,i[1])] or occupied[(i[0],i[1]+b)]):continue
++   candidate=cost+math.hypot(a,b)
++   if candidate<distance.get(j,math.inf):
++    distance[j]=candidate;previous[j]=i;heapq.heappush(heap,(candidate+math.dist(j,end),candidate,j))
++ if end not in visited:
++  if padding>.016:return route_waypoint(centre,yaw,goal,obs,geometry,margin,resolution,.015)
++  return tuple(goal),False
++ path=[end]
++ while path[-1]!=start:path.append(previous[path[-1]])
++ path.reverse();current=np.array([sx,sy]);chosen=point(path[min(2,len(path)-1)])
++ # Furthest locally visible waypoint, bounded distance. Stops at the first
++ # blocked shortcut rather than taking an unvalidated guide-box corner.
++ for index_ in path[1:]:
++  candidate=point(index_);length=math.dist(current,candidate)
++  if length>3.5:break
++  u=np.linspace(0,1,max(2,int(math.ceil(length/.04))+1))
++  pts=current[None,:]+u[:,None]*(candidate-current)[None,:]
++  pg=np.c_[pts,np.full(len(pts),yaw)]
++  if float(minimum_gaps(pg,[0.]*len(pg),static,geometry))<margin+max(.005,padding-.01):break
++  chosen=candidate
++ if math.dist(chosen,goal)<.15:chosen=np.array(goal)
++ return tuple(chosen),True
+--- a/src/rda_dwa/rda_dwa/realtime_ackermann.py
++++ b/src/rda_dwa/rda_dwa/realtime_ackermann.py
+@@ -96,19 +96,26 @@
+         return actor
+ 
+     def _future_refuge(self,poses,times,obs,margin):
+-        """Terminal parked refuge against each known CV actor's future ray.
+-
+-        A bounded prediction is not a guarantee for actors that change course.
+-        Unknown fixed boxes are checked by the complete geometric rollout.
++        """A parked OBB separated from each actor's complete future CV ray.
++
++        Projection on a perpendicular axis accounts for the actual parked yaw.
++        A passed actor may instead separate on the longitudinal axis. This is
++        conservative without replacing a narrow-road rectangle by its circle.
+         """
+-        safe=np.ones(len(poses),dtype=bool)
+-        end=poses[:,-1,:2]
++        safe=np.ones(len(poses),dtype=bool);end=poses[:,-1,:]
+         for o in obs:
+             if o.uncertain or o.speed<.1:continue
+-            velocity=np.array([o.vx,o.vy]);start=np.array([o.x,o.y])+velocity*(times[-1]+self.obstacle_age)
+-            rel=end-start;u=np.maximum(0.,rel@velocity/(o.speed**2))
+-            distance=np.linalg.norm(rel-u[:,None]*velocity,axis=1)
+-            safe &= distance>=self.geometry.radius+math.hypot(o.length,o.width)/2+margin
++            u=np.array([o.vx,o.vy])/o.speed;n=np.array([-u[1],u[0]])
++            start=np.array([o.x,o.y])+np.array([o.vx,o.vy])*(times[-1]+self.obstacle_age)
++            rel=end[:,:2]-start
++            def extent(axis):
++                c=np.cos(end[:,2]);s=np.sin(end[:,2])
++                body=self.geometry.length/2*np.abs(c*axis[0]+s*axis[1])+self.geometry.width/2*np.abs(-s*axis[0]+c*axis[1])
++                actor=o.length/2*abs(math.cos(o.heading)*axis[0]+math.sin(o.heading)*axis[1])+o.width/2*abs(-math.sin(o.heading)*axis[0]+math.cos(o.heading)*axis[1])
++                return body+actor
++            lateral=np.abs(rel@n)-extent(n)
++            passed=-(rel@u)-extent(u)
++            safe &= (lateral>=margin)|(passed>=margin)
+         return safe
+ 
+     def plan(self,robot,goal,obstacles,trap=None):
+@@ -117,7 +124,8 @@
+         obs=[o if hasattr(o,'vx') else obstacle_from_object(o) for o in obstacles]
+         if len(obs)>96:self.telemetry={'reason':'obstacle_capacity'};return False,0.,0.
+         centre=(robot.x+self.geometry.rear_offset*math.cos(robot.theta),robot.y+self.geometry.rear_offset*math.sin(robot.theta))
+-        local=self._guide_target(centre,goal,obs,min(deadline,begin+.015))
++        local=getattr(self,"external_guide_target",None)
++        if local is None:local=self._guide_target(centre,goal,obs,min(deadline,begin+.015))
+         dt=max(.02,min(.2,self.params.dt));acc=getattr(self.params,'command_acc',.7)
+         dec=getattr(self.params,'command_dec',1.2);jerk=getattr(self.params,'command_jerk',2.)
+         steer_rate=getattr(self.params,'command_steer_rate',math.radians(30))
+@@ -136,14 +144,15 @@
+             # A fixed world direction prevents left/right chattering. The final
+             # choice still has to pass time-indexed physical collision checks.
+             side=e['side'] or 1
+-            local=tuple(e['origin']+1.1*e['axis']+side*1.5*normal)
++            local=tuple(e['origin']+1.1*e['axis']+side*getattr(self.params,"refuge_lateral_m",1.2)*normal)
+             vmax=min(self.params.max_linear_velocity,getattr(self.params,'cruise_velocity',1.))
+         horizon=max(self.params.sim_time,5. if actor is not None else 0.)
+         times=np.linspace(0.,horizon,int(math.ceil(horizon/.05))+1)
+         # Forecast targets are desired servo inputs, not instantaneous actual
+         # velocities. Include intermediate lower targets for gradual braking;
+         # sampling only zero and near-current speed causes stop/start pulses.
+-        velocities=np.unique(np.r_[0.,np.linspace(0. if forecast else min(vmax,max(0.,robot.v-dec*dt)),vmax,9),min(vmax,max(0.,robot.v))])
++        waypoint_speed=min(vmax,max(.025,math.dist(centre,local)/3.5))
++        velocities=np.unique(np.r_[waypoint_speed,0.,np.linspace(0. if forecast else min(vmax,max(0.,robot.v-dec*dt)),vmax,9),min(vmax,max(0.,robot.v))])
+         deltas=np.unique(np.r_[np.linspace(-self.cc.ack.delta_max,self.cc.ack.delta_max,17),self.current_steer,0.])
+         vv,dd=np.meshgrid(velocities,deltas,indexing='ij');vs=vv.ravel();ds=dd.ravel()
+         vs=np.minimum(vs,np.sqrt(getattr(self.params,'lateral_acc_max',.6)*self.geometry.wheelbase/np.maximum(np.abs(np.tan(ds)),.001)))
+@@ -154,9 +163,10 @@
+             sv=[];sd=[];ss=[]
+             for side in (-1,1):
+                 if self._encounter['side'] and side!=self._encounter['side']:continue
+-                for cruise in (.45,.7,min(.95,vmax)):
+-                    for turn_time in (.7,1.1,1.5):
+-                        for brake_time in (2.4,3.2):
++                for cruise in (.6,.8,min(1.,vmax)):
++                    for turn_time in (.9,1.2,1.5,1.8):
++                        for brake_time in (2.,2.4,2.8,3.2):
++                            cruise=min(cruise,math.sqrt(getattr(self.params,"lateral_acc_max",.6)*self.geometry.wheelbase/math.tan(self.cc.ack.delta_max)))
+                             vprofile=np.where(times<brake_time,cruise,0.)
+                             # Turn out, countersteer, then settle before parking.
+                             dprofile=np.where(times<turn_time,side*self.cc.ack.delta_max,
+@@ -226,10 +236,11 @@
+             # Score each candidate against the refuge on its own side.
+             axis=self._encounter['axis'];normal=np.array([-axis[1],axis[0]])
+             for side in (-1,1):
+-                target=self._encounter['origin']+1.1*axis+side*1.5*normal
++                target=self._encounter['origin']+1.1*axis+side*getattr(self.params,"refuge_lateral_m",1.2)*normal
+                 mask=sides==side
+                 candidate_dist=np.linalg.norm(end[:,:2]-target,axis=1)
+                 score[mask]+=3*(dist[mask]-candidate_dist[mask])
++        if actor is not None:score+=4.*np.minimum(gaps,.5)
+         # Prefer a still-feasible continuation over repeatedly restarting turn-out.
+         if np.any(continuation&feasible):score[continuation&feasible]+=100.
+         score[~feasible]=-np.inf
+--- a/src/rda_dwa/rda_dwa/multimode_planner.py
++++ b/src/rda_dwa/rda_dwa/multimode_planner.py
+@@ -0,0 +1,242 @@
++"""ACK/CRAB mode-local planning with explicit stationary switch occupancy.
++ACK remains the calibrated planner. Mode candidates compare time to the SAME
++local waypoint. Mode selection is committed by the supervisor, never a tracker
++error threshold. Models and returned references carry body yaw, not path yaw.
++"""
++import math,time
++import numpy as np
++from .crab_model import CrabParams,rollout_crab
++from .motion_safety import to_centres,minimum_gaps
++
++class MultiModePlanner:
++    supports_multimode=True
++    def __init__(self,ack):
++        self.ack=ack;self.params=ack.params;self.geometry=ack.geometry
++        self.reference=[];self.telemetry={};self.current_mode=0;self.mode_epoch=0
++        self._guide_cache=None;self._guide_at=-1e9;self._guide_key=None;self._reverse_schedule=None;self.current_steer=0.;self.obstacle_age=0.;self.current_acc=0.;self.current_steer_rate=0.
++    def __getattr__(self,name):
++        ack=self.__dict__.get('ack')
++        if ack is None:raise AttributeError(name)
++        return getattr(ack,name)
++    def crab_params(self):
++        return CrabParams(v_max=getattr(self.params,'crab_v_max',.5),beta_rate=math.radians(getattr(self.params,'crab_beta_rate_deg',30.)),acc=getattr(self.params,'command_acc',.7),dec=getattr(self.params,'command_dec',1.2),jerk=getattr(self.params,'command_jerk',2.))
++    def guide(self,robot,goal,obs):
++        from .local_route import route_waypoint
++        centre=(robot.x+.345*math.cos(robot.theta),robot.y+.345*math.sin(robot.theta));now=getattr(robot,'planning_stamp',0.)
++        key=(tuple(goal),round(robot.theta/.2))
++        small=[o for o in obs if o.speed<=.1 and o.length<4. and o.width<2.]
++        if len(small)==1 and self.current_mode==0:
++            point=self.ack._guide_target(centre,goal,obs,time.perf_counter()+.015)
++            if math.dist(centre,point)<8.:self._guide_found=True;return point
++        if self._guide_cache is None or key!=self._guide_key or now-self._guide_at>.5 or math.dist(centre,self._guide_cache)<.25:
++            point,found=route_waypoint(centre,robot.theta,goal,obs,self.geometry,getattr(self.params,'safety_margin',.12))
++            self._guide_cache=point;self._guide_at=now;self._guide_key=key;self._guide_found=found
++        return self._guide_cache
++    def crab_reorientation(self,robot,goal,obs):
++        from .local_route import route_waypoint
++        from .motion_safety import spin_is_safe
++        centre=(robot.x+.345*math.cos(robot.theta),robot.y+.345*math.sin(robot.theta))
++        desired=math.atan2(goal[1]-centre[1],goal[0]-centre[0])
++        for yaw in (getattr(self,'_task_yaw',desired),getattr(self,'_task_yaw',desired)+math.pi/2,getattr(self,'_task_yaw',desired)-math.pi/2,desired,desired+math.pi/2,desired-math.pi/2):
++            if abs((yaw-robot.theta+math.pi)%(2*math.pi)-math.pi)<math.radians(1.5):continue
++            point,found=route_waypoint(centre,yaw,goal,obs,self.geometry,getattr(self.params,'safety_margin',.12))
++            forward=(point[0]-centre[0])*math.cos(yaw)+(point[1]-centre[1])*math.sin(yaw)
++            if found and spin_is_safe(*centre,robot.theta,yaw,obs,self.geometry,self.obstacle_age):return yaw
++        return None
++    def plan_crab(self,robot,goal,obs,local=None):
++        cp=self.crab_params();centre=np.array([robot.x+.345*math.cos(robot.theta),robot.y+.345*math.sin(robot.theta)])
++        target=np.array(local if local is not None else self.guide(robot,goal,obs));offset=target-centre
++        if not getattr(self,'_guide_found',True):
++            from .local_route import route_waypoint
++            from .motion_safety import spin_is_safe
++            desired=math.atan2(goal[1]-centre[1],goal[0]-centre[0])
++            for yaw in (getattr(self,'_task_yaw',desired),getattr(self,'_task_yaw',desired)+math.pi/2,getattr(self,'_task_yaw',desired)-math.pi/2,desired,desired+math.pi/2,desired-math.pi/2):
++                if abs((yaw-robot.theta+math.pi)%(2*math.pi)-math.pi)<math.radians(1.5):continue
++                _,found=route_waypoint(centre,yaw,goal,obs,self.geometry,getattr(self.params,'safety_margin',.12))
++                if found and spin_is_safe(*centre,robot.theta,yaw,obs,self.geometry,self.obstacle_age):
++                    self.reference=[];self.telemetry=dict(reason='blocked',route_yaw=yaw,guide_target=goal,motion_mode='CRAB',forecast_progress=0.)
++                    return False,0.,0.
++        direction=(math.atan2(offset[1],offset[0])-robot.theta+math.pi)%(2*math.pi)-math.pi
++        motion_sign=1.
++        if abs(direction)>math.pi/2+.02:
++            motion_sign=-1.;direction=(direction+math.pi+math.pi)%(2*math.pi)-math.pi
++        if abs(direction)>math.pi/2+.02:
++            yaw=self.crab_reorientation(robot,goal,obs)
++            if yaw is not None:
++                self.reference=[];self.telemetry=dict(reason='blocked',route_yaw=yaw,guide_target=goal,motion_mode='CRAB',forecast_progress=0.);return False,0.,0.
++            self.reference=[];self.telemetry={'reason':'crab_heading_unreachable','guide_target':tuple(target)};return False,0.,0.
++        beta=float(np.clip(direction,-math.pi/2,math.pi/2));dist=math.dist(centre,goal)
++        brake_delay=getattr(self.params,'actuator_delay_s',.1)+.25+cp.acc/cp.jerk
++        cap=min(cp.v_max,max(0.,math.sqrt((cp.dec*brake_delay)**2+2*cp.dec*max(0.,dist-.18))-cp.dec*brake_delay))
++        waypoint_speed=min(cap,max(.025,math.dist(centre,target)/3.5))
++        speeds=np.unique(np.r_[0.,np.linspace(0.,cap,6),min(cap,robot.v),waypoint_speed])
++        betas=np.unique(np.clip(np.r_[beta,self.current_steer,beta+np.radians([-15,-7,0,7,15]),0.],-math.pi/2,math.pi/2))
++        vv,bb=np.meshgrid(speeds*motion_sign,betas,indexing='ij')
++        poses,vel,ts,angles=rollout_crab(robot.x,robot.y,robot.theta,robot.v,self.current_steer,vv.ravel(),bb.ravel(),max(3.,getattr(self.params,'sim_time',3.)),params=cp,initial_acc=self.current_acc*(-1 if getattr(robot,"command_speed",0.)<0 else 1),initial_beta_rate=self.current_steer_rate,initial_sign=-1 if getattr(robot,"command_speed",0.)<0 else 1)
++        centres=to_centres(poses,self.geometry);gaps=minimum_gaps(centres,ts,obs,self.geometry,self.obstacle_age,np.maximum(vel,np.c_[vel[:,1:],vel[:,-1]])*.025+.002)
++        # Short-horizon command must retain a independently checked braking tail.
++        margin=getattr(self.params,'safety_margin',.12);progress=np.linalg.norm(offset)-np.linalg.norm(centres[:,-1,:2]-target,axis=1)
++        score=3*progress-.12*np.abs(bb.ravel()-self.current_steer)+.08*vv.ravel()+.1*np.minimum(gaps,.4)
++        score[gaps<margin]=-np.inf
++        current_sign=-1. if getattr(robot,"command_speed",0.)<-.001 else 1.
++        if robot.v>.035 and motion_sign!=current_sign:score[np.abs(vv.ravel())>.001]=-np.inf
++        if not np.any(np.isfinite(score)):
++            yaw=self.crab_reorientation(robot,goal,obs)
++            if yaw is not None:
++                self.reference=[];self.telemetry=dict(reason='blocked',route_yaw=yaw,guide_target=goal,motion_mode='CRAB',forecast_progress=0.);return False,0.,0.
++            self.reference=[];self.telemetry={'reason':'blocked','guide_target':tuple(target),'motion_mode':'CRAB'};return False,0.,0.
++        k=int(np.argmax(score));v=float(vv.ravel()[k]);b=float(bb.ravel()[k]);self.reference=[]
++        if abs(v)<.005 and robot.v<.035 and abs(beta-self.current_steer)>math.radians(1):
++            wait=abs(beta-self.current_steer)/cp.beta_rate+.3
++            st=np.linspace(0.,wait,max(2,int(math.ceil(wait/.05))+1));park=np.tile([robot.x,robot.y,robot.theta],(len(st),1))
++            pg=float(minimum_gaps(to_centres(park,self.geometry),st,obs,self.geometry,self.obstacle_age,.002))
++            if pg>=margin:
++                self.telemetry=dict(reason='crab_prepare',selected_beta=beta,crab_reverse=motion_sign<0,guide_target=tuple(target),forecast_progress=0.,motion_mode='CRAB')
++                return True,0.,beta
++        if abs(v)>.005 or robot.v>.025:self.reference=[(float(q[0]),float(q[1]),float(q[2]),v,float(t),b) for q,t in zip(poses[k],ts)]
++        reason='crab_motion' if abs(v)>.005 else ('goal_braking' if robot.v>.025 else ('crab_prepare' if abs(b-self.current_steer)>math.radians(1) else 'crab_hold'))
++        self.telemetry=dict(reason=reason,motion_mode='CRAB',crab_reverse=(v<0 or (v==0 and current_sign<0)),guide_target=tuple(target),selected_beta=b,forecast_progress=float(progress[k]),min_gap=float(gaps[k]) if math.isfinite(float(gaps[k])) else None,candidates=len(score))
++        return True,v,b
++    def switch_candidate(self,robot,goal,obs,local=None):
++        """Zero-speed preparation inside >=3s switching plus 4s translation.
++        Only queried near standstill: stopping from current speed is not omitted.
++        """
++        if robot.v>.035:return None
++        cp=self.crab_params();centre=np.array([robot.x+.345*math.cos(robot.theta),robot.y+.345*math.sin(robot.theta)])
++        target=np.array(local if local is not None else self.guide(robot,goal,obs));diff=target-centre
++        beta=(math.atan2(diff[1],diff[0])-robot.theta+math.pi)%(2*math.pi)-math.pi
++        forward_error=diff[0]*math.cos(robot.theta)+diff[1]*math.sin(robot.theta)
++        if abs(beta)>math.pi/2+1e-5:
++            if forward_error<-.03 or abs(beta)>math.pi/2+.03:
++                beta=(beta+math.pi+math.pi)%(2*math.pi)-math.pi;candidate_sign=-1.
++            else:beta=float(np.clip(beta,-math.pi/2,math.pi/2));candidate_sign=1.
++        else:candidate_sign=1.
++        wait=3.+.6+abs(self.current_steer)/cp.beta_rate
++        candidate_speed=min(cp.v_max,max(.1,math.dist(centre,target)/.8))
++        motion=min(4.,max(1.,math.dist(centre,target)/candidate_speed))
++        poses,vel,t,angles=rollout_crab(robot.x,robot.y,robot.theta,0.,beta,[candidate_sign*candidate_speed],[beta],motion,params=cp,delay=.1)
++        tail,tv,tt,tb=rollout_crab(*poses[0,-1],float(vel[0,-1]),beta,[0.],[beta],1.,params=cp,delay=0.,initial_sign=candidate_sign)
++        poses=np.concatenate((poses,tail[:,1:]),axis=1);t=np.r_[t,motion+tt[1:]]
++        wt=np.arange(0.,wait,.05);stationary=np.tile([robot.x,robot.y,robot.theta],(len(wt),1))
++        entire=np.concatenate((stationary,poses[0]));times=np.r_[wt,wait+t]
++        gap=float(minimum_gaps(to_centres(entire,self.geometry),times,obs,self.geometry,self.obstacle_age,.025*cp.v_max+.002))
++        if gap<getattr(self.params,'safety_margin',.12):return None
++        progress=math.dist(centre,target)-math.dist(to_centres(poses,self.geometry)[0,-1,:2],target)
++        if progress<min(.15,.4*math.dist(centre,target)):return None
++        return dict(mode=1,beta=beta,direction=candidate_sign,time_s=wait+math.dist(centre,target)/cp.v_max,gap=gap,progress=progress,guide_target=tuple(target))
++    def continue_reverse(self,robot,obs):
++        reference=getattr(self,'_reverse_reference',None)
++        if not reference:return None
++        best=(math.inf,0.)
++        elapsed=getattr(robot,'planning_stamp',0.)-self._reverse_started
++        for a,b in zip(reference,reference[1:]):
++            if a[4]>elapsed+.5:break
++            dx,dy=b[0]-a[0],b[1]-a[1];l2=dx*dx+dy*dy
++            u=max(0.,min(1.,((robot.x-a[0])*dx+(robot.y-a[1])*dy)/max(l2,1e-12)))
++            dist=math.hypot(robot.x-a[0]-u*dx,robot.y-a[1]-u*dy)
++            t=a[4]+u*(b[4]-a[4])
++            if t>=getattr(self,'_reverse_progress',0.)-.15 and dist<best[0]:best=(dist,t)
++        progress=max(getattr(self,'_reverse_progress',0.),best[1]);self._reverse_progress=progress
++        end=reference[-1]
++        if robot.v<.035 and math.hypot(robot.x-end[0],robot.y-end[1])<.1 and abs((robot.theta-end[2]+math.pi)%(2*math.pi)-math.pi)<math.radians(5):
++            self._reverse_reference=None;self._reverse_schedule=None;return None
++        from .reverse_tracking_forecast import forecast
++        predicted,vel,times=forecast(reference,robot.x,robot.y,robot.theta,robot.v,self.current_steer,
++            getattr(robot,'command_speed',-robot.v),-self.current_acc,self.current_steer_rate,self.geometry,
++            phase=max(0.,elapsed),rate=getattr(self.params,'command_steer_rate',math.radians(45)))
++        centres=to_centres(predicted,self.geometry)
++        gap=float(minimum_gaps(centres,times,obs,self.geometry,self.obstacle_age,.04)[0])
++        if gap<getattr(self.params,'safety_margin',.12):return None
++        # Keep the ORIGINAL phase geometry; a noisy replan must not restart the
++        # turn-out phase and postpone countersteering indefinitely.
++        self.reference=reference;self.telemetry=dict(reason='motion',motion_mode='ACK',reverse=True,committed_refuge=True,latched_macro=True,macro_start=self._reverse_started,min_gap=gap,forecast_progress=0.)
++        return True,reference[0][3],reference[0][3]*math.tan(reference[0][5])/self.geometry.wheelbase
++    def reverse_candidate(self,robot,obs):
++        from .signed_ack import rollout_reverse
++        ts=np.linspace(0.,7.,141);vs=[];ds=[];continuation=False
++        stamp=getattr(robot,'planning_stamp',0.)
++        if self._reverse_schedule is not None:
++            schedule=self._reverse_schedule;elapsed=stamp-schedule['stamp']
++            if elapsed<7.:
++                vs.append(np.interp(ts+elapsed,ts,schedule['v'],right=0.));ds.append(np.interp(ts+elapsed,ts,schedule['d'],right=0.));continuation=True
++            else:self._reverse_schedule=None
++        if robot.v>.035 and not continuation:return None
++        for amplitude in (math.radians(20),math.radians(25)):
++            for cruise in (.6,.8,1.):
++                for turn in (1.8,2.1,2.4,2.7):
++                    for brake in (3.2,3.6,4.,4.4):
++                        for side in (-1,1):
++                            vs.append(np.where(ts<brake,cruise,0.));ds.append(np.where(ts<turn,side*amplitude,np.where(ts<2*turn,-side*amplitude,0.)))
++        poses,vel,tt,angles=rollout_reverse(robot.x,robot.y,robot.theta,robot.v,self.current_steer,vs,ds,self.geometry,initial_acc=-self.current_acc,initial_rate=self.current_steer_rate,delay=getattr(self.params,"actuator_delay_s",.1),rate=getattr(self.params,'command_steer_rate',math.radians(45)))
++        centres=to_centres(poses,self.geometry);sweep=np.maximum(vel,np.c_[vel[:,1:],vel[:,-1]])*(1.+math.tan(math.pi/6)/.69*self.geometry.radius)*.025+.002
++        gaps=minimum_gaps(centres,tt,obs,self.geometry,self.obstacle_age,sweep)
++        refuge=self.ack._future_refuge(centres,tt,obs,.22)
++        heading=np.abs((centres[:,-1,2]-robot.theta+math.pi)%(2*math.pi)-math.pi)<math.radians(15)
++        safe=(gaps>=.22)&refuge&(vel[:,-1]<.035)&heading
++        if not np.any(safe):return None
++        scores=np.where(safe,gaps-.02*np.linalg.norm(centres[:,-1,:2]-centres[:,0,:2],axis=1),-np.inf)
++        if continuation and safe[0]:scores[0]+=100.
++        from .reverse_tracking_forecast import forecast
++        k=None;reference=None
++        for index in np.argsort(scores)[-8:][::-1]:
++            if not math.isfinite(float(scores[index])):continue
++            candidate=[(float(q[0]),float(q[1]),float(q[2]),-float(vt),float(t),float(bt)) for q,vt,t,bt in zip(poses[index],vs[index],tt,ds[index])]
++            predicted,pv,pt=forecast(candidate,robot.x,robot.y,robot.theta,robot.v,self.current_steer,
++                getattr(robot,'command_speed',-robot.v),-self.current_acc,self.current_steer_rate,self.geometry,
++                rate=getattr(self.params,'command_steer_rate',math.radians(45)))
++            pg=float(minimum_gaps(to_centres(predicted,self.geometry),pt,obs,self.geometry,self.obstacle_age,.04)[0])
++            if pg>=.18 and self.ack._future_refuge(to_centres(predicted,self.geometry),pt,obs,.18)[0]:
++                k=int(index);reference=candidate;break
++        if k is None:return None
++        v=float(vs[k][0]);b=float(ds[k][0])
++        if not(continuation and k==0):self._reverse_schedule=dict(v=vs[k],d=ds[k],stamp=stamp)
++        self._reverse_reference=reference;self._reverse_started=stamp;self._reverse_progress=0.
++        return -v,b,reference,float(gaps[k])
++    def plan(self,robot,goal,obs,trap=None):
++        if not hasattr(self,'_task_yaws'):self._task_yaws={}
++        if tuple(goal) not in self._task_yaws:self._task_yaws[tuple(goal)]=robot.theta
++        self._task_goal=tuple(goal);self._task_yaw=self._task_yaws[tuple(goal)]
++        if self.current_mode==1:return self.plan_crab(robot,goal,obs)
++        if getattr(self,'_reverse_reference',None) is not None:
++            continued=self.continue_reverse(robot,obs)
++            if continued is not None:return continued
++        a=self.ack;a.current_steer=self.current_steer;a.obstacle_age=self.obstacle_age;a.current_acc=self.current_acc;a.current_steer_rate=self.current_steer_rate
++        centre=np.array([robot.x+.345*math.cos(robot.theta),robot.y+.345*math.sin(robot.theta)])
++        forward=np.array([math.cos(robot.theta),math.sin(robot.theta)])
++        approaching=[o for o in obs if not o.uncertain and o.speed>.1 and (np.array([o.x,o.y])-centre)@forward>.3 and np.array([o.vx,o.vy])@forward<-.15 and abs((np.array([o.x,o.y])-centre)@np.array([-forward[1],forward[0]]))<1.4+o.width/2]
++        if self._reverse_schedule is None and approaching:
++            answer=a.plan(robot,goal,obs,trap)
++            if answer[0] and a.telemetry.get('min_gap',0.)>=getattr(self.params,'dynamic_forward_margin',.4):
++                self.reference=a.reference;self.telemetry=dict(a.telemetry,motion_mode='ACK');return answer
++        if self._reverse_schedule is not None or approaching:
++            reverse=self.reverse_candidate(robot,obs)
++            if reverse is not None:
++                v,b,reference,gap=reverse
++                self.reference=reference;self.telemetry=dict(reason='motion',motion_mode='ACK',reverse=True,committed_refuge=True,macro_start=self._reverse_started,selected_delta=b,min_gap=gap,forecast_progress=0.,guide_target=goal)
++                return True,v,v*math.tan(b)/self.geometry.wheelbase
++            if self._reverse_schedule is not None:
++                self.reference=[];self.telemetry=dict(reason='dynamic_wait',motion_mode='ACK',reverse=True,forecast_progress=0.,guide_target=goal)
++                return True,0.,0.
++        local=self.guide(robot,goal,obs)
++        # Feed the same local waypoint to ACK and CRAB; the timed physical
++        # collision model remains authoritative, not this geometric guide.
++        if not getattr(self,'_guide_found',True):
++            from .local_route import route_waypoint
++            from .motion_safety import spin_is_safe
++            desired=math.atan2(goal[1]-centre[1],goal[0]-centre[0])
++            yaw_choice=None
++            for yaw in (self._task_yaw,self._task_yaw+math.pi/2,self._task_yaw-math.pi/2,desired,desired+math.pi/2,desired-math.pi/2):
++                error=abs((yaw-robot.theta+math.pi)%(2*math.pi)-math.pi)
++                if error<math.radians(8):continue
++                _,found=route_waypoint(centre,yaw,goal,obs,self.geometry,getattr(self.params,'safety_margin',.12))
++                if found and spin_is_safe(*centre,robot.theta,yaw,obs,self.geometry,self.obstacle_age):
++                    yaw_choice=yaw;break
++            self.reference=[];
++            if yaw_choice is not None:
++                self.telemetry=dict(reason='blocked',route_yaw=yaw_choice,guide_target=goal,motion_mode='ACK',forecast_progress=0.)
++                return False,0.,0.
++            self.telemetry=dict(reason='blocked',guide_no_route=True,guide_target=goal,motion_mode='ACK',forecast_progress=0.)
++            return False,0.,0.
++        a.external_guide_target=local
++        answer=a.plan(robot,goal,obs,trap);self.reference=a.reference;self.telemetry=dict(a.telemetry,motion_mode='ACK');return answer
++    def set_last_cmd(self,v,w):self.ack.set_last_cmd(v,w)
+--- a/src/rda_dwa/rda_dwa/motion_safety.py
++++ b/src/rda_dwa/rda_dwa/motion_safety.py
+@@ -128,8 +128,9 @@
+     rear[:,0,:]=np.stack((xx,yy,th),axis=1);vv[:,0]=v
+     steering[:,0]=delta;accelerations[:,0]=acceleration;rates[:,0]=rate
+     for j in range(1,len(times)):
+-        target_v=vs[:,j] if vs.ndim==2 else vs
+-        target_d=ds[:,j] if ds.ndim==2 else ds
++        delayed=max(0,int(np.searchsorted(times,times[j]-delay,side="right")-1))
++        target_v=vs[:,delayed] if vs.ndim==2 else vs
++        target_d=ds[:,delayed] if ds.ndim==2 else ds
+         if times[j]<=delay:target_v=vec(speed);target_d=vec(steer)
+         if jerk is None:v+=np.clip(target_v-v,-dec*step,acc*step)
+         else:
+--- a/src/rda_dwa/rda_dwa/signed_ack.py
++++ b/src/rda_dwa/rda_dwa/signed_ack.py
+@@ -0,0 +1,24 @@
++"""Signed ACK rear-reference forecast. Direction reversals require body stop.
++Magnitude actuator dynamics match the forward model; yaw uses signed velocity.
++"""
++import math
++import numpy as np
++from .motion_safety import speed_step,steering_step
++
++
++def rollout_reverse(x,y,yaw,speed,steer,vtargets,dtargets,geometry,horizon=7.,dt=.05,initial_acc=0.,initial_rate=0.,delay=.1,rate=math.radians(45)):
++ vt=np.asarray(vtargets,float);ds=np.asarray(dtargets,float)
++ if vt.ndim==1:vt=vt[:,None]
++ if ds.ndim==1:ds=ds[:,None]
++ n=max(len(vt),len(ds));ts=np.linspace(0,horizon,int(math.ceil(horizon/dt))+1);h=ts[1]-ts[0]
++ vt=np.broadcast_to(vt,(n,len(ts))) if vt.shape[1]==1 else vt;ds=np.broadcast_to(ds,(n,len(ts))) if ds.shape[1]==1 else ds
++ xx=np.full(n,float(x));yy=np.full(n,float(y));th=np.full(n,float(yaw));v=np.full(n,abs(speed));a=np.full(n,float(initial_acc));b=np.full(n,float(steer));r=np.full(n,float(initial_rate))
++ poses=np.empty((n,len(ts),3));vel=np.empty((n,len(ts)));angles=np.empty_like(vel)
++ poses[:,0]=np.c_[xx,yy,th];vel[:,0]=v;angles[:,0]=b
++ for i in range(1,len(ts)):
++  j=max(0,int(np.searchsorted(ts,ts[i]-delay,side="right")-1))
++  target_v=vt[:,j] if ts[i]>delay else abs(speed);target_b=ds[:,j] if ts[i]>delay else steer
++  v,a=speed_step(v,a,target_v,h,.7,1.2,2.);b,r=steering_step(b,r,target_b,h,rate,math.radians(100))
++  w=-v*np.tan(b)/geometry.wheelbase;xx-=v*np.cos(th+w*h/2)*h;yy-=v*np.sin(th+w*h/2)*h;th+=w*h
++  poses[:,i]=np.c_[xx,yy,th];vel[:,i]=v;angles[:,i]=b
++ return poses,vel,ts,angles
+--- a/src/rda_dwa/rda_dwa/reverse_tracking_forecast.py
++++ b/src/rda_dwa/rda_dwa/reverse_tracking_forecast.py
+@@ -0,0 +1,45 @@
++"""Bounded closed-loop reverse tracking forecast for a committed macro path.
++References use rear coordinates and body yaw. Plant integration is separated
++from the speed/steering controller, including its command transport delay.
++"""
++import math
++from collections import deque
++import numpy as np
++from .motion_safety import speed_step,steering_step
++
++
++def forecast(reference,x,y,yaw,speed,steer,command_speed,acc,steer_rate,geometry,
++             horizon=7.,dt=.05,phase=0.,rate=math.radians(45),ky=1.5,kth=1.8):
++ q=np.asarray(reference,float);schedule=q[:,[4,3,5]].copy();keep=np.r_[True,np.hypot(np.diff(q[:,0]),np.diff(q[:,1]))>1e-5];q=q[keep]
++ if len(q)<2:raise ValueError('reverse reference has no geometry')
++ arc=np.r_[0.,np.cumsum(np.hypot(np.diff(q[:,0]),np.diff(q[:,1])))];angles=np.unwrap(q[:,2])
++ sx=q[:-1,0];sy=q[:-1,1];dx=np.diff(q[:,0]);dy=np.diff(q[:,1]);l2=np.maximum(dx*dx+dy*dy,1e-12)
++ ts=np.linspace(0,horizon,int(math.ceil(horizon/dt))+1);h=ts[1]-ts[0]
++ cmd_v=abs(command_speed);cmd_delta=steer;cmd_a=acc;cmd_rate=steer_rate
++ lag_speed=max(0.,abs(command_speed)-acc*.08)
++ v=max(0.,speed) if speed<.1 else .3*max(0.,speed)+.7*lag_speed
++ delta=steer-steer_rate*.08;actual_target=(v,delta);pending=deque()
++ poses=[];vel=[]
++ for t in ts:
++  poses.append((x,y,yaw));vel.append(v)
++  u=np.clip(((x-sx)*dx+(y-sy)*dy)/l2,0.,1.);distance=(x-sx-u*dx)**2+(y-sy-u*dy)**2
++  i=int(np.argmin(distance));s=arc[i]+float(u[i])*(arc[i+1]-arc[i])
++  xr=np.interp(s,arc,q[:,0]);yr=np.interp(s,arc,q[:,1]);theta=np.interp(s,arc,angles)
++  vr=abs(float(np.interp(phase+t,schedule[:,0],schedule[:,1])));ff=float(np.interp(phase+t,schedule[:,0],schedule[:,2]))
++  remaining=arc[-1]-s
++  if vr<.01 and remaining>.08:
++   vr=min(.4,math.sqrt(2.*1.2*max(0.,remaining-.05)))
++   ff=float(np.interp(s,arc,q[:,5]))
++  ey=-(x-xr)*math.sin(theta)+(y-yr)*math.cos(theta);eth=(yaw-theta+math.pi)%(2*math.pi)-math.pi
++  correction=max(-math.radians(8),min(math.radians(8),-ky*ey+kth*eth))
++  target=max(-math.pi/6,min(math.pi/6,ff+correction))
++  cmd_delta,cmd_rate=steering_step(cmd_delta,cmd_rate,target,h,rate,math.radians(100))
++  cmd_v,cmd_a=speed_step(cmd_v,cmd_a,vr,h,.7,1.2,2.)
++  pending.append((t+.08,float(cmd_v),float(cmd_delta)))
++  while pending and pending[0][0]<=t+1e-9:_,tv,td=pending.popleft();actual_target=(tv,td)
++  tv,td=actual_target;limit=.7 if tv>v else 1.2
++  v+=max(-limit*h,min(limit*h,tv-v));v=max(0.,v)
++  delta+=max(-rate*h,min(rate*h,td-delta))
++  w=-v*math.tan(delta)/geometry.wheelbase
++  x-=v*math.cos(yaw+w*h/2)*h;y-=v*math.sin(yaw+w*h/2)*h;yaw+=w*h
++ return np.asarray(poses)[None,:,:],np.asarray(vel)[None,:],ts
+--- a/src/rda_dwa/rda_dwa/crab_model.py
++++ b/src/rda_dwa/rda_dwa/crab_model.py
+@@ -0,0 +1,43 @@
++"""Mode 1 translation: yaw held, continuous +/-90 degree wheel direction.
++All poses here use the SAME rear reference as the existing ACK planner.
++Collision callers convert to the physical centre. Never use tan(beta).
++"""
++from dataclasses import dataclass
++import math
++import numpy as np
++from .motion_safety import speed_step,steering_step
++
++@dataclass
++class CrabParams:
++    beta_max: float = math.pi/2
++    beta_rate: float = math.radians(30)
++    beta_accel: float = math.radians(100)
++    v_max: float = .5
++    acc: float = .7
++    dec: float = 1.2
++    jerk: float = 2.
++    direction_acc: float = .6
++
++
++def rollout_crab(x,y,yaw,speed,beta,vs,bs,horizon=3.,dt=.05,params=None,
++                 initial_acc=0.,initial_beta_rate=0.,delay=.1,initial_sign=1.):
++    p=params or CrabParams();vs=np.asarray(vs,dtype=float).reshape(-1);bs=np.asarray(bs,dtype=float).reshape(-1)
++    n=max(len(vs),len(bs));vs=np.broadcast_to(vs,(n,));bs=np.broadcast_to(bs,(n,))
++    if not np.all(np.isfinite(vs)) or not np.all(np.isfinite(bs)):raise ValueError('non-finite CRAB command')
++    if np.any(np.abs(bs)>p.beta_max+1e-8):raise ValueError('CRAB angle outside physical range')
++    ts=np.linspace(0,horizon,int(math.ceil(horizon/dt))+1);h=ts[1]-ts[0]
++    poses=np.empty((n,len(ts),3));vel=np.empty((n,len(ts)));angles=np.empty_like(vel)
++    xx=np.full(n,float(x));yy=np.full(n,float(y));v=np.full(n,max(0.,speed));b=np.full(n,float(beta));a=np.full(n,float(initial_acc));r=np.full(n,float(initial_beta_rate))
++    poses[:,0]=np.column_stack((xx,yy,np.full(n,yaw)));vel[:,0]=v;angles[:,0]=b
++    for i in range(1,len(ts)):
++        sign=np.where(np.abs(vs)>.0001,np.sign(vs),initial_sign)
++        target_v=np.minimum(np.abs(vs),p.v_max);target_b=bs
++        if ts[i]<=delay:target_v=np.full(n,speed);target_b=np.full(n,float(beta))
++        # Direction changes are bounded by v*beta_dot as well as servo rate.
++        max_rate=np.minimum(p.beta_rate,p.direction_acc/np.maximum(v,.05))
++        b,r=steering_step(b,r,target_b,h,max_rate,p.beta_accel)
++        b=np.clip(b,-p.beta_max,p.beta_max)
++        v,a=speed_step(v,a,target_v,h,p.acc,p.dec,p.jerk)
++        xx+=sign*v*np.cos(yaw+b)*h;yy+=sign*v*np.sin(yaw+b)*h
++        poses[:,i]=np.column_stack((xx,yy,np.full(n,yaw)));vel[:,i]=v;angles[:,i]=b
++    return poses,vel,ts,angles
+--- a/src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
+@@ -18,7 +18,7 @@
+ 
+ from geometry_msgs.msg import Twist
+ from nav_msgs.msg import Odometry, Path
+-from std_msgs.msg import String, Int32, Float32
++from std_msgs.msg import String, Int32, Float32, Float32MultiArray
+ try:
+     from control_msgs.msg import CarCtr
+ except Exception:
+@@ -85,6 +85,8 @@
+         self.declare_parameter('use_atomic_plan',True)
+         self._atomic=bool(self.get_parameter('use_atomic_plan').value)
+         self._plan_seq=0;self._last_plan_stamp=-1e9;self._last_plan_reason='no_plan'
++        self._sub_driver_mode=self.create_subscription(String,'/car_driver/mode_state',self._cb_driver_mode,qos)
++        self._pub_body_motion=self.create_publisher(Float32MultiArray,'/rda/body_motion',5)
+         self._sub_plan=self.create_subscription(String,'/rda/plan',self._cb_plan,qos)
+         self._sub_obs=self.create_subscription(ObstacleArray,'/rda/obstacles',self._cb_obstacles,qos)
+         self._sub_car_state=self.create_subscription(CarState,'/car_state',self._cb_car_state,qos)
+@@ -159,6 +161,7 @@
+         self.core.set_reference(pts, now, self._traj_seq)
+ 
+     def _cb_clear(self, msg: Int32):
++        if self._atomic:return
+         """/rda/traj_clear：模式切换 / trap 激活 / trap 退出 → 清空跟踪路径。"""
+         if not self._atomic:self.core.consume_clear(int(msg.data))
+ 
+@@ -198,17 +201,33 @@
+         self.get_logger().info(
+             f"[DIAG] CLEAR_PATH reason={reason} planner_reason={getattr(self, '_last_plan_reason', 'no_plan')}")
+ 
++    def _cb_driver_mode(self,msg):
++        try:self.core.set_driver_state(json.loads(msg.data),self._now())
++        except (ValueError,TypeError,KeyError):pass
++
+     def _cb_plan(self,msg):
+-        if not self._atomic:return
++        if not self._atomic:
++            try:
++                packet=json.loads(msg.data)
++                if int(packet.get('schema_version',1))==2 and packet.get('motion_mode')!='ACK':
++                    self._last_plan_reason='multimode_requires_atomic';self.core.set_safety(self._last_plan_reason)
++            except (ValueError,TypeError):pass
++            return
+         try:
+             p=json.loads(msg.data);now=self._now();stamp=float(p['stamp'])
+             if not math.isfinite(stamp) or stamp<=self._last_plan_stamp or now-stamp>self.core.p.cmd_timeout:return
+             target=float(p['target']);session=int(p['session']);mode=int(p['mode'])
+-            if mode not in (0,1) or not math.isfinite(target):raise ValueError('plan fields')
++            v2=int(p.get('schema_version',1))==2
++            if (not v2 and mode not in (0,1)) or not math.isfinite(target):raise ValueError('plan fields')
+             reason=str(p['reason']);self._last_plan_reason=reason
+             self._last_plan_stamp=stamp;self._last_cmd_ts=now;self._spin_target=target
+-            healthy=reason in ('motion','goal_braking','dynamic_braking','dynamic_wait','spin_requested','spin_active','spin_reached','reached','mode_return_wait')
++            healthy=reason in ('motion','goal_braking','dynamic_braking','dynamic_wait','spin_requested','spin_active','spin_reached','reached','mode_return_wait','crab_requested','crab_motion','crab_prepare','crab_hold','mode_switch_wait','recovery_motion')
+             self.core.set_safety('' if healthy else reason)
++            if v2:
++                packet=dict(p,spin_session=session,spin_target=target,road_base=p.get('reference',[]))
++                self.core.set_plan(packet,now,int(p.get('mode_epoch',0))*1000000+self._plan_seq)
++                self._plan_seq+=1;self._last_traj_ts=now
++                return
+             self.core.set_traj_mode(mode,now,session,target)
+             if mode==0:
+                 self._plan_seq+=1;self.core.set_reference(p.get('reference',[]),now,self._plan_seq);self._last_traj_ts=now
+@@ -247,9 +266,11 @@
+         elif now-self.core._pose_at>self.core.p.localization_timeout:reason='localization_timeout'
+         elif now-self.core._obstacle_at>self.core.p.obstacle_timeout:reason='obstacle_timeout'
+         if reason:self.core.set_safety(reason)
+-        elif self._last_plan_reason in ('motion','goal_braking','dynamic_braking','dynamic_wait','spin_requested','spin_active','spin_reached','reached','mode_return_wait') and self.core._safety_reason not in ('invalid_localization','localization_jump'):
++        elif self._last_plan_reason in ('motion','goal_braking','dynamic_braking','dynamic_wait','spin_requested','spin_active','spin_reached','reached','mode_return_wait','crab_requested','crab_motion','crab_prepare','crab_hold','mode_switch_wait','recovery_motion') and self.core._safety_reason not in ('invalid_localization','localization_jump'):
+             self.core.set_safety('')
+         cmd=self.core.step(now,dt,self._spin_target)
++        e=self.core._velocity_estimator
++        self._pub_body_motion.publish(Float32MultiArray(data=[float(e.vx_body),float(e.vy_body),float(e.omega),float(e.valid),float(max(0.,now-self.core._pose_at))]))
+         self._publish(cmd)
+         self._control_seq+=1
+         packet=dict(schema_version=1,producer_monotonic_ns=time.monotonic_ns(),producer_ros_ns=self.get_clock().now().nanoseconds,sequence=self._control_seq,raw_dt_s=raw_dt,used_dt_s=dt,duration_s=time.monotonic()-begin,mode=self.core.mode,stage=self.core._spin_stage,session=self.core._session,result=self.core._spin_result,target_yaw_rad=self.core._spin_target,safety_reason=self.core._safety_reason,command=cmd,tracking=self.core.diag,measured_v_estimate=self.core._v_meas,yaw_rate_estimate=self.core._yaw_rate,centre=self.core._centre,rear_pose=[self.core._px,self.core._py,self.core._pyaw],pose_source_stamp=self.core._pose_stamp,pose_arrival_age_s=now-self.core._pose_at,obstacle_source_stamp=self.core._obstacle_source,obstacle_age_s=now-self.core._obstacle_at,wheel_max_cached=self.core._wheel_max,wheel_arrival_age_s=now-self.core._wheel_at,mode_echo=self.core._mode_echo,mode_echo_age_s=now-self.core._mode_echo_at,reference_seq=self.core._ref_seq,reference_age_s=now-self.core._last_traj_ts,reference_points=len(self.core._ref),steer_rate_rad_s=self.core._steer_rate,acceleration_state=self.core._acc,pid_integral=self.core._pid_i)
+--- a/src/rda_dwa_real/rda_dwa_real/multimode_tracking.py
++++ b/src/rda_dwa_real/rda_dwa_real/multimode_tracking.py
+@@ -0,0 +1,201 @@
++"""Version-2 tracker/session execution, reusing ACK LQR and spin gains.
++Driver READY is the only mechanical completion signal. The tracker separately
++confirms body stop and accounts for zero-speed angle preparation.
++"""
++import math
++import numpy as np
++from rda_dwa.crab_model import CrabParams,rollout_crab
++from rda_dwa.motion_safety import speed_step,steering_step,to_centres,minimum_gaps
++
++MODES={'ACK':0,'CRAB':1,'SPIN':4}
++
++class MultimodeTrackerMixin:
++    def init_multimode(self):
++        self._motion_sign=1.;self._v2=False;self._v2_mode=0;self._v2_desired=0;self._v2_phase='RUN'
++        self._v2_pending=None;self._v2_at=0.;self._v2_stop_at=None;self._v2_prepare=0.
++        self._spin_stop_since=None;self._driver_state=None;self._driver_at=-1e9;self._v2_epoch=-1;self._mode_echo_rx=-1e9
++    def set_driver_state(self,state,now):
++        actual=int(state.get('actual_mode',-1))
++        if actual not in (0,1,4):return
++        self._driver_state=dict(state);self._driver_at=now
++        self._v2_mode=actual
++    def set_plan(self,plan,now,seq):
++        mode=str(plan.get('motion_mode','ACK'))
++        if mode not in MODES:raise ValueError('unknown motion_mode')
++        epoch=int(plan.get('mode_epoch',0))
++        if epoch<self._v2_epoch:return
++        if epoch>self._v2_epoch:self._spin_result=None;self._spin_stop_since=None
++        self._last_v2_reason=plan.get('reason','');self._v2=True;self._v2_epoch=epoch;self._session=int(plan.get('spin_session',epoch))
++        self._committed_refuge=bool(plan.get('planner',{}).get('committed_refuge'));self._v2_desired=MODES[mode];self._v2_prepare=float(plan.get('prepare_angle_rad',0.))
++        self._spin_precision=float(plan.get('spin_tolerance_deg',self.p.rotate_precision_deg))
++        if not math.isfinite(self._spin_precision) or not 0.5<=self._spin_precision<=8.:raise ValueError('spin precision')
++        self._crab_yaw_ref=float(plan.get('body_yaw_ref',self._pyaw))
++        if not math.isfinite(self._crab_yaw_ref):raise ValueError('body yaw reference')
++        self._spin_target=float(plan.get('spin_target',self._pyaw))
++        if self._v2_phase in ('BRAKE','RESET') and self._v2_desired==self._v2_mode:
++            self._v2_pending=self._v2_mode
++        if not math.isfinite(self._v2_prepare) or abs(self._v2_prepare)>math.pi/2+1e-8:raise ValueError('invalid angle')
++        if self._v2_phase=='RUN' and self._v2_desired==self._v2_mode:
++            self.mode=mode
++            reference=plan.get('road_base',[])
++            if reference:
++                previous=self.mode;self.mode=self.MODE_ACK
++                self.set_reference(reference,now,seq);self.mode=previous
++                self._reverse_ref=int(plan.get('direction',-1 if math.copysign(1.,reference[0][3])<0 else 1))<0
++                if self._reverse_ref:
++                    self._reverse_raw_reference=[tuple(q) for q in reference]
++                    self._reverse_macro_start=float(plan.get('planner',{}).get('macro_start',now))
++                if self._v2_mode in (0,1) and abs(self._last_v_out)>.02 and self._reverse_ref!=(self._last_v_out<0):
++                    self._v2_pending=0;self._v2_phase='BRAKE';self._v2_at=now;self._v2_stop_at=None;self.clear_path('direction_change_stop')
++
++            else:
++                self.clear_path(plan.get('reason','empty_plan'))
++    def _mode_output(self,mode,v,angle):
++        if abs(v)>.001 and mode!=4:self._motion_sign=math.copysign(1.,v)
++        self._last_v_out=float(v);self._last_steer=float(angle)
++        return dict(enable=1,turnmode=int(mode),speed=float(v),angle=math.degrees(angle) if mode!=4 else 0.)
++    def _v2_stop(self,dt,angle=None,mode=None):
++        source=self._v2_mode if mode is None else mode
++        if source==4:
++            self._spin_w+=max(-self.p.spin_acc_max*dt,min(self.p.spin_acc_max*dt,-self._spin_w))
++            return self._mode_output(4,self._spin_w,0.)
++        sign=self._motion_sign
++        v,a=speed_step(abs(self._last_v_out),self._acc,0.,dt,self.p.acc_max,self.p.dec_max,self.p.jerk_max)
++        self._acc=float(a)
++        return self._mode_output(source,sign*float(v),self._last_steer if angle is None else angle)
++    def _v2_stopped(self,now):
++        return self._velocity_estimator.valid and now-self._pose_at<=self.p.localization_timeout and self._stopped(now)
++    def _step_v2(self,now,dt):
++        if self._safety_reason:
++            self._acc=0.;self._spin_w=0.;self._v2_stop_at=None;self._spin_stop_since=None
++            if self._v2_phase=='RESET':self._v2_phase='BRAKE'
++            self._diag={'branch':'MULTIMODE_SAFETY','reason':self._safety_reason}
++            return self._mode_output(self._v2_mode,0.,self._last_steer)
++        if self._driver_state is None or now-self._driver_at>self.p.driver_feedback_timeout:
++            self._acc=0.;self._spin_w=0.;self._v2_stop_at=None;self._spin_stop_since=None
++            if self._v2_phase=='RESET':self._v2_phase='BRAKE'
++            self._diag={'branch':'DRIVER_STALE'}
++            return self._mode_output(self._v2_mode,0.,self._last_steer)
++        if self._v2_phase=='RUN' and self._v2_desired!=self._v2_mode:
++            self._v2_pending=self._v2_desired;self._v2_phase='BRAKE';self._v2_at=now;self._v2_stop_at=None
++            self.clear_path('mode_transition');self._spin_result=None
++        if self._v2_phase!='RUN':
++            self.mode='SWITCH';self._diag={'branch':'MODE_'+self._v2_phase,'target_mode':self._v2_pending}
++            if now-self._v2_at>self.p.mode_switch_timeout:
++                self._safety_reason='mode_switch_timeout';return self._mode_output(self._v2_mode,0.,self._last_steer)
++            if self._v2_phase=='BRAKE':
++                stopped=self._v2_stopped(now)
++                self._v2_stop_at=(now if self._v2_stop_at is None else self._v2_stop_at) if stopped else None
++                if self._v2_stop_at is not None and now-self._v2_stop_at>=.3:
++                    self._v2_phase='RESET';self._zero_at=now;self._zero_duration=abs(self._last_steer)/math.radians(self.p.crab_beta_rate_deg)+.2
++                return self._v2_stop(dt)
++            if self._v2_phase=='RESET':
++                if not self._v2_stopped(now):
++                    self._v2_phase='BRAKE';self._v2_stop_at=None;return self._v2_stop(dt)
++                angle,rate=steering_step(self._last_steer,self._steer_rate,0.,dt,math.radians(self.p.crab_beta_rate_deg),math.radians(self.p.max_steer_accel_deg))
++                self._steer_rate=float(rate)
++                if now-self._zero_at>=self._zero_duration and abs(angle)<math.radians(.5):
++                    self._v2_phase='WAIT_DRIVER';self._prepare_at=now;self._prepared_target=self._v2_prepare if self._v2_pending==1 else 0.
++                    self._last_steer=0.;self._steer_rate=0.
++                return self._mode_output(self._v2_mode,0.,float(angle))
++            target=self._v2_pending
++            angle,rate=steering_step(self._last_steer,self._steer_rate,self._prepared_target,dt,math.radians(self.p.crab_beta_rate_deg),math.radians(self.p.max_steer_accel_deg))
++            self._steer_rate=float(rate)
++            state=self._driver_state
++            stopped=self._v2_stopped(now)
++            self._v2_stop_at=(now if self._v2_stop_at is None else self._v2_stop_at) if stopped else None
++            if self._v2_stop_at is not None and now-self._v2_stop_at>=.3 and state.get('ready') and int(state.get('actual_mode',-1))==target and now-self._prepare_at>=abs(self._prepared_target)/math.radians(self.p.crab_beta_rate_deg)+.25 and self._v2_stopped(now):
++                self._v2_phase='RUN';self._v2_pending=None;self.mode={0:'ACK',1:'CRAB',4:'SPIN'}[target]
++                self._last_v_out=self._acc=self._spin_w=0.;self._spin_result=None;self.clear_path('mode_ready_replan')
++            return self._mode_output(target,0.,float(angle))
++        self.mode={0:'ACK',1:'CRAB',4:'SPIN'}[self._v2_mode]
++        if not self._driver_state.get('ready'):
++            self._spin_stop_since=None;self._v2_stop_at=None
++            self._diag={'branch':'MODE_NOT_READY'};return self._mode_output(self._v2_mode,0.,self._last_steer)
++        if self._v2_mode==4:
++            err=(self._spin_target-self._pyaw+math.pi)%(2*math.pi)-math.pi
++            wanted=math.copysign(min(self.p.spin_w_max,self.p.spin_w_max*abs(err)/math.radians(self.p.rotate_decel_deg)),err) if abs(err)>math.radians(getattr(self,'_spin_precision',self.p.rotate_precision_deg)) else 0.
++            self._spin_w+=max(-self.p.spin_acc_max*dt,min(self.p.spin_acc_max*dt,wanted-self._spin_w))
++            horizon=max(.8,abs(self._yaw_rate)/self.p.spin_acc_max+.3)
++            times=np.arange(0.,horizon+.025,.05);yaw=self._pyaw;rate=self._yaw_rate;poses=[]
++            for t in times:
++                poses.append([self._centre[0],self._centre[1],yaw])
++                rate+=max(-self.p.spin_acc_max*.05,min(self.p.spin_acc_max*.05,self._spin_w-rate));yaw+=rate*.05
++            gap=float(minimum_gaps(np.asarray(poses),times,self._obstacles,self.geometry,now-self._obstacle_at,max(abs(self._spin_w),abs(self._yaw_rate))*self.geometry.radius*.025+.002))
++            if gap<self.p.safety_margin:
++                self._diag={'branch':'SPIN_EXECUTION_GUARD','min_predicted_gap':gap};return self._mode_output(4,0.,0.)
++            settled=abs(err)<=math.radians(getattr(self,'_spin_precision',self.p.rotate_precision_deg)) and abs(self._spin_w)<.03 and self._v2_stopped(now)
++            self._spin_stop_since=(now if self._spin_stop_since is None else self._spin_stop_since) if settled else None
++            if self._spin_stop_since is not None and now-self._spin_stop_since>=self.p.spin_stop_hold:self._spin_result='reached'
++            self._diag={'branch':'SPIN_RUN','spin_err':err};return self._mode_output(4,self._spin_w,0.)
++        if self._v2_mode==1 and self._last_v2_reason=='crab_prepare' and self._v2_stopped(now):
++            angle,rate=steering_step(self._last_steer,self._steer_rate,self._v2_prepare,dt,math.radians(self.p.crab_beta_rate_deg),math.radians(self.p.max_steer_accel_deg))
++            self._steer_rate=float(rate);self._diag={'branch':'CRAB_PREPARE'};return self._mode_output(1,0.,float(angle))
++        if len(self._ref)<2 or now-self._last_traj_ts>self.p.traj_timeout:
++            self._diag={'branch':'MODE_NO_REF'};return self._v2_stop(dt)
++        if self._v2_mode==0 and getattr(self,'_reverse_ref',False):return self._step_reverse(now,dt)
++        if self._v2_mode==0:
++            self._v2_bypass=True
++            try:return self.step(now,dt)
++            finally:self._v2_bypass=False
++        return self._step_crab(now,dt)
++    def _step_crab(self,now,dt):
++        s=self._project();xr,yr,theta,vr,_=self._eval_at_s(s)
++        i=min(len(self._ref)-1,max(1,self._proj_idx+1));a,b=self._ref[i-1],self._ref[i]
++        chi=math.atan2(b['y']-a['y'],b['x']-a['x'])
++        # Endpoint derivative comes from commanded beta, not body yaw.
++        beta=self._target_steer_at_s(s,chi-self._pyaw)
++        ref_sign=-1. if getattr(self,'_reverse_ref',False) else 1.
++        world=ref_sign*np.array([vr*math.cos(theta+beta),vr*math.sin(theta+beta)])+self.p.crab_position_gain*np.array([xr-self._px,yr-self._py])
++        c,ss=math.cos(self._pyaw),math.sin(self._pyaw)
++        bx=c*world[0]+ss*world[1];by=-ss*world[0]+c*world[1]
++        sign=self._motion_sign if abs(bx)<.025 else math.copysign(1.,bx)
++        wanted=min(self.p.crab_v_max,math.hypot(bx,by))
++        target=math.atan2(sign*by,max(0.,sign*bx)) if wanted>.01 else self._last_steer
++        if abs(self._last_v_out)>.02 and sign!=self._motion_sign:
++            self._diag={'branch':'CRAB_DIRECTION_BRAKE'};return self._v2_stop(dt)
++        yaw_error=abs((getattr(self,'_crab_yaw_ref',theta)-self._pyaw+math.pi)%(2*math.pi)-math.pi)
++        if yaw_error>math.radians(self.p.crab_yaw_tolerance_deg):
++            self._diag={'branch':'CRAB_YAW_FAULT'};return self._v2_stop(dt)
++        angle,rate=steering_step(self._last_steer,self._steer_rate,target,dt,math.radians(self.p.crab_beta_rate_deg),math.radians(self.p.max_steer_accel_deg));angle=float(np.clip(angle,-math.pi/2,math.pi/2));self._steer_rate=float(rate)
++        if abs(target-angle)>math.radians(12):wanted=min(wanted,.12)
++        v,a=speed_step(abs(self._last_v_out),self._acc,wanted,dt,self.p.acc_max,self.p.dec_max,self.p.jerk_max);self._acc=float(a)
++        cp=CrabParams(v_max=self.p.crab_v_max,beta_rate=math.radians(self.p.crab_beta_rate_deg))
++        poses,_,tt,_=rollout_crab(self._px,self._py,self._pyaw,self._v_meas,self._last_steer,[sign*float(v)],[angle],max(.8,self._v_meas/self.p.dec_max+.6),params=cp,initial_acc=self._acc,initial_beta_rate=self._steer_rate,initial_sign=self._motion_sign)
++        gap=float(minimum_gaps(to_centres(poses,self.geometry),tt,self._obstacles,self.geometry,now-self._obstacle_at,max(self._v_meas,float(v))*.025+.002)[0])
++        stop,_,st,_=rollout_crab(self._px,self._py,self._pyaw,self._v_meas,self._last_steer,[0.],[self._last_steer],max(1.5,self._v_meas/self.p.dec_max+.9),params=cp,initial_acc=self._acc,initial_beta_rate=self._steer_rate,initial_sign=self._motion_sign)
++        gap=min(gap,float(minimum_gaps(to_centres(stop,self.geometry),st,self._obstacles,self.geometry,now-self._obstacle_at,max(self._v_meas,float(v))*.025+.002)[0]))
++        if gap<self.p.safety_margin:
++            self._diag={'branch':'CRAB_EXECUTION_GUARD','min_predicted_gap':gap};return self._mode_output(1,0.,self._last_steer)
++        self._diag={'branch':'CRAB','e_y':math.hypot(xr-self._px,yr-self._py),'e_th':yaw_error,'min_predicted_gap':gap,'v_ref':vr,'beta':angle}
++        return self._mode_output(1,sign*float(v),angle)
++
++    def _step_reverse(self,now,dt):
++        from rda_dwa.signed_ack import rollout_reverse
++        s=self._project();xr,yr,theta,vr,_=self._eval_at_s(s)
++        raw=np.asarray(self._reverse_raw_reference,float);phase=max(0.,now-self._reverse_macro_start)
++        ff=float(np.interp(phase,raw[:,4],raw[:,5]));vr=abs(float(np.interp(phase,raw[:,4],raw[:,3])))
++        remaining=self._s_arr[-1]-s
++        if vr<.01 and remaining>.08:
++            vr=min(.4,math.sqrt(2.*self.p.dec_max*max(0.,remaining-.05)))
++            ff=self._target_steer_at_s(s,0.)
++        err=(self._pyaw-theta+math.pi)%(2*math.pi)-math.pi
++        ey=-(self._px-xr)*math.sin(theta)+(self._py-yr)*math.cos(theta)
++        correction=-self.p.reverse_position_gain*ey+self.p.reverse_heading_gain*err
++        correction=float(np.clip(correction,-math.radians(self.p.feedback_limit_deg),math.radians(self.p.feedback_limit_deg)))
++        target=float(np.clip(ff+correction,-math.pi/6,math.pi/6))
++        angle=self._steer(target,dt)
++        v,a=speed_step(abs(self._last_v_out),self._acc,min(vr,self.p.v_max),dt,self.p.acc_max,self.p.dec_max,self.p.jerk_max);self._acc=float(a)
++        from rda_dwa.reverse_tracking_forecast import forecast
++        reference=self._reverse_raw_reference
++        poses,_,tt=forecast(reference,self._px,self._py,self._pyaw,self._v_meas,self._last_steer,
++            self._last_v_out,self._acc,self._steer_rate,self.geometry,horizon=max(1.5,self._v_meas/1.2+.9),phase=phase,
++            rate=math.radians(self.p.max_steer_rate_deg),ky=self.p.reverse_position_gain,kth=self.p.reverse_heading_gain)
++        gap=float(minimum_gaps(to_centres(poses,self.geometry),tt,self._obstacles,self.geometry,now-self._obstacle_at,max(self._v_meas,float(v))*.05+.002)[0])
++        stop,_,st,_=rollout_reverse(self._px,self._py,self._pyaw,self._v_meas,self._last_steer,[0.],[self._last_steer],self.geometry,horizon=max(1.5,self._v_meas/1.2+.9),initial_acc=self._acc,initial_rate=self._steer_rate,rate=math.radians(self.p.max_steer_rate_deg))
++        brake_gap=float(minimum_gaps(to_centres(stop,self.geometry),st,self._obstacles,self.geometry,now-self._obstacle_at,max(self._v_meas,float(v))*.05+.002)[0])
++        if not getattr(self,'_committed_refuge',False):gap=min(gap,brake_gap)
++        if gap<self.p.safety_margin:
++            self._diag={'branch':'REVERSE_GUARD','min_predicted_gap':gap};return self._mode_output(0,0.,self._last_steer)
++        self._diag={'branch':'ACK_REVERSE','braking_backup_gap':brake_gap,'validated_refuge_continuation':getattr(self,'_committed_refuge',False),'e_th':err,'min_predicted_gap':gap,'v_ref':-vr}
++        return self._mode_output(0,-float(v),angle)
+--- a/src/rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py
++++ b/src/rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py
+@@ -56,6 +56,9 @@
+         self._blocked_since=None;self._episode_retries=0;self._episode_anchor=self.centre();self._cooldown=-1e9
+         self._pose_fault=False;self._pose_prior=None;self._arbit='ACK';self._session+=1;self._clear_traj_pending=True
+         self._velocity_estimator.reset()
++        if hasattr(self,'_mm_desired'):
++            if self._mm_desired==4:self._mm_desired=0;self._mm_beta=0.;self._mm_epoch+=1;self._mm_wait=self._mm_last
++            self._arbit={0:'ACK',1:'CRAB',4:'SPIN_REQUEST'}[self._mm_desired]
+     def set_obstacles(self,detections,stamp=None,frame='map',arrival=None,source_age=0.):
+         if frame!=self.cfg.algorithm_frame:
+             self._t_obs=-1e9;return
+@@ -74,6 +77,8 @@
+     def set_wheel_feedback(self,speeds,stamp=None):
+         if len(speeds)==4 and all(math.isfinite(float(v)) for v in speeds):
+             self._wheel_speeds=list(speeds);self._wheel_ts=time.monotonic() if stamp is None else stamp
++    def set_driver_state(self,state,arrival=None):
++        self._driver_state=dict(state);self._driver_arrival=time.monotonic() if arrival is None else arrival
+     def set_mode_ready(self,mode,arrival=None):
+         self._mode_ready=int(mode);self._mode_arrival=time.monotonic() if arrival is None else arrival
+     def set_tracker_cmd_speed(self,v,angle=0.,mode=0,arrival=None):
+@@ -81,8 +86,10 @@
+         if self._tracker_cmd_at is not None and mode==0 and self._tracker_mode==0:
+             dt=now-self._tracker_cmd_at
+             if .005<dt<.15:
+-                self._tracker_acc=max(-1.2,min(.7,(v-(self._tracker_cmd_v or 0.))/dt))
+-                self._tracker_steer_rate=max(-math.radians(30),min(math.radians(30),(math.radians(angle)-self._tracker_angle)/dt))
++                reverse=v<-.001 or (self._tracker_cmd_v or 0.)<-.001
++                low,high=(-.7,1.2) if reverse else (-1.2,.7)
++                self._tracker_acc=max(low,min(high,(v-(self._tracker_cmd_v or 0.))/dt))
++                self._tracker_steer_rate=max(-math.radians(getattr(self.cfg,"command_steer_rate_deg",30.)),min(math.radians(getattr(self.cfg,"command_steer_rate_deg",30.)),(math.radians(angle)-self._tracker_angle)/dt))
+         self._tracker_cmd_at=now
+         self._tracker_cmd_v=v;self._tracker_angle=math.radians(angle);self._tracker_mode=mode
+     def set_bridge_state(self,state,session=None):
+@@ -130,6 +137,9 @@
+         return min(candidates,key=lambda q:q[0])[1:] if candidates else None
+ 
+     def step(self,dt=None,now=None):
++        if getattr(self.planner,"supports_multimode",False):
++            from .multimode_supervisor import step_multimode
++            return step_multimode(self,dt,now)
+         now=time.monotonic() if now is None else now;self._t_now=now
+         elapsed=0. if self._last_step is None else max(0.,now-self._last_step);self._last_step=now
+         plan_dt=max(.01,min(.2,dt or self.cfg.control_dt))
+--- a/src/rda_dwa_real/rda_dwa_real/pose_velocity.py
++++ b/src/rda_dwa_real/rda_dwa_real/pose_velocity.py
+@@ -8,9 +8,11 @@
+     def __init__(self, window=.45):
+         self.window = window
+         self.rows = deque(maxlen=80)
++        self.valid=False;self.vx_body=self.vy_body=self.omega=self.speed_norm=0.
+ 
+     def reset(self):
+         self.rows.clear()
++        self.valid=False;self.vx_body=self.vy_body=self.omega=self.speed_norm=0.
+ 
+     def update(self, x, y, yaw, stamp):
+         if self.rows and stamp <= self.rows[-1][0]:
+@@ -19,6 +21,7 @@
+         while len(self.rows) > 2 and stamp-self.rows[0][0] > self.window:
+             self.rows.popleft()
+         if len(self.rows) < 4 or stamp-self.rows[0][0] < .12:
++            self.valid=False
+             return 0., 0.
+         values = np.asarray(self.rows)
+         t = values[:, 0]-stamp
+@@ -35,4 +38,10 @@
+             scale = max(.008, float(np.median(residual))*1.5)
+             weights = np.minimum(1., scale/np.maximum(residual, 1e-9))
+         vx, vy, omega = coef[1]
+-        return float(vx*math.cos(yaw)+vy*math.sin(yaw)), float(omega)
++        if math.hypot(vx,vy)<.08 and np.max(np.ptp(coords[:,:2],axis=0))<.03:
++            low=np.linalg.lstsq(design[:,:2],coords,rcond=None)[0]
++            vx,vy,omega=low[1]
++        self.vx_body=float(vx*math.cos(yaw)+vy*math.sin(yaw))
++        self.vy_body=float(-vx*math.sin(yaw)+vy*math.cos(yaw))
++        self.omega=float(omega);self.speed_norm=math.hypot(self.vx_body,self.vy_body);self.valid=True
++        return self.vx_body, self.omega
+--- a/src/rda_dwa_real/rda_dwa_real/traj_tracker_core.py
++++ b/src/rda_dwa_real/rda_dwa_real/traj_tracker_core.py
+@@ -10,6 +10,7 @@
+ from collections import deque
+ import numpy as np
+ from .adaptive_preview import AdaptivePreview
++from .multimode_tracking import MultimodeTrackerMixin
+ from .pose_velocity import PoseVelocityEstimator
+ from rda_dwa.motion_safety import VehicleGeometry,rollout_rear,to_centres,minimum_gaps,steering_step,speed_step
+ 
+@@ -40,6 +41,9 @@
+         self.pid_kp=.3;self.pid_ki=.05;self.pid_kd=0.;self.pid_i_limit=.1;self.pid_overshoot=0.;self.pid_stall_time=1.5
+         self.acc_max=.7;self.dec_max=1.2;self.jerk_max=2.;self.v_meas_gain=.3
+         self.spin_w_max=.6;self.spin_acc_max=.8;self.rotate_precision_deg=4.;self.rotate_decel_deg=30.
++        self.crab_v_max=.5;self.crab_beta_rate_deg=30.;self.crab_position_gain=1.2;self.crab_yaw_tolerance_deg=8.
++        self.reverse_position_gain=1.5;self.reverse_heading_gain=1.8;
++        self.driver_feedback_timeout=.5;self.mode_switch_timeout=12.
+         self.spin_wait_time=3.;self.spin_stop_hold=.5;self.spin_timeout=10.;self.spin_stop_speed=.035
+         self.spin_wait_timeout=7.;self.yaw_stop_rate=.06
+         self.speed_preview_distance=0.;self.lateral_acc_max=.6;self.stop_window_s=0.
+@@ -54,7 +58,7 @@
+         self.spin_hyst=.2;self.spin_w_deadband=.06;self.spin_min_run=1.;self.recover_delay=3.5
+         self.v_resolution=.05;self.omega_resolution=.1
+ 
+-class TrajTrackerCore:
++class TrajTrackerCore(MultimodeTrackerMixin):
+     MODE_ACK='ACK';MODE_SPIN='SPIN';MODE_STOP='STOP';MODE_WAIT_ACK='WAIT_ACK'
+     STATE_ACK=0;STATE_HANGUP=1;STATE_SPIN_RUN=2;STATE_SPIN_OK=3;STATE_SPIN_TIMEOUT=4
+     def __init__(self,params=None,on_transition=None,on_clear=None):
+@@ -69,6 +73,7 @@
+         self._px=self._py=self._pyaw=0.;self._centre=(0.,0.);self._pose_inited=False;self._pose_stamp=None;self._pose_at=-1e9
+         self._pose_history=deque(maxlen=100);self._v_meas=0.;self._yaw_rate=0.;self._wheel_max=None;self._wheel_at=-1e9
+         self._velocity_estimator=PoseVelocityEstimator()
++        self.init_multimode()
+         self._pose_reinitializations=0
+         self._ref=[];self._s_arr=np.zeros(0);self._t_arr=np.zeros(0);self._bs=None;self._ref_seq=-1;self._last_traj_ts=-1e9
+         self._s_veh=0.;self._proj_idx=0;self._clear_count=0;self._clear_seq=-1
+@@ -88,12 +93,15 @@
+                 else:self.set_safety('localization_jump');return
+         effective_stamp=stamp if stamp is not None else (arrival if arrival is not None else (self._pose_stamp or 0.)+dt)
+         estimate=self._velocity_estimator.update(rx,ry,yaw,effective_stamp)
+-        if estimate is not None:self._v_meas,self._yaw_rate=estimate
++        if estimate is not None:
++            self._v_meas,self._yaw_rate=estimate
++            if self._v2:self._v_meas=self._velocity_estimator.speed_norm
+         self._px,self._py,self._pyaw=rx,ry,yaw;self._centre=(x,y);self._pose_inited=True;self._pose_stamp=stamp
+         if arrival is not None:self._pose_at=arrival
+         if stamp is not None:self._pose_history.append((stamp,x,y,yaw))
+     def set_mode_ready(self,mode,now):
+         mode=int(mode)
++        self._mode_echo_rx=now
+         if mode!=self._mode_echo or self._mode_echo_at<self._mode_since:
+             self._mode_echo_at=now
+         self._mode_echo=mode
+@@ -120,7 +128,7 @@
+         self._ref=[];s=0.
+         for i,q in enumerate(clean):
+             if i:s+=math.hypot(q[0]-clean[i-1][0],q[1]-clean[i-1][1])
+-            self._ref.append(dict(s=s,x=q[0],y=q[1],th=q[2],v=max(0.,q[3]),t=now,
++            self._ref.append(dict(s=s,x=q[0],y=q[1],th=q[2],v=abs(q[3]) if self._v2 else max(0.,q[3]),t=now,
+                                   target_steer=q[5] if len(q)>5 else None))
+         self._s_arr=np.array([r['s'] for r in self._ref]);self._t_arr=np.array([now+r['s']/max(r['v'],.025) for r in self._ref])
+         self._last_traj_ts=now;self._ref_seq=seq if seq is not None else self._ref_seq+1
+@@ -165,6 +173,8 @@
+         elif mode_cmd==0 and self.mode==self.MODE_WAIT_ACK:
+             self._ack_requested=True
+     def bridge_state(self):
++        if self._v2:
++            return 1 if self._v2_phase!='RUN' else (3 if self._spin_result=='reached' else (2 if self._v2_mode==4 else 0))
+         if self.mode in (self.MODE_STOP,self.MODE_WAIT_ACK):
+             if self._spin_result=='pending':return 1
+             return 3 if self._spin_result=='reached' else 4
+@@ -176,6 +186,7 @@
+     def spin_cmd(self,w):return dict(enable=1,turnmode=4,speed=w,angle=0.)
+     def spin_stop_cmd(self):return self.spin_cmd(0.)
+     def stop_cmd(self):
++        if self._v2:return self._mode_output(self._v2_mode,0.,self._last_steer)
+         self._last_v_out=0.;self._acc=0.;self._pid_i=0.
+         return self.ack_cmd(0.,self._last_steer) # stationary steering is held, never snapped to zero
+     def emergency_cmd(self):
+@@ -199,6 +210,7 @@
+         return float(delta)
+     def step(self,now,dt,spin_target=None):
+         dt=max(.001,min(.1,dt))
++        if self._v2 and not getattr(self,"_v2_bypass",False):return self._step_v2(now,dt)
+         if self._safety_reason:
+             if self.mode==self.MODE_SPIN:
+                 self._ack_echo_required_since=-1e9 if self._spin_stage=='BRAKE' else now
+--- a/src/rda_dwa_real/rda_dwa_real/bridge_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/bridge_node.py
+@@ -43,6 +43,7 @@
+ from rda_dwa.module_config import module_config
+ from rda_dwa.enhanced_dwa import EnhancedDWA
+ from rda_dwa.realtime_ackermann import RealtimeAckermannPlanner
++from rda_dwa.multimode_planner import MultiModePlanner
+ from .realtime_vehicle_core import RealtimeVehicleBridgeCore
+ from .async_planner import AsyncPlanner
+ from rda_dwa.four_wheel_steer_model import FourWheelSteerParams
+@@ -92,6 +93,9 @@
+         self.declare_parameter('bridge_state_topic', '/car_bridge_state')  # 控制桥执行状态
+         self.declare_parameter('emergency_stop', True)
+         self.declare_parameter('enable_trap', True)
++        self.declare_parameter('multimode_enabled',True)
++        self.declare_parameter('planning_latency_s',.25)
++        for key,value in {'crab_v_max':.5,'crab_beta_rate_deg':30.,'mode_switch_gain_s':1.,'mode_confirm_s':.4,'refuge_lateral_m':1.2,'dynamic_forward_margin':.4}.items():self.declare_parameter(key,value)
+         # ---- 模式仲裁参数（2026-11-04：SPIN/trap 判定上收 planner 侧；
+         #   与 vehicle_bridge.BridgeConfig 默认一致，yaml rda_dwa_real_bridge 段可覆盖）----
+         self.declare_parameter('v_streak_threshold', 0.05)
+@@ -301,6 +305,10 @@
+         for key in ['near_goal_spin_distance','near_goal_spin_angle_deg','blocked_spin_time','spin_speed','command_acc','command_steer_rate_deg','safety_margin','goal_replay_epsilon','motion_stall_time','recovery_subgoal_distance','recovery_max_retries','goal_max_spin_requests']:
+             setattr(cfg,key,self.get_parameter(key).value)
+         pp.command_steer_rate=math.radians(float(self.get_parameter('command_steer_rate_deg').value))
++        for key in ('crab_v_max','crab_beta_rate_deg','mode_switch_gain_s','mode_confirm_s','refuge_lateral_m','dynamic_forward_margin'):
++            value=float(self.get_parameter(key).value);setattr(pp,key,value);setattr(cfg,key,value)
++        if bool(self.get_parameter('multimode_enabled').value):planner=MultiModePlanner(planner)
++        if bool(self.get_parameter('async_planning').value):pp.actuator_delay_s+=float(self.get_parameter('planning_latency_s').value)
+         result_max_age = float(self.get_parameter('planning_result_max_age_s').value)
+         self._async_planner = AsyncPlanner(planner, max_age=result_max_age) if bool(self.get_parameter('async_planning').value) else None
+         if self._async_planner is not None: planner=self._async_planner
+@@ -352,6 +360,7 @@
+                 ObstacleArray, '/rda/obstacles', self._cb_obstacles, qos_volatile)
+         # self._sub_scan = self.create_subscription(
+         #     LaserScan, '/scan', self._cb_scan, qos_volatile)
++        self._sub_driver_mode=self.create_subscription(String,'/car_driver/mode_state',self._cb_driver_mode,10)
+         self._sub_odom = self.create_subscription(
+             Odometry, '/localization', self._cb_odom, qos_volatile)
+         self._sub_pose = self.create_subscription(
+@@ -529,6 +538,10 @@
+             frame = self.core.cfg.algorithm_frame
+         self.core.set_goal(gx, gy, stamp, frame=frame)
+ 
++    def _cb_driver_mode(self,msg):
++        try:self.core.set_driver_state(json.loads(msg.data),arrival=time.monotonic())
++        except (ValueError,TypeError,KeyError):pass
++
+     def _cb_car_state(self, msg):
+         """底盘四轮轮速反馈（CarState.speed[4]，m/s）→ 规划层 v/ω 融合（见 vehicle_bridge）。"""
+         self.core.set_wheel_feedback(list(msg.speed), stamp=time.monotonic())
+@@ -743,6 +756,8 @@
+         self._last_theta_apf=self._last_theta_target=theta_target
+         self._pub_spin_target.publish(Float32(data=theta_target))
+         self._pub_plan.publish(String(data=json.dumps({
++            'body_yaw_ref':info.get('body_yaw_ref',theta),'spin_tolerance_deg':info.get('spin_tolerance_deg',4.),'direction':info.get('direction',1),'schema_version':info.get('schema_version',1),'motion_mode':info.get('motion_mode','ACK'),
++            'mode_epoch':info.get('mode_epoch',0),'prepare_angle_rad':info.get('prepare_angle_rad',0.),
+             'stamp':time.monotonic(),'session':int(info.get('spin_session',0)),
+             'mode':int(info.get('traj_mode',0)),'target':theta_target,
+             'reason':info.get('reason','fault'),'reference':rb,
+--- a/src/rda_dwa_real/rda_dwa_real/async_planner.py
++++ b/src/rda_dwa_real/rda_dwa_real/async_planner.py
+@@ -9,6 +9,7 @@
+         seq,stamp,robot,goal,obs,trap,steer,age,plan_dt,*actuator=item
+         try:
+             started=time.monotonic();planner.current_steer=steer;planner.obstacle_age=age
++            planner.current_mode=getattr(robot,"motion_mode",0);planner.mode_epoch=getattr(robot,"mode_epoch",0)
+             planner.current_acc,planner.current_steer_rate=actuator if actuator else (0.,0.)
+             planner.params.dt=plan_dt
+             result=planner.plan(robot,goal,obs,trap)
+@@ -24,6 +25,12 @@
+         ctx=multiprocessing.get_context('spawn');self._input=ctx.Queue(1);self._output=ctx.Queue(2)
+         self._process=ctx.Process(target=_work,args=(self._input,self._output,planner),daemon=True);self._process.start()
+     def __getattr__(self,name):return getattr(self.base,name)
++    def switch_candidate(self,robot,goal,obs,local=None):
++        # This small opportunity check runs on the parent, so it needs the SAME
++        # arrival-age and actuator snapshot as the separately queued worker.
++        for key in ('current_steer','obstacle_age','current_acc','current_steer_rate','current_mode','mode_epoch'):
++            setattr(self.base,key,getattr(self,key,0.))
++        return self.base.switch_candidate(robot,goal,obs,local)
+     def plan(self,robot,goal,obs,trap=None):
+         now=time.monotonic()
+         while True:
+@@ -32,7 +39,7 @@
+             if kind=='ready':self._ready=True
+             else:self._pending=False;self._result=payload
+         if self._ready and not self._pending and self._process.is_alive():
+-            self._seq+=1;item=(self._seq,now,copy.copy(robot),tuple(goal),copy.deepcopy(obs),copy.deepcopy(trap),self.current_steer,self.obstacle_age,self.params.dt,getattr(self,'current_acc',0.),getattr(self,'current_steer_rate',0.))
++            self._seq+=1;robot.motion_mode=getattr(self,"current_mode",0);robot.mode_epoch=getattr(self,"mode_epoch",0);item=(self._seq,now,copy.copy(robot),tuple(goal),copy.deepcopy(obs),copy.deepcopy(trap),self.current_steer,self.obstacle_age,self.params.dt,getattr(self,'current_acc',0.),getattr(self,'current_steer_rate',0.))
+             try:self._input.put_nowait(item);self._pending=True
+             except queue.Full:pass
+         self.reference=[]
+@@ -57,6 +64,7 @@
+                 yaw=a[2]+u*((b[2]-a[2]+math.pi)%(2*math.pi)-math.pi)
+                 heading_error=(robot.theta-yaw+math.pi)%(2*math.pi)-math.pi
+         stale_causes=[]
++        if getattr(pose,"motion_mode",0)!=getattr(self,"current_mode",0) or getattr(pose,"mode_epoch",0)!=getattr(self,"mode_epoch",0):stale_causes.append("mode_changed")
+         if old_goal!=tuple(goal):stale_causes.append('goal_changed')
+         if age>self.max_age+1e-6:stale_causes.append('result_age')
+         if deviation>.18:stale_causes.append('pose_displacement')
+--- a/src/rda_dwa_real/rda_dwa_real/multimode_supervisor.py
++++ b/src/rda_dwa_real/rda_dwa_real/multimode_supervisor.py
+@@ -0,0 +1,156 @@
++"""Mode opportunity/recovery arbitration for the existing realtime bridge.
++One mode intent per epoch; bounded recovery, fresh execution after READY.
++"""
++import math,time
++
++
++def step_multimode(c,dt,now):
++ now=time.monotonic() if now is None else now;c._t_now=now
++ if not hasattr(c,'_mm_desired'):
++  c._mm_desired=0;c._mm_epoch=0;c._mm_beta=0.;c._mm_stall=0.;c._mm_last=now;c._mm_wait=now;c._mm_goal=None;c._mm_candidate_at=None;c._mm_anchor=c.centre();c._mm_motion_at=now
++ elapsed=max(0.,now-c._mm_last);c._mm_last=now
++ if c._goal!=c._mm_goal:
++  c._mm_goal=c._goal;c._mm_epoch+=1;c._mm_recovered=False;c._mm_stall=0.;c._mm_candidate_at=None;c._mm_anchor=c.centre();c._mm_motion_at=now
++ info={'ok':False,'plan_ok':False,'collision':False,'reached':False,'n_obs':len(c._last_received_obs),'dist_goal':math.inf}
++ def finish(reason,v=0.,w=0.,road=()):
++  out=c._finish(info,reason,v,w,road)
++  out.update(body_yaw_ref=getattr(c,"_mm_crab_yaw",c.robot.theta),spin_tolerance_deg=getattr(c,'_mm_spin_tolerance',4.),direction=-1 if (info.get('planner',{}).get('reverse') or info.get('planner',{}).get('crab_reverse')) else 1,schema_version=2,motion_mode={0:'ACK',1:'CRAB',4:'SPIN'}[c._mm_desired],mode_epoch=c._mm_epoch,prepare_angle_rad=info.get('planner',{}).get('selected_beta',c._mm_beta))
++  return out
++ def request(mode,beta=0.,yaw=None,reason='mode_switch_wait'):
++  c._mm_desired=mode;c._mm_epoch+=1;c._session+=1;c._mm_beta=beta;c._mm_wait=now;c._clear_traj_pending=True
++  c._mm_candidate_at=None;c._mm_stall=0.;c._arbit={0:'ACK',1:'CRAB',4:'SPIN_REQUEST'}[mode]
++  if mode==1:c._mm_crab_yaw=c.robot.theta
++  if yaw is not None:c._session_target=yaw;c._request_since=now;c._last_spin_result=None
++  return finish(reason)
++ if not c._goal_received:return finish('no_goal')
++ if c._pose_fault or now-c._t_loc>c.cfg.localization_timeout:return finish('localization_fault')
++ if now-c._t_obs>c.cfg.obstacle_timeout:return finish('obstacle_timeout')
++ obs=c._last_received_obs;c._last_obs=obs;age=now-c._t_obs;centre=c.centre();dg=math.dist(centre,c._goal);info['dist_goal']=dg
++ if math.dist(centre,c._mm_anchor)>.05:c._mm_anchor=centre;c._mm_motion_at=now
++ actual_stall=now-c._mm_motion_at>2.
++ c._v_meas=c._velocity_estimator.speed_norm;c.robot.v=max(0.,c._v_meas);c.robot.omega=c._omega_meas;c.robot.planning_stamp=now;c.robot.command_speed=float(c._tracker_cmd_v or 0.)
++ if dg<c.pp.goal_tolerance and c._velocity_estimator.valid and c._v_meas<.035:
++  info['reached']=True;return finish('reached')
++ driver=getattr(c,'_driver_state',None)
++ if driver is None or now-getattr(c,'_driver_arrival',-1e9)>.5:return finish('driver_feedback_stale')
++ if c._mm_desired==4:
++  c._mm_motion_at=now;c._mm_anchor=centre
++  from rda_dwa.motion_safety import spin_is_safe
++  if not spin_is_safe(*centre,c.robot.theta,c._session_target,obs,c.geometry,age,speed=getattr(c.cfg,'spin_speed',.6),margin=getattr(c.cfg,'safety_margin',.12)):
++   return finish('spin_safety_abort')
++  if c._last_spin_result=='reached':
++   c._last_spin_result=None;return request(0,reason='spin_reached')
++  if now-c._request_since>getattr(c.cfg,'spin_request_timeout',18.):return finish('spin_request_timeout')
++  info['ok']=True;return finish('spin_active')
++ if c._bridge_state==1 or int(driver.get('actual_mode',-1))!=c._mm_desired or not driver.get('ready'):
++  if not getattr(c,'_mm_wait_seen',False):c._mm_wait=now
++  c._mm_wait_seen=True
++  c._mm_motion_at=now;c._mm_anchor=centre
++  if now-c._mm_wait>12.:return finish('mode_switch_timeout')
++  return finish('mode_switch_wait')
++ c._mm_wait_seen=False
++ if c._mm_desired==1 and abs((c.robot.theta-getattr(c,'_mm_crab_yaw',c.robot.theta)+math.pi)%(2*math.pi)-math.pi)>math.radians(8):
++  c._goal_requests+=1;c._mm_spin_tolerance=1.;return request(4,yaw=c._mm_crab_yaw,reason='spin_requested')
++ if c._recovery_failed:return finish('recovery_exhausted')
++ if c._recovery_goal is not None:
++  c._recovery_elapsed+=elapsed
++  if c._recovery_elapsed>getattr(c.cfg,'trap_max_duration',45.):
++   c._recovery_failed=True;return finish('recovery_exhausted')
++ if c._recovery_goal is not None and math.dist(centre,c._recovery_goal)<.3:
++  c._recovery_goal=None;c._mm_stall=0.;c._episode_retries=0;c._mm_recovered=True
++ target=c._recovery_goal or c._goal
++ p=c.planner;p.current_mode=c._mm_desired;p.mode_epoch=c._mm_epoch;p.current_steer=c._tracker_angle;p.obstacle_age=age
++ p.current_acc=c._tracker_acc;p.current_steer_rate=c._tracker_steer_rate;p.params.dt=max(.02,min(.2,dt or .1))
++ urgent=False
++ if hasattr(p,'base') and getattr(p.base,'supports_multimode',False) and c._mm_desired==0:
++  forward=(math.cos(c.robot.theta),math.sin(c.robot.theta))
++  for o in obs:
++   along=(o.x-centre[0])*forward[0]+(o.y-centre[1])*forward[1]
++   closing=-(o.vx*forward[0]+o.vy*forward[1])+max(c.robot.v,min(.8,getattr(p.params,"cruise_velocity",1.)))
++   lateral=abs(-(o.x-centre[0])*forward[1]+(o.y-centre[1])*forward[0])
++   if not o.uncertain and o.speed>.1 and along>.3 and closing>.2 and along/closing<6. and lateral<1.4+o.width/2:urgent=True
++  urgent=urgent or p.base._reverse_schedule is not None
++ if urgent:
++  for key in ('current_steer','obstacle_age','current_acc','current_steer_rate','current_mode','mode_epoch'):setattr(p.base,key,getattr(p,key,0.))
++  original_delay=p.base.params.actuator_delay_s;p.base.params.actuator_delay_s=min(.1,original_delay)
++  start=time.perf_counter()
++  try:ok,v,u=p.base.plan(c.robot,target,obs,None)
++  finally:p.base.params.actuator_delay_s=original_delay
++  p.reference=p.base.reference;p.telemetry=dict(p.base.telemetry,urgent_parent_planning=True,urgent_duration_s=time.perf_counter()-start)
++  c._mm_urgent=True
++ else:
++  if getattr(c,'_mm_urgent',False):
++   c._mm_urgent=False;c._mm_epoch+=1;p.mode_epoch=c._mm_epoch
++   if hasattr(p,'_result'):p._result=None
++  ok,v,u=p.plan(c.robot,target,obs,None)
++ tele=dict(p.telemetry);info.update(plan_ok=ok,planner=tele)
++ reason=tele.get('reason','blocked');local=tele.get('guide_target',target)
++ if reason=='crab_prepare':
++  c._mm_motion_at=now;info['ok']=True;return finish(reason)
++ if reason in ('planning_budget','planning_pending','planning_result_stale','planning_worker_failed','planning_exception'):
++  return finish(reason)
++ if tele.get('route_yaw') is not None:
++  if c._goal_requests>=getattr(c.cfg,'goal_max_spin_requests',4):
++   c._recovery_failed=True;return finish('recovery_exhausted')
++  c._goal_requests+=1;c._mm_spin_tolerance=1.;return request(4,yaw=tele['route_yaw'],reason='spin_requested')
++ if tele.get('guide_no_route'):
++  from rda_dwa.motion_safety import minimum_gaps
++  import numpy as np
++  probes=[]
++  for offset in (0.,math.pi/2,-math.pi/2):
++   probes.append([centre[0]+.8*math.cos(c.robot.theta+offset),centre[1]+.8*math.sin(c.robot.theta+offset),c.robot.theta])
++  blocked=[float(minimum_gaps(np.array([pose]),[0.],obs,c.geometry,age))<getattr(c.cfg,'safety_margin',.12) for pose in probes]
++  if getattr(c,'_mm_recovered',False) or not all(blocked):
++   c._recovery_failed=True;return finish('bounded_static_no_route')
++ if c._mm_desired==0:
++  bad=not ok or abs(v)<.005 or tele.get('forecast_progress',0.)<.05 or actual_stall
++  choice=p.switch_candidate(c.robot,target,obs,local) if c.robot.v<.035 else None
++  if choice is not None:
++   distance=math.dist(centre,local);progress=max(.01,tele.get('forecast_progress',0.));ack_time=3.*distance/progress
++   reference=getattr(p,'reference',[])
++   axis=math.atan2(target[1]-centre[1],target[0]-centre[0]);sides=[]
++   for obstacle in obs:
++    if obstacle.speed>.1 or obstacle.length>=4. or obstacle.width>=2.:continue
++    dx,dy=obstacle.x-centre[0],obstacle.y-centre[1]
++    if -.5<dx*math.cos(axis)+dy*math.sin(axis)<math.dist(centre,target)+1.:sides.append(-dx*math.sin(axis)+dy*math.cos(axis))
++   paired=any(y>.2 for y in sides) and any(y<-.2 for y in sides)
++   if reference and paired:
++    yaw_peak=max((point[2] for point in reference),key=lambda yaw:abs((yaw-c.robot.theta+math.pi)%(2*math.pi)-math.pi))
++    yaw_change=abs((yaw_peak-c.robot.theta+math.pi)%(2*math.pi)-math.pi)
++    if yaw_change>.2:
++     from rda_dwa.local_route import route_waypoint
++     _,future_route=route_waypoint(centre,yaw_peak,target,obs,c.geometry,getattr(c.cfg,'safety_margin',.12))
++     if not future_route:ack_time+=6.+yaw_change/.6
++   # Comparable waypoint time; include an ordinary change penalty.
++   worthwhile=bad or choice['time_s']+getattr(c.cfg,'mode_switch_gain_s',1.)<ack_time
++   if worthwhile:
++    c._mm_candidate_at=now if c._mm_candidate_at is None else c._mm_candidate_at
++    if bad or now-c._mm_candidate_at>=getattr(c.cfg,'mode_confirm_s',.4):return request(1,choice['beta'],reason='crab_requested')
++    return finish('mode_switch_wait')
++   else:c._mm_candidate_at=None
++  else:c._mm_candidate_at=None
++ if c._mm_desired==1 and reason=='crab_heading_unreachable':
++  # Fixed-yaw CRAB has no backward direction in the forward-only first version.
++  return request(0)
++ dynamic=any(o.speed>.1 and not o.uncertain for o in obs)
++ stagnant=(not ok or abs(v)<.005 or tele.get('forecast_progress',0.)<.02 or actual_stall)
++ if reason in ('planning_budget','planning_pending','planning_result_stale','planning_worker_failed','planning_exception'):
++  return finish(reason)
++ c._mm_stall=c._mm_stall+elapsed if stagnant and not dynamic else 0.
++ if c._mm_stall>=getattr(c.cfg,'blocked_spin_time',1.5) and getattr(c.cfg,'enable_trap',True):
++  if c._episode_retries>=getattr(c.cfg,'recovery_max_retries',2) or c._goal_requests>=getattr(c.cfg,'goal_max_spin_requests',4):
++   c._recovery_failed=True;return finish('recovery_exhausted')
++  desired=math.atan2(local[1]-centre[1],local[0]-centre[0]);choice=c._recovery_heading(desired,obs,age,True)
++  if choice is None:
++   c._recovery_failed=True;return finish('recovery_no_safe_heading')
++  yaw,sub=choice;c._recovery_goal=sub;c._recovery_elapsed=0.;c._episode_retries+=1;c._goal_requests+=1
++  c._mm_spin_tolerance=4.
++  return request(4,yaw=yaw,reason='spin_requested')
++ if not ok:return finish(reason)
++ if c._mm_desired==0 and v>=0. and not tele.get("reverse") and not c._safe_motion(v,u,obs,age):
++  choice=p.switch_candidate(c.robot,target,obs,local) if c.robot.v<.035 else None
++  if choice is not None:return request(1,choice['beta'],reason='crab_requested')
++  return finish('execution_collision_guard')
++ info['ok']=True;c.state.v=v
++ if c._mm_desired==0:p.set_last_cmd(v,u)
++ return finish(reason,v,0. if c._mm_desired==1 else u,getattr(p,'reference',[]))
+--- a/src/rda_dwa_real/test/test_engineering_behaviour.py
++++ b/src/rda_dwa_real/test/test_engineering_behaviour.py
+@@ -62,7 +62,9 @@
+   self.assertTrue(result['reached'],result)
+   self.assertGreaterEqual(result['min_physical_gap_m'],.12,result)
+   self.assertLessEqual(result['max_command_jerk_m_s3'],2.+1e-7)
+-  self.assertLessEqual(result['max_steer_rate_deg_s'],30.+1e-7)
++  from closed_loop import CONFIG
++  limit=CONFIG['traj_tracker_node']['ros__parameters']['max_steer_rate_deg']
++  self.assertLessEqual(result['max_steer_rate_deg_s'],limit+1e-7)
+   self.assertLessEqual(result['max_steer_accel_deg_s2'],100.+1e-7)
+  def test_straight_goal_approach_has_no_stop_then_accelerate_pulse(self):
+   import json
+--- a/src/rda_dwa_real/test/test_localization_input.py
++++ b/src/rda_dwa_real/test/test_localization_input.py
+@@ -180,6 +180,9 @@
+         bridge._localization_input.buffer.transform = transform()
+         bridge.core.set_goal(4., 0., frame='map')
+         bridge.core.set_obstacles([], stamp=1000., arrival=time.monotonic())
++        ready={'actual_mode':0,'target_mode':0,'ready':True,'phase':'READY'}
++        bridge.core.set_driver_state(ready,arrival=time.monotonic())
++        tracker.core.set_driver_state(ready,tracker._now())
+         bridge._control_cycle()
+         packet = bridge._pub_plan.messages[-1]
+         self.assertEqual(json.loads(packet.data)['reason'], 'motion')
+@@ -296,6 +299,9 @@
+         bridge._cb_odom(self.localization(stamp=997.))
+         bridge.core.set_goal(4., 0., frame='map')
+         bridge.core.set_obstacles([], stamp=1000., arrival=time.monotonic())
++        ready={'actual_mode':0,'target_mode':0,'ready':True,'phase':'READY'}
++        bridge.core.set_driver_state(ready,arrival=time.monotonic())
++        tracker.core.set_driver_state(ready,tracker._now())
+         bridge._control_cycle()
+         packet = bridge._pub_plan.messages[-1]
+         self.assertEqual(json.loads(packet.data)['reason'], 'motion')
+--- a/src/rda_dwa_real/test/test_multimode.py
++++ b/src/rda_dwa_real/test/test_multimode.py
+@@ -0,0 +1,124 @@
++"""Behavioural tests for sideways motion, readiness and mode-specific safety."""
++from pathlib import Path
++import sys,math
++import numpy as np
++ROOT=Path(__file__).resolve().parents[2]
++sys.path[:0]=[str(ROOT/'rda_dwa'),str(ROOT/'rda_dwa_real')]
++from rda_dwa.crab_model import rollout_crab,CrabParams
++from rda_dwa_real.pose_velocity import PoseVelocityEstimator
++from rda_dwa_real.traj_tracker_core import TrajTrackerCore
++
++
++def test_lateral_velocity_is_observable_and_warmup_unknown():
++ e=PoseVelocityEstimator();e.update(0,0,0,0);assert not e.valid
++ for t in np.arange(.05,.8,.05):e.update(0,.3*t,0,t)
++ assert e.valid and abs(e.vy_body-.3)<1e-6 and abs(e.speed_norm-.3)<1e-6
++ assert abs(e.vx_body)<1e-6
++ e.reset();assert not e.valid
++
++
++def test_ninety_degree_translation_preserves_yaw_and_full_distance():
++ poses,v,t,b=rollout_crab(0,0,0,.3,math.pi/2,[.3],[math.pi/2],horizon=2,delay=0)
++ assert max(abs(poses[0,:,0]))<1e-6
++ assert abs(poses[0,-1,1]-.6)<1e-6
++ assert max(abs(poses[0,:,2]))<1e-6
++
++
++def test_angle_step_is_not_instantaneous_translation():
++ poses,v,t,b=rollout_crab(0,0,0,.3,0,[.3],[math.pi/2],horizon=1,delay=0)
++ assert b[0,-1]<math.radians(31)
++ assert poses[0,-1,0]>.2 and poses[0,-1,1]<.12
++ assert max(abs(np.diff(b[0])/np.diff(t)))<=math.radians(30)+1e-8
++
++
++def test_crab_stop_retains_mode_and_angle():
++ c=TrajTrackerCore();c._v2=True;c._v2_mode=1;c._last_steer=math.pi/2
++ cmd=c.stop_cmd();assert cmd['turnmode']==1 and cmd['speed']==0 and cmd['angle']==90
++
++
++def test_driver_stale_never_allows_crab_motion():
++ c=TrajTrackerCore();c.set_plan({'motion_mode':'CRAB','mode_epoch':1,'road_base':[]},0,1)
++ cmd=c.step(.1,.02);assert cmd['speed']==0 and c.diag['branch']=='DRIVER_STALE'
++
++
++def test_switch_waits_for_physical_ready_and_new_plan():
++ c=TrajTrackerCore();c.set_plan({'motion_mode':'CRAB','mode_epoch':1,'prepare_angle_rad':math.pi/2},0,1)
++ first_request=None
++ for i in range(340):
++  t=i*.02;c.set_pose(0,0,0,stamp=t,arrival=t)
++  actual=1 if first_request is not None else 0
++  ready=first_request is None or t-first_request>=3
++  c.set_driver_state({'actual_mode':actual,'target_mode':actual,'ready':ready},t)
++  cmd=c.step(t,.02)
++  if cmd['turnmode']==1 and first_request is None:first_request=t
++  assert cmd['speed']==0 # no fresh executable reference after READY
++ assert first_request is not None and c._v2_phase=='RUN' and c.mode=='CRAB'
++ assert c._last_steer>math.radians(89)
++
++
++def test_reverse_forecast_moves_back_without_relabeling_body_yaw():
++ from rda_dwa.signed_ack import rollout_reverse
++ from rda_dwa.motion_safety import VehicleGeometry
++ poses,v,t,b=rollout_reverse(0,0,0,.3,0,[.3],[0],VehicleGeometry(),horizon=1,delay=0)
++ assert poses[0,-1,0]<-.29 and max(abs(poses[0,:,1]))<1e-8
++ assert max(abs(poses[0,:,2]))<1e-8
++
++
++def test_async_rejects_old_mode_epoch_at_same_pose():
++ import queue,types
++ from rda_dwa_real.async_planner import AsyncPlanner
++ c=AsyncPlanner.__new__(AsyncPlanner)
++ c.base=types.SimpleNamespace(params=types.SimpleNamespace(dt=.1));c.max_age=10.;c.current_mode=1;c.mode_epoch=2;c._pending=True;c._ready=True;c._seq=1
++ c._output=queue.Queue();c._input=queue.Queue();c._process=types.SimpleNamespace(is_alive=lambda:True)
++ import time
++ old=types.SimpleNamespace(x=0.,y=0.,theta=0.,motion_mode=0,mode_epoch=1)
++ c._result=(1,time.monotonic(),old,(5.,0.),(True,.5,0.),[(0,0,0,.5,0)],{'reason':'motion'})
++ ok,_,_=c.plan(types.SimpleNamespace(x=0.,y=0.,theta=0.),(5.,0.),[])
++ assert not ok and 'mode_changed' in c.telemetry['stale_causes']
++
++
++def test_empty_wait_plan_replaces_previous_motion():
++ c=TrajTrackerCore();c.set_driver_state({'actual_mode':0,'ready':True},0.)
++ c.set_plan({'motion_mode':'ACK','mode_epoch':1,'road_base':[(0,0,0,.5,0,0),(1,0,0,.5,2,0)]},0,1)
++ assert c._ref
++ c.set_plan({'motion_mode':'ACK','mode_epoch':1,'reason':'dynamic_wait','road_base':[]},.1,2)
++ assert not c._ref
++
++
++def test_signed_zero_brake_reference_stays_reverse():
++ c=TrajTrackerCore();c.set_driver_state({'actual_mode':0,'ready':True},0.)
++ c.set_plan({'motion_mode':'ACK','mode_epoch':1,'road_base':[(0,0,0,-0.,0,0),(-1,0,0,-0.,2,0)]},0,1)
++ assert c._reverse_ref
++
++
++def test_spin_does_not_complete_with_nonzero_command():
++ c=TrajTrackerCore();c._v2=True;c._v2_mode=c._v2_desired=4;c._spin_target=.01;c._spin_w=.2
++ for t in np.arange(0,1.01,.04):c.set_pose(0,0,0,stamp=float(t),arrival=float(t))
++ c.set_driver_state({'actual_mode':4,'ready':True},1.)
++ cmd=c.step(1.,.02)
++ assert cmd['speed']>.1 and c._spin_result!='reached'
++
++
++def test_ninety_degree_boundary_tolerates_pose_noise_without_reverse():
++ import types,json
++ from rda_dwa.module_config import module_config
++ from rda_dwa.ackermann_model import AckermannParams
++ from rda_dwa.realtime_ackermann import RealtimeAckermannPlanner
++ from rda_dwa.multimode_planner import MultiModePlanner
++ p=MultiModePlanner(RealtimeAckermannPlanner(module_config('v15_latesc'),'ENHANCED_DWA',collision_model='rectangle',ack_params=AckermannParams()))
++ robot=types.SimpleNamespace(x=-.343,y=0.,theta=0.,v=0.,planning_stamp=0.)
++ choice=p.switch_candidate(robot,(0.,1.2),[])
++ assert choice and abs(choice['beta']-math.pi/2)<1e-6
++ p.current_mode=1;p.current_steer=math.pi/2
++ ok,_,_=p.plan(robot,(0.,1.2),[])
++ assert ok
++ json.dumps(p.telemetry,allow_nan=False)
++
++
++def test_crab_reverse_reference_commands_reverse_translation():
++ c=TrajTrackerCore()
++ for t in np.arange(0,.25,.05):c.set_pose(0,0,0,stamp=float(t),arrival=float(t))
++ c.set_driver_state({'actual_mode':1,'ready':True},.2)
++ c.set_plan({'motion_mode':'CRAB','mode_epoch':1,'direction':-1,'road_base':[(-.345,0,0,-.3,0,0),(-2.345,0,0,-.3,3,0)]},.2,1)
++ cmd=c.step(.2,.02)
++ assert cmd['turnmode']==1 and cmd['speed']<0 and abs(cmd['angle'])<1e-6
+--- a/src/rda_dwa_real/config/real_vehicle.yaml
++++ b/src/rda_dwa_real/config/real_vehicle.yaml
+@@ -93,16 +93,24 @@
+     road_base_len: 2.5
+     road_base_ds: 0.1
+     spin_target_free_fallback: true
++    multimode_enabled: true
++    crab_v_max: 0.7
++    crab_beta_rate_deg: 30.0
++    mode_switch_gain_s: 1.0
++    mode_confirm_s: 0.4
++    refuge_lateral_m: 1.2
++    dynamic_forward_margin: 0.4
+     kinematics_mode: ackermann
+     ack_wheelbase: 0.69
+     ack_length: 1.2
+     ack_width: 0.8
+     ack_delta_max_deg: 30.0
+-    ack_delta_dot_max_deg: 30.0
++    ack_delta_dot_max_deg: 45.0
+     ack_v_max: 1.0
+     ack_v_min: 0.0
+     ack_a_max: 0.7
+     ack_dec_max: 1.2
++    planning_latency_s: 0.25
+     async_planning: true
+     planning_budget_s: 0.25
+     planning_result_max_age_s: 0.8
+@@ -116,18 +124,18 @@
+     command_steer_accel_deg: 100.0
+     actuator_delay_s: 0.1
+     staged_avoidance: true
+-    command_steer_rate_deg: 30.0
++    command_steer_rate_deg: 45.0
+     near_goal_spin_distance: 3.5
+     near_goal_spin_angle_deg: 75.0
+     blocked_spin_time: 1.5
+     spin_speed: 0.6
+-    guide_extra: 0.12
++    guide_extra: 0.03
+     velocity_horizon_targets: true
+     cruise_velocity: 1.0
+-    lateral_acc_max: 0.6
++    lateral_acc_max: 0.9
+     goal_replay_epsilon: 0.05
+     motion_stall_time: 3.0
+-    recovery_subgoal_distance: 1.8
++    recovery_subgoal_distance: 2.4
+     recovery_max_retries: 2
+     goal_max_spin_requests: 4
+ control_bridge_node:
+@@ -186,7 +194,7 @@
+     preview_update_period: 0.1
+     preview_scan_distance: 0.8
+     preview_obstacle_limit: 12.0
+-    max_steer_rate_deg: 30.0
++    max_steer_rate_deg: 45.0
+     pid_kp: 0.3
+     pid_ki: 0.05
+     pid_kd: 0.0
+@@ -227,9 +235,17 @@
+     localization_timeout: 2.0
+     obstacle_timeout: 0.4
+     safety_margin: 0.12
++    crab_v_max: 0.7
++    crab_beta_rate_deg: 30.0
++    reverse_position_gain: 1.5
++    reverse_heading_gain: 1.8
++    crab_position_gain: 1.2
++    crab_yaw_tolerance_deg: 8.0
++    driver_feedback_timeout: 0.5
++    mode_switch_timeout: 12.0
+     use_atomic_plan: true
+     speed_preview_distance: 0.0
+-    lateral_acc_max: 0.6
++    lateral_acc_max: 0.9
+     stop_window_s: 1.0
+ lidar_track_node:
+   ros__parameters:
+--- a/src/rda_dwa_real/launch/rl_dwa_car.launch.py
++++ b/src/rda_dwa_real/launch/rl_dwa_car.launch.py
+@@ -68,6 +68,9 @@
+                 'remote_ip': '192.168.15.15',
+                 'run_enable': True,
+                 'mode_change_time': 3.0,
++                'spin_command_scale': 0.429,
++                'spin_sign': -1.0,
++                'wheel_feedback_scale': 1.0,
+             }],
+         ),
+     ])
+--- a/src/control/car_ctr/CMakeLists.txt
++++ b/src/control/car_ctr/CMakeLists.txt
+@@ -26,6 +26,7 @@
+ 
+ ament_target_dependencies(car_ctr_node
+   rclcpp
++  std_msgs
+   tf2
+   tf2_ros
+   common
+--- a/src/control/car_ctr/src/car_ctr.cpp
++++ b/src/control/car_ctr/src/car_ctr.cpp
+@@ -1,5 +1,7 @@
+ #include <cmath>
++#include "mode_transaction.hpp"
+ #include <cstdint>
++#include <stdexcept>
+ #include <std_msgs/msg/string.hpp>
+ #include <chrono>
+ #include <sstream>
+@@ -22,6 +24,14 @@
+ {
+ private:
+     TUDP *udp;
++    ModeTransaction transaction;
++    TTimer steady_clock,body_age;
++    bool turn_seen[4]={false,false,false,false};double turn_position[4]={0,0,0,0};TTimer turn_age[4];
++    double command_at=-1e9,car_echo_at=-1e9,body_at=-1e9,error_at=-1e9,management_until=-1e9;
++    bool body_valid=false;double body_speed=0.,body_yaw_rate=0.,body_source_age=0.;
++    double wheel_feedback_scale=1.,angle_sign=-1.,spin_command_scale=.429,spin_sign=-1.;
++    rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr body_sub;
++    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr mode_state_pub;
+     TTimer delay_time;
+     TTimer command_watchdog;
+     bool command_seen=false;
+@@ -34,7 +44,7 @@
+     control_msgs::msg::CarState car_state_msg;
+     
+     bool run_enable=false;
+-    float mode_change_time=3.0;
++    double mode_change_time=3.0;
+     int  mode_latched = -1;          // P2-修复⑤：模式切换锁存（-1=未在切换；否则=已下发切换的指令侧模式）
+     TNodeCheck *nodecheck;
+ 
+@@ -72,20 +82,21 @@
+     }
+     void send_packet(char* packet){udp->Send(packet);last_tx=packet;++tx_calls;io_event("tx_send_called",last_tx);}
+     void publish_driver_diag(){
++        const double now=steady_ns()*1e-9;
+         if(!driver_diag_pub)return;
+         std_msgs::msg::String msg;std::ostringstream out;
+         out << "{\"schema_version\":1,\"sequence\":" << ++driver_sequence << ",\"producer_wall_ns\":" << unix_ns() << ",\"producer_steady_ns\":" << steady_ns()
+             << ",\"driver_dt_s\":" << number(driver_dt_s) << ",\"reason\":" << quote(driver_reason) << ",\"socket_diagnostic_dropped\":" << udp->diagnostics.dropped() << ",\"command_callbacks\":" << command_callbacks << ",\"tx_send_calls\":" << tx_calls << ",\"rx_batches\":" << rx_batches
+-            << ",\"command_seen\":" << (command_seen?"true":"false") << ",\"command_age_s\":" << (command_seen?number(command_watchdog.GetValue()):"null")
++            << ",\"command_seen\":" << (command_seen?"true":"false") << ",\"command_age_s\":" << (command_seen?number(now-command_at):"null")
+             << ",\"command_heartbeat\":" << car_ctr_msg.heartbeat << ",\"command_mode\":" << car_ctr_msg.turnmode << ",\"command_speed\":" << number(car_ctr_msg.speed)
+             << ",\"firmware_angle_command_deg\":" << number(car_ctr_msg.angle) << ",\"run_enable\":" << (run_enable?"true":"false") << ",\"mode_latched\":" << mode_latched
+-            << ",\"mode_wait_elapsed_s\":" << number(delay_time.GetValue()) << ",\"echo_seen\":" << (echo_seen?"true":"false") << ",\"echo_age_s\":" << (echo_seen?number(echo_age.GetValue()):"null")
++            << ",\"mode_wait_elapsed_s\":" << number(transaction.phase=="WAIT_MECHANICAL" && transaction.echo_at>=0?now-transaction.echo_at:0.) << ",\"echo_seen\":" << (echo_seen?"true":"false") << ",\"echo_age_s\":" << (echo_seen?number(now-car_echo_at):"null")
+             << ",\"feedback_mode_raw\":" << car_state_msg.turnmode << ",\"feedback_enable_raw\":" << car_state_msg.enable << ",\"feedback_ctrmode_raw\":" << car_state_msg.ctrmode
+             << ",\"wheel_feedback_age_s\":[";
+         for(int i=0;i<4;++i){if(i)out << ',';out << (wheel_seen[i]?number(wheel_age[i].GetValue()):"null");}
+         out << "],\"wheel_speed_cached_mps\":[";
+         for(int i=0;i<4;++i){if(i)out << ',';out << number(car_state_msg.speed[i]);}
+-        out << "],\"errcode_seen\":" << (err_seen?"true":"false") << ",\"errcode_age_s\":" << (err_seen?number(err_age.GetValue()):"null")
++        out << "],\"errcode_seen\":" << (err_seen?"true":"false") << ",\"errcode_age_s\":" << (err_seen?number(now-error_at):"null")
+             << ",\"actual_steering_feedback_available\":false,\"last_tx\":" << quote(last_tx) << ",\"last_rx\":" << quote(last_rx) << "}";
+         msg.data=out.str();try{driver_diag_pub->publish(msg);}catch(const std::exception&){}
+     }
+@@ -119,122 +130,43 @@
+ 
+     void CarCmdCallback(const control_msgs::msg::CarCtr::SharedPtr msg)
+     {
+-        ++command_callbacks;driver_reason="command_received";
+-        car_ctr_msg = *msg;
+-        command_watchdog.Clear();
+-        command_seen=true;
+-
+-        // 2026-11-06：指令被丢弃时必须能看见原因，否则"上层在发 0.7m/s 而车不动"无从判断。
+-        //   ctrmode==0 = 底盘在手动/未知档，或从未收到过底盘回包（CarState 默认值 0）。
+-        static TTimer drop_tmr;
+-        if(!run_enable || car_state_msg.ctrmode==0)
+-        {
+-            if (drop_tmr.GetValue() > 3)
+-            {
+-                drop_tmr.Clear();
+-                RCLCPP_WARN(nh->get_logger(),
+-                    "[car_ctr] 丢弃 /car_cmd：run_enable=%d ctrmode=%d "
+-                    "（ctrmode=0 表示底盘在手动档或从未收到回包）",
+-                    (int)run_enable, (int)car_state_msg.ctrmode);
+-            }
+-            driver_reason=!run_enable?"run_disabled":"manual_or_no_echo";
+-            return;
+-        }
+-
+-        char str[100]={0};
+-        float speed = car_ctr_msg.speed;
+-        car_ctr_msg.angle *=-1; // 底层角度反的
+-
+-        // A stop must not wait behind a mechanical mode transition. Run 0
+-        // stops the CURRENT firmware mode before any SteerModeCtrl request.
+-        if (!car_ctr_msg.enable) {
+-            driver_reason="command_disabled_stop";
+-            sprintf(str,"Car Run 0.0 %.2f",car_ctr_msg.angle);
+-            send_packet(str);
+-            return; // A disabled command must never fall through to nonzero Run.
+-        }
+-        if (fabs(speed)<1e-6) {
+-            sprintf(str,"Car Run 0.0 %.2f",car_ctr_msg.angle);
+-            send_packet(str);
+-        }
+-        int cmd_tm = (int)car_ctr_msg.turnmode;
+-        int fb_tm  = map_state_turnmode_to_cmd(car_state_msg.turnmode);
+-
+-        // ---- P2-修复⑤：模式切换锁存 ----
+-        // 底盘机械切换（四轮摆角）有物理时延，反馈滞后停留在旧值；若仅比较"当前帧反馈
+-        // vs 当前指令"，切换途中上游指令一变化就会被误判"已匹配"，反向 SteerModeCtrl
+-        // 不补发、3s 后按新指令发 Run 造成底盘模式混乱。
+-        // 锁存语义：下发切换后，反馈必须真正到达锁存目标模式才认为切换完成；期间持续
+-        // 补发锁存目标（防 UDP 丢包）并忽略上游中途变化，完成后自然跟随新指令。
+-        if (mode_latched < 0)
+-        {
+-            if (fb_tm == -2)
+-            {
+-                // 注：新映射（2026-11-06）不再返回 -2，本分支实际不可达；
+-                //     保留仅为兼容旧回滚版本，勿据此判断存在"差速中间态"。
+-                // 反馈处于切换中间态（差速）：以当前指令为切换目标，开始锁存
+-                mode_latched = cmd_tm;
+-                driver_reason="mode_switch_send_called";
+-                sprintf(str, "Car SteerModeCtrl %d", cmd_tm);
+-                send_packet(str);
+-                delay_time.Clear();
+-                return;
+-            }
+-            if (fb_tm != cmd_tm)
+-            {
+-                // 模式不匹配：下发切换命令并锁存
+-                mode_latched = cmd_tm;
+-                driver_reason="mode_switch_send_called";
+-                sprintf(str, "Car SteerModeCtrl %d", cmd_tm);
+-                send_packet(str);
+-                delay_time.Clear();
+-                return;
+-            }
+-        }
+-        else
+-        {
+-            // 切换进行中：反馈必须到达锁存目标模式
+-            if (fb_tm == mode_latched)
+-            {
+-                // 切换完成：清除锁存，模式空窗从 0 起算
+-                mode_latched = -1;
+-                delay_time.Clear();
+-            }
+-            else
+-            {
+-                // 未到位：持续补发锁存目标（不采信上游中途变化）；中间态(-2)不重置空窗
+-                //（避免切换慢时 3s 窗口永远起算不了），其他未到位状态重置空窗
+-                driver_reason="mode_switch_send_called";
+-                sprintf(str, "Car SteerModeCtrl %d", mode_latched);
+-                send_packet(str);
+-                if (fb_tm != -2)
+-                    delay_time.Clear();
+-                return;
+-            }
+-        }
+-
+-        driver_reason="mechanical_mode_wait";
+-        // ---- 模式已匹配（或锁存刚清除）：按 3s 模式空窗后发 Run ----
+-        if(delay_time.GetValue() > mode_change_time && (cmd_tm==0 || cmd_tm==1))
+-        {
+-            driver_reason="ack_run_send_called";
+-            sprintf(str, "Car Run %.2f %.2f", speed, car_ctr_msg.angle);
+-            send_packet(str);
+-            // RCLCPP_INFO(nh->get_logger(), "UDP Send: %s", str);
+-        }
+-        else if(delay_time.GetValue() > mode_change_time && (cmd_tm==2 || cmd_tm==4))
+-        {
+-            float send_speed = speed;
+-
+-            if (cmd_tm==4)
+-            {
+-                send_speed = -2.0 * send_speed;
+-            }
+-            driver_reason="spin_or_lateral_run_send_called";
+-            sprintf(str, "Car Run %.2f 0.0", send_speed);
+-            send_packet(str);
+-            // RCLCPP_INFO(nh->get_logger(), "UDP Send: %s", str);
+-        }
++        ++command_callbacks;car_ctr_msg=*msg;command_watchdog.Clear();command_seen=true;command_at=steady_ns()*1e-9;
++        car_ctr_msg.angle *= angle_sign;
++    }
++    void ControlTick() {
++        const double now=steady_ns()*1e-9;
++        if(!run_enable){transaction.rearm();char stop[100];std::snprintf(stop,sizeof(stop),"Car Run 0 %.2f",transaction.last_run_angle);if(now-transaction.last_tx>.08){send_packet(stop);transaction.last_tx=now;}return;}
++        const bool fresh=echo_seen && now-car_echo_at<=transaction.feedback_timeout;
++        // Serialized acquisition uses >=80ms between distinct commands.
++        if((!fresh || car_state_msg.ctrmode!=1 || car_state_msg.enable!=255) && now-transaction.last_tx>.1){
++            char packet[100];
++            if(!fresh || car_state_msg.ctrmode!=1)std::snprintf(packet,sizeof(packet),"Car Code_Ctrl");
++            else std::snprintf(packet,sizeof(packet),"Car Enable");
++            send_packet(packet);transaction.last_tx=now;management_until=now+.08;transaction.ready=false;
++        }
++        bool alarms=false;for(int e:car_state_msg.errcode)alarms|=(e!=0);
++        const bool body_fresh=body_valid && now-body_at+body_source_age<.35;
++        const bool stopped=body_speed<.035 && std::abs(body_yaw_rate)<.06;
++        const bool diag_fresh=err_seen && now-error_at<2.;
++        const bool live=command_seen && now-command_at<.5 && car_ctr_msg.enable && diag_fresh;
++        double speed=car_ctr_msg.speed;
++        if(car_ctr_msg.turnmode==4)speed=spin_sign*spin_command_scale*speed;
++        speed=std::clamp(speed,-2.,2.);
++        const double limit=car_ctr_msg.turnmode==1?90.:30.;
++        const double angle=std::clamp((double)car_ctr_msg.angle,-limit,limit);
++        std::string packet=now<management_until?"":transaction.next(now,car_ctr_msg.turnmode,speed,angle,
++            car_state_msg.turnmode,fresh,car_state_msg.ctrmode==1,car_state_msg.enable==255,
++            alarms,body_fresh,stopped,live);
++        if(!packet.empty())send_packet(packet.data());
++        driver_reason=!fresh?"feedback_stale":(!body_fresh?"body_feedback_stale":(!diag_fresh?"diagnostics_stale":(transaction.fault.empty()?transaction.phase:transaction.fault)));
++        mode_latched=transaction.target;
++        std_msgs::msg::String state;std::ostringstream o;
++        o << "{\"schema_version\":2,\"actual_mode\":" << car_state_msg.turnmode
++          << ",\"target_mode\":" << (transaction.target<0?car_state_msg.turnmode:transaction.target)
++          << ",\"ready\":" << (transaction.ready?"true":"false")
++          << ",\"phase\":" << quote(transaction.phase) << ",\"ready_level\":\"timed_open_loop\""
++          << ",\"echo_age_s\":" << number(now-car_echo_at) << ",\"fault_reason\":" << quote(transaction.fault) << "}";
++        state.data=o.str();mode_state_pub->publish(state);
+     }
+ 
+ public:
+@@ -249,6 +181,11 @@
+         nh->declare_parameter<int>("remote_port", 8080);  // 远程目标端口，默认 8080
+         nh->declare_parameter<bool>("run_enable", false);
+         nh->declare_parameter<double>("mode_change_time", 3.0);  // 模式切换空窗期(秒)，默认3.0与原硬编码行为一致
++        nh->declare_parameter<double>("wheel_feedback_scale",1.0);
++        nh->declare_parameter<double>("angle_sign",-1.0);
++        nh->declare_parameter<double>("spin_command_scale",0.429);
++        nh->declare_parameter<double>("spin_sign",-1.0);
++        nh->declare_parameter<double>("feedback_timeout",0.5);
+         nh->declare_parameter<double>("check/node_rate", 10.0);
+         nh->declare_parameter<double>("check/track_rate", 10.0);
+         nh->declare_parameter<std::string>("check/msg", "");
+@@ -265,6 +202,16 @@
+         nodecheck = new TNodeCheck(nh, "node_rate");
+         nodecheck->Find("node_rate")->SetLimit(10);
+ 
++        nh->get_parameter("wheel_feedback_scale",wheel_feedback_scale);nh->get_parameter("angle_sign",angle_sign);
++        nh->get_parameter("feedback_timeout",transaction.feedback_timeout);
++        nh->get_parameter("spin_command_scale",spin_command_scale);nh->get_parameter("spin_sign",spin_sign);
++        if(!std::isfinite(spin_command_scale) || spin_command_scale<=0. || !std::isfinite(spin_sign) || std::abs(spin_sign)!=1. || !std::isfinite(wheel_feedback_scale) || wheel_feedback_scale<=0.)throw std::invalid_argument("Invalid mode unit conversion");
++        transaction.wait_s=std::max(3.,(double)mode_change_time);
++        mode_state_pub=nh->create_publisher<std_msgs::msg::String>("/car_driver/mode_state",10);
++        body_sub=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/rda/body_motion",5,[this](std_msgs::msg::Float32MultiArray::SharedPtr m){
++            if(m->data.size()!=5)return;for(float v:m->data)if(!std::isfinite(v))return;
++            body_speed=std::hypot(m->data[0],m->data[1]);body_yaw_rate=m->data[2];body_valid=m->data[3]>.5;body_source_age=std::max(0.,(double)m->data[4]);body_age.Clear();body_at=steady_ns()*1e-9;
++        });
+         driver_diag_pub=nh->create_publisher<std_msgs::msg::String>("/car_driver/diag",10);
+         driver_io_pub=nh->create_publisher<std_msgs::msg::String>("/car_driver/io",10);
+         udp = new TUDP(local_port);
+@@ -285,9 +232,13 @@
+             std::bind(&TCarCtr::CarCmdCallback, this, std::placeholders::_1)
+         );
+ 
+-        Enable(true);  
++        // Acquisition and enable are serialized by ControlTick.  
+     }
+     
++    void Shutdown() {
++        char packet[100];std::snprintf(packet,sizeof(packet),"Car Run 0 %.2f",transaction.last_run_angle);send_packet(packet);
++        usleep(80000);send_packet((char*)"Car Disable");usleep(80000);
++    }
+     void Stop(int flag)
+     {
+         char str[50];
+@@ -323,40 +274,6 @@
+         //   车物理上不动；同时 /car_state 再无新帧（本 run car_state 全程 0Hz）。
+         //   这是一条闭环死锁：不回包 → 不重试使能 → 不使能 → 不动也不回包。
+         //   修复：把重试提前到回包判断之前，与"有没有回包"彻底解耦，并加无回包告警。
+-        static TTimer tmr;          // 3s 周期：重发 Code_Ctrl / Enable
+-        static TTimer no_rec_tmr;   // 距最后一次有效回包的时间
+-
+-        if (udp->rec_count != 0)  no_rec_tmr.Clear();
+-        if (tmr.GetValue() > 3)
+-        {
+-            tmr.Clear();
+-            if(run_enable)
+-            {
+-                if(car_state_msg.ctrmode==0)
+-                {
+-                    AutoCtr(true);      // 先切程控
+-                    Enable(true);       // 再请求使能（两个请求均幂等，可重复下发）
+-                }
+-                else if(car_state_msg.enable != 255)
+-                {
+-                    Enable(true);
+-                }
+-            }
+-            else 
+-            {
+-                if(car_state_msg.enable!=0)  Enable(false);
+-                else if(car_state_msg.ctrmode==1)  AutoCtr(false);
+-            }    
+-            if (no_rec_tmr.GetValue() > 3.0)
+-            {
+-                RCLCPP_WARN(nh->get_logger(),
+-                    "[car_ctr] 已 %.1fs 收不到底盘 UDP 回包(/car_state 不刷新)，"
+-                    "已重发 Code_Ctrl+Enable 仍无响应。请检查：网线/网段(192.168.15.x)、"
+-                    "底盘上电与急停、底盘是否在程控档。当前 enable=%d ctrmode=%d",
+-                    no_rec_tmr.GetValue(), (int)car_state_msg.enable, (int)car_state_msg.ctrmode);
+-            }
+-        }
+-
+         if (udp->rec_count == 0)  return;
+         const int received_batch_count=udp->rec_count;
+         udp->rec_count = 0;
+@@ -373,25 +290,35 @@
+             if (substrs.size()>=4 && substrs[0] == "Car")
+             {
+                 echo_seen=numeric_token(substrs[1]) && numeric_token(substrs[2]) && numeric_token(substrs[3]);echo_age.Clear();
++                if(!echo_seen)continue;
++                car_echo_at=steady_ns()*1e-9;
+                 car_state_msg.enable = atoi(substrs.at(1).c_str());
+                 car_state_msg.ctrmode = atoi(substrs.at(2).c_str());
+                 car_state_msg.turnmode = atoi(substrs.at(3).c_str());
+                 nodecheck->Find("node_rate")->Beat();
+             }
+-            if (substrs.size()>=3 && substrs[0].find("Wheel") != string::npos) 
++            if (substrs.size()>=3 && substrs[0].size()==6 && substrs[0].substr(0,5)=="Wheel") 
+             {
+                 int len = substrs[0].length();
+                 int id = atoi(substrs[0].substr(len - 1, len).c_str());
+                 
+                 // 修复：移除 resize，增加边界检查
+                 if(id >= 0 && id < (int)car_state_msg.speed.size()) {
+-                    car_state_msg.speed[id] = atof(substrs.at(2).c_str()) * RPM2SPD;
++                    car_state_msg.speed[id] = atof(substrs.at(2).c_str()) * wheel_feedback_scale;
+                     wheel_seen[id]=numeric_token(substrs[2]) && std::isfinite(car_state_msg.speed[id]);wheel_age[id].Clear();
++                }
++            }
++            if(substrs.size()>=3 && substrs[0].size()==5 && substrs[0].substr(0,4)=="Turn") {
++                int id=substrs[0][4]-'0';
++                if(id>=0 && id<4 && numeric_token(substrs[2])) {
++                    turn_position[id]=atof(substrs[2].c_str());turn_seen[id]=std::abs(turn_position[id])>1.;turn_age[id].Clear();
+                 }
+             }
+             if (substrs.size()>=9 && substrs[0].find("errcode") != string::npos) 
+             {
+-                err_seen=true;err_age.Clear();
++                bool valid=true;for(int k=0;k<8;++k)valid=valid && numeric_token(substrs[1+k]);
++                if(!valid)continue;
++                err_seen=true;err_age.Clear();error_at=steady_ns()*1e-9;
+                 // 修复：移除 resize，直接填充固定数组
+                 for(int k=0; k<8 && k < (int)car_state_msg.errcode.size(); k++)  
+                     car_state_msg.errcode[k]=atoi(substrs[1+k].c_str());
+@@ -406,13 +333,7 @@
+         driver_dt_s=driver_tick_seen?driver_loop_timer.GetValue():0.;driver_tick_seen=true;driver_loop_timer.Clear();
+         nh->get_parameter("run_enable", run_enable);
+         UDP_Proc();
+-        // Independent of ROS-time and of the 3 s steering-mode delay.
+-        if(command_seen && command_watchdog.GetValue()>.5) {
+-            char stop_packet[100];
+-            sprintf(stop_packet,"Car Run 0.0 %.2f",car_ctr_msg.angle);
+-            driver_reason="command_watchdog_stop";
+-            send_packet(stop_packet);
+-        }
++        ControlTick();
+         drain_socket_diagnostics();
+         publish_driver_diag();
+     }
+@@ -422,13 +343,14 @@
+ {
+     rclcpp::init(argc, argv);
+     TCarCtr myCar;
+-    rclcpp::Rate rate(20);
++    rclcpp::Rate rate(25);
+     while (rclcpp::ok())
+     {
+         myCar.run();
+         rclcpp::spin_some(myCar.nh);
+         rate.sleep();
+     }
++    myCar.Shutdown();
+     rclcpp::shutdown();
+     return 0;
+ };
+--- a/src/control/car_ctr/src/mode_transaction.hpp
++++ b/src/control/car_ctr/src/mode_transaction.hpp
+@@ -0,0 +1,64 @@
++#pragma once
++#include <algorithm>
++#include <cmath>
++#include <cstdio>
++#include <string>
++
++// Pure deterministic policy, monotonic seconds. The caller supplies actual
++// body-motion evidence, not commanded wheel speed. No ROS or UDP dependencies.
++struct ModeTransaction {
++    double wait_s=3.,feedback_timeout=.5,deadline_s=12.;
++    int target=-1;std::string phase="READY",fault;
++    double started=0.,stopped_at=-1.,zero_at=0.,echo_at=-1.,sent_at=-10.,last_tx=-10.;
++    double old_angle=0.,last_run_angle=0.;int retries=0;
++    bool ready=false;
++    static bool legal(int m){return m==0 || m==1 || m==4;}
++    std::string run(double v,double a){char b[100];std::snprintf(b,sizeof(b),"Car Run %.3f %.2f",v,a);return b;}
++    std::string next(double now,int desired,double velocity,double angle,int actual,
++                     bool feedback_fresh,bool control,bool enabled,bool alarms,
++                     bool body_valid,bool stopped,bool command_live) {
++        if(now-last_tx<.039 || (phase=="ECHO" && now-last_tx<.08))return "";
++        ready=false;
++        if(!legal(desired) || !std::isfinite(velocity) || !std::isfinite(angle)) {fault="invalid_command";phase="FAULT";}
++        if(alarms){fault="axis_alarm";phase="FAULT";}
++        if(!feedback_fresh || !control || !enabled || !body_valid || !command_live || !fault.empty()) {
++            stopped_at=-1.;if(phase=="RESET")phase="BRAKE";
++            last_tx=now;return run(0.,last_run_angle);
++        }
++        if(body_valid && stopped){if(stopped_at<0)stopped_at=now;}else stopped_at=-1.;
++        if(phase=="FAULT") {last_tx=now;return run(0.,last_run_angle);} // explicit re-arm required
++        if(target<0 && actual!=desired){target=desired;started=now;phase="BRAKE";stopped_at=-1.;old_angle=last_run_angle;retries=0;echo_at=-1.;}
++        if(target>=0 && now-started>deadline_s){phase="FAULT";fault="switch_timeout";last_tx=now;return run(0.,last_run_angle);}
++        if(phase=="BRAKE") {
++            if(body_valid && stopped){if(stopped_at<0)stopped_at=now;}else stopped_at=-1.;
++            if(stopped_at>=0 && now-stopped_at>=.3){phase="RESET";zero_at=now;}
++            last_tx=now;return run(0.,old_angle);
++        }
++        if(phase=="RESET") {
++            if(!stopped){phase="BRAKE";stopped_at=-1.;old_angle=0.;last_tx=now;return run(0.,0.);}
++            if(now-zero_at>=std::abs(old_angle)/30.+.2){phase="SEND";}
++            last_tx=now;return run(0.,0.);
++        }
++        if(phase=="SEND" && !stopped){phase="BRAKE";stopped_at=-1.;old_angle=0.;last_tx=now;return run(0.,0.);}
++        if(phase=="SEND" || phase=="ECHO") {
++            if(phase=="ECHO" && actual==target){phase="WAIT_MECHANICAL";echo_at=now;}
++            else if(now-last_tx>=.08 && (phase=="SEND" || now-sent_at>=.5)) {
++                if(retries>=4){fault="echo_timeout";phase="FAULT";last_tx=now;return run(0.,0.);}
++                phase="ECHO";sent_at=now;last_tx=now;++retries;
++                return "Car SteerModeCtrl "+std::to_string(target);
++            } else return ""; // reserve mode-command slot; do not overwrite with Run
++        }
++        if(phase=="WAIT_MECHANICAL") {
++            if(actual!=target){fault="mode_echo_changed";phase="FAULT";last_tx=now;return run(0.,0.);}
++            if(now-last_tx<.08)return ""; // protect last distinct command
++            if(now-echo_at>=std::max(3.,wait_s) && body_valid && stopped && stopped_at>=0 && now-stopped_at>=.3){phase="READY";target=-1;last_run_angle=angle;}
++            else {last_tx=now;return run(0.,angle);}
++        }
++        if(phase=="READY") {
++            if(actual!=desired){last_tx=now;return run(0.,last_run_angle);}
++            ready=true;last_run_angle=angle;last_tx=now;return run(velocity,angle);
++        }
++        last_tx=now;return run(0.,last_run_angle);
++    }
++    void rearm(){fault.clear();phase="READY";target=-1;ready=false;stopped_at=-1.;}
++};
+--- a/src/msg/control_msgs/msg/CarCtr.msg
++++ b/src/msg/control_msgs/msg/CarCtr.msg
+@@ -3,6 +3,6 @@
+ int8 up_down_flag  #  0-上升  1-下降
+ int32 enable
+ int32 turnmode    #  0-阿克曼    1-斜行  2-横移模式  4-自转模式  x-差速模式  
+-float32 speed
++float32 speed  # 上层模式0/1: m/s；模式4: rad/s，驱动转换为轮面m/s
+ float32 angle
+ int32 heartbeat--- a/src/msg/control_msgs/msg/CarState.msg
++++ b/src/msg/control_msgs/msg/CarState.msg
+@@ -1,5 +1,5 @@
+ int32 enable
+ int32 ctrmode
+-int32 turnmode    # 0-阿克曼  1-差速模式  2-自转模式  3-横移模式  4-斜行    
++int32 turnmode    # 0-阿克曼  1-斜行(含90度)  2-横移(未使用)  4-自转    
+ float32[4] speed
+ int32[8] errcode

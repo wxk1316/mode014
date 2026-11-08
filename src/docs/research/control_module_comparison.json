@@ -1,0 +1,93 @@
+{
+  "scope": "control-only module ablation; same current planner/perception; synthetic inputs; no ROS/DDS/UDP or independent collision oracle",
+  "baseline_archive": "docs/research/baseline_sources.zip",
+  "results": {
+    "baseline_control": {
+      "executable_but_unmoving_walls_1_32m": {
+        "spin_sessions": 1,
+        "trap_active": true,
+        "stall_class": "unclassified",
+        "requests": [
+          {
+            "time_s": 0.7000000000000001,
+            "target_rad": -1.3089969389957472
+          }
+        ],
+        "latency_ms": {
+          "p50": 0.17758300236891955,
+          "p95": 11.35547500452958,
+          "p99": 13.425944999908092
+        },
+        "maximum_ms": 14.053874998353422,
+        "deadline_misses_100ms": 0
+      },
+      "true_static_blockage_walls_1_14m": {
+        "spin_sessions": 1,
+        "trap_active": true,
+        "stall_class": "unclassified",
+        "requests": [
+          {
+            "time_s": 0.7000000000000001,
+            "target_rad": -1.3089969389957472
+          }
+        ],
+        "latency_ms": {
+          "p50": 0.17670800298219547,
+          "p95": 5.63889159966493,
+          "p99": 7.888198082800949
+        },
+        "maximum_ms": 8.597958003520034,
+        "deadline_misses_100ms": 0
+      },
+      "episode_memory": {
+        "attempts_after_internal_lateral_drift": 0,
+        "trap_released_without_rejoin_motion": true
+      },
+      "physical_stop": {
+        "mode4_requested_while_measured_speed_point2": 0.3,
+        "reverse_allowed_with_one_wheel_point1": true
+      }
+    },
+    "patched_control": {
+      "executable_but_unmoving_walls_1_32m": {
+        "spin_sessions": 0,
+        "trap_active": false,
+        "stall_class": "execution_stall",
+        "requests": [],
+        "latency_ms": {
+          "p50": 11.22183400002541,
+          "p95": 11.54815779882483,
+          "p99": 11.661393674439749
+        },
+        "maximum_ms": 11.690083993016742,
+        "deadline_misses_100ms": 0
+      },
+      "true_static_blockage_walls_1_14m": {
+        "spin_sessions": 1,
+        "trap_active": true,
+        "stall_class": "confirmed_static_constraint",
+        "requests": [
+          {
+            "time_s": 0.7000000000000001,
+            "target_rad": -1.3089969389957472
+          }
+        ],
+        "latency_ms": {
+          "p50": 0.18754100165097043,
+          "p95": 5.741091599338688,
+          "p99": 12.289561924408172
+        },
+        "maximum_ms": 14.35729200602509,
+        "deadline_misses_100ms": 0
+      },
+      "episode_memory": {
+        "attempts_after_internal_lateral_drift": 2,
+        "trap_released_without_rejoin_motion": false
+      },
+      "physical_stop": {
+        "mode4_requested_while_measured_speed_point2": null,
+        "reverse_allowed_with_one_wheel_point1": false
+      }
+    }
+  }
+}

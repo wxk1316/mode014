@@ -1,0 +1,4 @@
+unique_identifier_msgs/UUID id
+autoware_perception_msgs/Semantic semantic
+autoware_perception_msgs/State state
+autoware_perception_msgs/Shape shape

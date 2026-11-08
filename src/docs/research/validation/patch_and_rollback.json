@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-06",
+  "checks": {
+    "patch_dry_run": true,
+    "patch_apply": true,
+    "applied_hashes_match": true,
+    "rollback_preview": true,
+    "refused_later_edit_without_any_write": true,
+    "rollback_apply": true,
+    "restored_before_hashes_and_removed_only_added": true,
+    "idempotent_rollback": true
+  },
+  "files": 27,
+  "source_workspace_modified_by_verification": false,
+  "isolated_outside_src": true
+}

@@ -1,0 +1,12 @@
+string gait_name
+bool gait_run_state
+float32 s
+float32 h
+float32 tw_z
+float32 tw_t
+float32 ksw
+float32 tw1
+float32 s1
+float32 gait_angle
+---
+string feedback

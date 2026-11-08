@@ -1,0 +1,67 @@
+{
+  "case": "staggered_barriers",
+  "baseline": false,
+  "noise": true,
+  "seed": 7,
+  "reached": false,
+  "duration_s": 75.0,
+  "goal_distance_m": 2.5624023500329067,
+  "min_gap_m": 0.16936362148657338,
+  "collision": false,
+  "switches": [
+    {
+      "t": 18.240000000000002,
+      "mode": 4
+    },
+    {
+      "t": 29.68,
+      "mode": 0
+    },
+    {
+      "t": 40.96,
+      "mode": 4
+    },
+    {
+      "t": 50.52,
+      "mode": 0
+    },
+    {
+      "t": 55.0,
+      "mode": 4
+    },
+    {
+      "t": 60.0,
+      "mode": 0
+    },
+    {
+      "t": 64.52,
+      "mode": 1
+    }
+  ],
+  "spin_count": 3,
+  "crab_count": 1,
+  "trap_ticks": 219,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 4.466879284946508,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "mode_switch_wait": 178,
+    "planning_pending": 3,
+    "motion": 211,
+    "goal_braking": 6,
+    "blocked": 3,
+    "spin_requested": 3,
+    "spin_active": 262,
+    "spin_reached": 3,
+    "planning_result_stale": 10,
+    "crab_requested": 1,
+    "crab_motion": 69
+  },
+  "final_reason": "crab_motion",
+  "plan_p95_ms": 5.2860748488456,
+  "plan_max_ms": 18.41191601124592,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

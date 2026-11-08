@@ -1,0 +1,11 @@
+{
+  "baseline_source_count": 94,
+  "modified_source_count": 25,
+  "new_source_count": 15,
+  "patch_dry_run_passed": true,
+  "patch_apply_matches_final_source_hashes": true,
+  "patch_sha256": "90491c8ce4f6509b5464bc0455f24e511da391aa49c5f334c9b594ca4dbc1227",
+  "source_hashes_verified": true,
+  "check_directory": "temporary /tmp directory (removed after check)",
+  "localization_source_modifications": []
+}

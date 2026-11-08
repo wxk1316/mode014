@@ -1,0 +1,469 @@
+[
+  {
+    "id": "C03",
+    "doi": "10.1007/s10514-023-10097-6",
+    "title": [
+      "Regulated pure pursuit for robot path tracking"
+    ],
+    "authors": [
+      {
+        "given": "Steve",
+        "family": "Macenski",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Shrijit",
+        "family": "Singh",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0003-3121-5744",
+        "authenticated-orcid": false,
+        "given": "Francisco",
+        "family": "Martín",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Jonatan",
+        "family": "Ginés",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "venue": [
+      "Autonomous Robots"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2023,
+          6,
+          10
+        ]
+      ]
+    },
+    "crossref_is_referenced_by_count": 112,
+    "metadata_indexed": {
+      "date-parts": [
+        [
+          2026,
+          11,
+          5
+        ]
+      ],
+      "date-time": "2026-11-05T01:02:23Z",
+      "timestamp": 1793840543616,
+      "version": "4.6.1"
+    },
+    "doi_url": "https://doi.org/10.1007/s10514-023-10097-6",
+    "observed_date": "2026-11-06",
+    "count_scope": "Crossref deposited citation links, not Google Scholar total"
+  },
+  {
+    "id": "C04",
+    "doi": "10.15607/RSS.2021.XVII.015",
+    "title": [
+      "Jerk-limited Real-time Trajectory Generation with Arbitrary Target States"
+    ],
+    "authors": [
+      {
+        "given": "Lars",
+        "family": "Berscheid",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Torsten",
+        "family": "Kroeger",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "venue": [
+      "Robotics: Science and Systems XVII"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2021,
+          7,
+          12
+        ]
+      ]
+    },
+    "crossref_is_referenced_by_count": 95,
+    "metadata_indexed": {
+      "date-parts": [
+        [
+          2026,
+          11,
+          5
+        ]
+      ],
+      "date-time": "2026-11-05T01:03:41Z",
+      "timestamp": 1793840621140,
+      "version": "4.6.1"
+    },
+    "doi_url": "https://doi.org/10.15607/rss.2021.xvii.015",
+    "observed_date": "2026-11-06",
+    "count_scope": "Crossref deposited citation links, not Google Scholar total"
+  },
+  {
+    "id": "R21-PSF",
+    "doi": "10.1016/j.automatica.2021.109597",
+    "observed_date": "2026-11-06",
+    "count": null,
+    "title": [
+      "A predictive safety filter for learning-based control of constrained nonlinear dynamical systems"
+    ],
+    "authors": [
+      {
+        "given": "Kim Peter",
+        "family": "Wabersich",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Melanie N.",
+        "family": "Zeilinger",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "venue": [
+      "Automatica"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2021,
+          7
+        ]
+      ]
+    },
+    "crossref_is_referenced_by_count": 275,
+    "metadata_indexed": {
+      "date-parts": [
+        [
+          2026,
+          11,
+          5
+        ]
+      ],
+      "date-time": "2026-11-05T01:16:12Z",
+      "timestamp": 1793841372791,
+      "version": "4.6.1"
+    },
+    "doi_url": "https://doi.org/10.1016/j.automatica.2021.109597",
+    "count_scope": "Crossref deposited citation links, not Google Scholar total"
+  },
+  {
+    "id": "A03",
+    "doi": "10.1007/978-3-031-25056-9_43",
+    "title": [
+      "SimpleTrack: Understanding and Rethinking 3D Multi-object Tracking"
+    ],
+    "authors": [
+      {
+        "given": "Ziqi",
+        "family": "Pang",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Zhichao",
+        "family": "Li",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Naiyan",
+        "family": "Wang",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "venue": [
+      "Lecture Notes in Computer Science",
+      "Computer Vision – ECCV 2022 Workshops"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2023
+        ]
+      ]
+    },
+    "crossref_is_referenced_by_count": 145,
+    "metadata_indexed": {
+      "date-parts": [
+        [
+          2026,
+          11,
+          2
+        ]
+      ],
+      "date-time": "2026-11-02T11:50:16Z",
+      "timestamp": 1793620216550,
+      "version": "4.5.0"
+    },
+    "doi_url": "https://doi.org/10.1007/978-3-031-25056-9_43",
+    "observed_date": "2026-11-06",
+    "count_scope": "Crossref deposited citation links, not Google Scholar total"
+  },
+  {
+    "id": "A05",
+    "doi": "10.1109/IROS47612.2022.9981561",
+    "title": [
+      "Patchwork++: Fast and Robust Ground Segmentation Solving Partial Under-Segmentation Using 3D Point Cloud"
+    ],
+    "authors": [
+      {
+        "given": "Seungjae",
+        "family": "Lee",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "School of Electrical Engineering at KAIST,Korea Advanced Institute of Science and Technology,Daejeon,Republic of Korea,34141"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Hyungtae",
+        "family": "Lim",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "School of Electrical Engineering at KAIST,Korea Advanced Institute of Science and Technology,Daejeon,Republic of Korea,34141"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Hyun",
+        "family": "Myung",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "School of Electrical Engineering at KAIST,Korea Advanced Institute of Science and Technology,Daejeon,Republic of Korea,34141"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "venue": [
+      "2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2022,
+          10,
+          23
+        ]
+      ]
+    },
+    "crossref_is_referenced_by_count": 186,
+    "metadata_indexed": {
+      "date-parts": [
+        [
+          2026,
+          10,
+          31
+        ]
+      ],
+      "date-time": "2026-10-31T20:22:51Z",
+      "timestamp": 1793478171994,
+      "version": "4.5.0"
+    },
+    "doi_url": "https://doi.org/10.1109/iros47612.2022.9981561",
+    "observed_date": "2026-11-06",
+    "count_scope": "Crossref deposited citation links, not Google Scholar total"
+  },
+  {
+    "id": "B07",
+    "doi": "10.1109/IROS60139.2025.11246091",
+    "title": [
+      "Gradient Field-Based Dynamic Window Approach for Collision Avoidance in Complex Environments"
+    ],
+    "authors": [
+      {
+        "given": "Ze",
+        "family": "Zhang",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "Chalmers University of Technology,Gothenburg,Sweden,41296"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Yifan",
+        "family": "Xue",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "University of Pennsylvania,Philadelphia,PA,USA,19104"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Nadia",
+        "family": "Figueroa",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "University of Pennsylvania,Philadelphia,PA,USA,19104"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Knut",
+        "family": "Åkesson",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Chalmers University of Technology,Gothenburg,Sweden,41296"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "venue": [
+      "2025 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          10,
+          19
+        ]
+      ]
+    },
+    "crossref_is_referenced_by_count": 3,
+    "metadata_indexed": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          2
+        ]
+      ],
+      "date-time": "2026-07-02T10:23:39Z",
+      "timestamp": 1782987819989,
+      "version": "3.54.5"
+    },
+    "doi_url": "https://doi.org/10.1109/iros60139.2025.11246091",
+    "observed_date": "2026-11-06",
+    "count_scope": "Crossref deposited citation links, not Google Scholar total"
+  }
+]

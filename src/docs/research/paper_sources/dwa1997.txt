@@ -1,0 +1,214 @@
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+
+ The Dynamic Window Approach to Collision Avoidance - Robotics Institute Carnegie Mellon University 
+
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+ Your Profile 
+ Settings 
+ Sign out 
+ -->
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ Your Profile 
+ Settings 
+ Sign out 
+ -->
+ 
+ 
+ 
+
+
+
+ 
+ 
+ 
+ 
+ Filter By: 
+ 
+ All Publications
+ 
+ 
+ Conference Papers
+ 
+ 
+ Journal Articles
+ 
+ 
+ Workshop Paper
+ 
+ 
+ Master's Theses
+ 
+ 
+ PhD Theses
+ 
+ 
+ Technical Reports
+ 
+ 
+ 
+ 
+ ← Back to
+ Publications 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ The Dynamic Window Approach to Collision Avoidance 
+ 
+ 
+
+ 
+ 
+ 
+
+ 
+ March
+ 1997
+ 
+
+ The Dynamic Window Approach to Collision Avoidance 
+
+ 
+ 
+ View Publication
+ 
+ 
+ 
+
+ 
+ Authors: Dieter Fox, W. Burgard, and Sebastian Thrun 
+ 
+
+ 
+ Magazine Article
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+
+
+ 
+ Abstract: 
+ This approach, designed for mobile robots equipped with synchro-drives, is derived directly from the motion dynamics of the robot. In experiments, the dynamic window approach safely controlled the mobile robot RHINO at speeds of up to 95 cm/sec, in populated and dynamic environments. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ copied = false, 2000);
+ ">
+ 
+ 
+
+ 
+ 
+ @periodical{Fox-1997-16403, author = {Dieter Fox And W. Burgard And Sebastian Thrun}, title = {The Dynamic Window Approach to Collision Avoidance}, journal = {IEEE Robotics and Automation}, year = {1997}, month = {March}, pages = {23 - 33}, volume = {4}, }
+ 
+ 
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+ 
+
+ 
+ 
+ 
+ Copyright notice: This material is presented to ensure timely dissemination of
+ scholarly
+ and
+ technical work. Copyright and all rights therein are retained by authors or by other copyright holders.
+ All
+ persons copying this information are expected to adhere to the terms and constraints invoked by each
+ author's
+ copyright. These works may not be reposted without the explicit permission of the copyright holder.
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ © 2026 RI Data Repository. All rights reserved.
+ 
+ 
+ 
+ 
+ 
+
+ 

@@ -1,0 +1,50 @@
+[
+  {
+    "case": "multi_blocks",
+    "file": "docs/research/validation/lateral_first_final_90s/multi_blocks_trace.json",
+    "at": 23.8,
+    "pose": [
+      0.6505999969422869,
+      3.903163399075337e-05,
+      0.00010639126496646448
+    ],
+    "confined_27_perturbations_count": 0,
+    "samples": 27
+  },
+  {
+    "case": "u_shape",
+    "file": "docs/research/validation/static_recovery_final_90s/integrated/u_shape_trace.json",
+    "at": 12.5,
+    "pose": [
+      0.26620000000000027,
+      0.0,
+      0.0
+    ],
+    "confined_27_perturbations_count": 27,
+    "samples": 27
+  },
+  {
+    "case": "thick_u",
+    "file": "docs/research/validation/static_recovery_final_90s/integrated/thick_u_trace.json",
+    "at": 14.1,
+    "pose": [
+      0.7935874845527434,
+      0.003019844674616443,
+      0.008355766719039962
+    ],
+    "confined_27_perturbations_count": 27,
+    "samples": 27
+  },
+  {
+    "case": "narrow_u",
+    "file": "docs/research/validation/static_recovery_final_90s/integrated/narrow_u_trace.json",
+    "at": 13.4,
+    "pose": [
+      0.6512000000000004,
+      0.0,
+      0.0
+    ],
+    "confined_27_perturbations_count": 27,
+    "samples": 27
+  }
+]

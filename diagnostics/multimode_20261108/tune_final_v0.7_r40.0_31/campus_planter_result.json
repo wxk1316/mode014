@@ -1,0 +1,29 @@
+{
+  "case": "campus_planter",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 16.52,
+  "goal_distance_m": 0.18662240238383992,
+  "min_gap_m": 0.14212046712454843,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.8989281890829659,
+  "reasons": {
+    "motion": 164,
+    "mode_switch_wait": 1,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 3.0560520026483573,
+  "plan_max_ms": 4.60512499557808,
+  "worker_delay_s": 0.0,
+  "time_model": "virtual time excluding synchronous solve wall time",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

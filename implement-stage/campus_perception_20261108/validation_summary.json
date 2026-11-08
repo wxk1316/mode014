@@ -1,0 +1,15 @@
+{
+  "downloaded_artifacts": 14,
+  "model_bytes": 106709442,
+  "onnx_checker": "passed",
+  "harp_cpu_forward": "passed",
+  "patchwork_cpu": "passed",
+  "cuda_build": "not_executed_no_cuda_host",
+  "ros_transport": "not_executed_no_ros_host",
+  "vehicle_fps": "not_measured",
+  "tests_passed": 32,
+  "assumption_review_round": 2,
+  "undeclared_remaining": 0,
+  "review_independence": "same-family",
+  "review_acceptance": "provisional"
+}

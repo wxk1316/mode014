@@ -1,0 +1,73 @@
+{
+  "undeclared": [],
+  "stale_rows": [],
+  "semantic_undeclared": 0,
+  "verdict": "clean",
+  "round": 2,
+  "resolved": [
+    {
+      "ledger_row": "A028",
+      "finding": "HARP fusion and class-selection policy",
+      "evidence": "The ledger and README now declare class-10-only drivable-grid fusion, shared instance detection/tracking, and the existing planner's lack of grid consumption. This matches pipeline.py and geometry.py."
+    },
+    {
+      "ledger_row": "A029",
+      "finding": "Discarded vehicle roll and pitch",
+      "evidence": "Pose retains XYZ/roll/pitch/yaw; both localization input paths preserve the attitude; matrix() uses all three angles. Execution of the actual _odom/_pose methods reproduced the supplied full rigid transform. A static world point remained aligned across historical compensation with changing roll, pitch, yaw, and translation."
+    },
+    {
+      "ledger_row": "A030",
+      "finding": "Implicit CenterPoint postprocessing definition",
+      "evidence": "The ledger and README explicitly describe the local radial ROI, same-class circle/IoU suppression, 500-box limit, and omitted area remapper. These declarations match the reviewed backend and NMS implementation."
+    },
+    {
+      "ledger_row": "A031",
+      "finding": "Implicit ground and occupancy policy",
+      "evidence": "The single-plane model, whole-frame rejection on unreliable ground, relief thresholds, free-cell support rule, and one-cell dilation are now declared and match geometry.py. These are disclosed conservative policies, not remaining implementation contradictions."
+    },
+    {
+      "ledger_row": "A032",
+      "finding": "Unbounded semantic inheritance and mixed confidence meanings",
+      "evidence": "Semantic memory is bounded to one second. Current measurement score is separate from semantic_score, semantic_observation_stamp, semantic_age, and validity/history fields. The current regression confirmed that geometry score 1.0 does not replace semantic confidence 0.4 and that the exported semantic label expires to UNKNOWN. Planner-type semantics are separately documented."
+    },
+    {
+      "ledger_row": "A033",
+      "finding": "Implicit comparison populations and semantic availability meaning",
+      "evidence": "The received-success population is declared in the ledger, README, and report. Comparison separately counts planner publication attempts and diagnostic reasons. Semantic cache existence and current spatial matching are separate; zero matches now yield semantic_available=false. In-memory execution of the actual summarise function verified these fields and denominators."
+    },
+    {
+      "ledger_row": "A034",
+      "finding": "State-estimate timestamp versus per-object observation timestamp",
+      "evidence": "The fixed planner-message limitation is now explicitly declared. Header time describes the current estimated state; per-object observation age remains in rich output, and prediction retention is bounded by tracker_lost_time. The unchanged message projection matches this declared contract."
+    },
+    {
+      "ledger_row": "A026",
+      "finding": "Dropped successful semantic timing",
+      "evidence": "The prior correction remains present: successful semantic results emit their prediction/processing durations independently of detector output, the recorder subscribes to those diagnostics, and the comparison reports them."
+    },
+    {
+      "ledger_row": "A027",
+      "finding": "Sensor-extrinsic configuration precedence",
+      "evidence": "The prior correction and declaration remain present: all six mounting parameters feed both perception and newly published TF; launch-argument precedence over YAML and existing-TF precedence in standalone detection are documented."
+    }
+  ],
+  "verification": {
+    "read_only": true,
+    "files_edited": false,
+    "agents_spawned": false,
+    "executed": [
+      "All three current test_review_regressions.py test functions passed.",
+      "Actual _odom/_pose methods preserved a nonzero roll/pitch/yaw quaternion and XYZ translation.",
+      "Historical-sweep compensation aligned a static world point across changing full vehicle attitude.",
+      "Actual comparison summarisation, using in-memory records, correctly separated received tracks, publication attempts, diagnostic reasons, semantic timing, and matched fractions."
+    ],
+    "not_claimed": [
+      "ROS transport or launch execution",
+      "CUDA compilation or GPU inference",
+      "Vehicle-runtime performance or detection accuracy",
+      "Independent rerun of the parent's entire 32-test suite"
+    ]
+  },
+  "administrative_note": "BUILD_NOTE.md still contains historical Blockers prose saying HARP identity awaits clarification, while A001 and its F3 record say it is confirmed. Update that run-status prose during finalization; it is not a remaining code/ledger assumption mismatch.",
+  "review_assurance": "Provisional. No cross-family model-identity evidence was supplied to this reviewer. Clean means no remaining undeclared assumptions or stale ledger choices were identified within this bounded review, not that the method or vehicle deployment has been independently validated."
+}

@@ -1,0 +1,772 @@
+{
+  "date": "2026-11-06",
+  "scope": "pure Python synthetic model snapshots; no ROS2/DDS/vehicle/real logs",
+  "quantile_limit": "3 repeated fixed snapshots per case; empirical p99 is not a calibrated tail bound",
+  "equal_commands_against_frozen_baseline": {
+    "batch_only": true,
+    "full": true
+  },
+  "results": [
+    {
+      "case": "near_tiles512",
+      "variant": "baseline",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 2272.8500419980264,
+        "p95": 2277.5213795037416,
+        "p99": 2277.9366095042496,
+        "max": 2278.0404170043766
+      },
+      "cycle_deadline_100ms_misses": 3,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": 0.48,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "dense_tiles512",
+      "variant": "baseline",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 2522.25974999601,
+        "p95": 2527.997512798902,
+        "p99": 2528.507536159159,
+        "max": 2528.635041999223
+      },
+      "cycle_deadline_100ms_misses": 3,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": 0.7299999999999999,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "mixed_tiles512",
+      "variant": "baseline",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 2428.3486250060378,
+        "p95": 2431.0845871987112,
+        "p99": 2431.32778383806,
+        "max": 2431.388582997897
+      },
+      "cycle_deadline_100ms_misses": 3,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": 0.825,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "reverse_near_tiles512",
+      "variant": "baseline",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.0,
+          0.0
+        ],
+        [
+          true,
+          0.0,
+          0.0
+        ],
+        [
+          true,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 2739.5206250002957,
+        "p95": 2760.078274700936,
+        "p99": 2761.905621340993,
+        "max": 2762.3624580010073
+      },
+      "cycle_deadline_100ms_misses": 3,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": 0.6950625561134911,
+      "selected_nominal_path_m": 0.022667347472950385,
+      "selected_endpoint_heading_error_rad": 0.008235731977194849,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "near_tiles512",
+      "variant": "batch_only",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 77.84904100117274,
+        "p95": 78.18001689738594,
+        "p99": 78.20943697704934,
+        "max": 78.21679199696518
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.48,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 92,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "dense_tiles512",
+      "variant": "batch_only",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 56.832208996638656,
+        "p95": 59.98565869886079,
+        "p99": 60.26596533905831,
+        "max": 60.33604199910769
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.7299999999999999,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 102,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "mixed_tiles512",
+      "variant": "batch_only",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 61.270875004993286,
+        "p95": 61.39687500181026,
+        "p99": 61.40807500152732,
+        "max": 61.41087500145659
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.825,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "reverse_near_tiles512",
+      "variant": "batch_only",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.0,
+          0.0
+        ],
+        [
+          true,
+          0.0,
+          0.0
+        ],
+        [
+          true,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 134.52362500538584,
+        "p95": 140.14802559977397,
+        "p99": 140.64797231927514,
+        "max": 140.77295899915043
+      },
+      "cycle_deadline_100ms_misses": 3,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": 0.6950625561134911,
+      "selected_nominal_path_m": 0.022667347472950385,
+      "selected_endpoint_heading_error_rad": 0.008235731977194849,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 111,
+        "feasible_count": 111,
+        "checked_count": 111
+      }
+    },
+    {
+      "case": "near_tiles512",
+      "variant": "full",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 68.57066600059625,
+        "p95": 69.67931659528404,
+        "p99": 69.77786331481184,
+        "max": 69.80249999469379
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.48,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 92,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "dense_tiles512",
+      "variant": "full",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 52.22991600021487,
+        "p95": 52.57697849738179,
+        "p99": 52.60782849712996,
+        "max": 52.615540997067
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.7299999999999999,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 102,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "mixed_tiles512",
+      "variant": "full",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 56.94249999942258,
+        "p95": 57.484112794918474,
+        "p99": 57.53225615451811,
+        "max": 57.54429199441802
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.825,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "reverse_near_tiles512",
+      "variant": "full",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.0,
+          0.0
+        ],
+        [
+          true,
+          0.0,
+          0.0
+        ],
+        [
+          true,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 118.13979099679273,
+        "p95": 119.07054130206234,
+        "p99": 119.15327466253075,
+        "max": 119.17395800264785
+      },
+      "cycle_deadline_100ms_misses": 3,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": 0.6950625561134911,
+      "selected_nominal_path_m": 0.022667347472950385,
+      "selected_endpoint_heading_error_rad": 0.008235731977194849,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 111,
+        "feasible_count": 111,
+        "checked_count": 111
+      }
+    },
+    {
+      "case": "near_tiles512",
+      "variant": "full_budget",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 70.62733299972024,
+        "p95": 72.15894579640008,
+        "p99": 72.29508915610495,
+        "max": 72.32912499603117
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.48,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 92,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "dense_tiles512",
+      "variant": "full_budget",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 49.652749999950174,
+        "p95": 49.86233749805251,
+        "p99": 49.88096749788383,
+        "max": 49.88562499784166
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.7299999999999999,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 102,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "mixed_tiles512",
+      "variant": "full_budget",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 54.52624999452382,
+        "p95": 55.26394939952297,
+        "p99": 55.32952267996734,
+        "max": 55.34591600007843
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.825,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "reverse_near_tiles512",
+      "variant": "full_budget",
+      "samples": 3,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "deadline",
+        "deadline",
+        "deadline"
+      ],
+      "latency_ms": {
+        "p50": 80.18333300424274,
+        "p95": 80.20729549680254,
+        "p99": 80.2094254961412,
+        "max": 80.20995799597586
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 3,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 111,
+        "feasible_count": 111,
+        "checked_count": 111
+      },
+      "fallback_zero_command_model_safe": true,
+      "fallback_limit": "same bicycle/CV/braking model; no actual wheel feedback or real-time vehicle evidence"
+    }
+  ],
+  "frozen_source_sha256": {
+    "rda_dwa/rda_dwa/enhanced_dwa.py": "c83a513b0077b3b295cb50cff9f37974aab98b104bd2e72392669ff1bc6f0d9c",
+    "rda_dwa/rda_dwa/collision_checker.py": "6b75c76311a6ce469a6debec70ac5a121281e4297deab60aed120337aa976181",
+    "rda_dwa/rda_dwa/params.py": "6c96b2fb0570d789164698674da9ba39dec14aad13a671450f56555692c5a8d3",
+    "rda_dwa/rda_dwa/local_guide.py": "da1f7d22c8875ac9a6c5459a9de469adb6ada6e522dce9c38a29373fc08238a7",
+    "rda_dwa/rda_dwa/hybrid_primitives.py": "cdbbcb369ecb16dc684117792913a4ac83c196e0f970633a8fdba4d24f9503f6"
+  }
+}

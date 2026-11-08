@@ -1,0 +1,157 @@
+/*
+ * Copyright 2019 Autoware Foundation. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include <mission_planner/mission_planner_base.h>
+
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
+#include <lanelet2_routing/Route.h>
+
+#include <lanelet2_extension/utility/message_conversion.h>
+#include <lanelet2_extension/utility/query.h>
+#include <lanelet2_extension/visualization/visualization.h>
+
+namespace mission_planner
+{
+MissionPlanner::MissionPlanner(const std::string & node_name, const rclcpp::NodeOptions & options)
+: Node(node_name, options)
+{
+  // 参数声明和获取
+  this->declare_parameter<std::string>("map_frame", "map");
+  this->declare_parameter<std::string>("base_link_frame", "base_link");
+  
+  map_frame_ = this->get_parameter("map_frame").as_string();
+  base_link_frame_ = this->get_parameter("base_link_frame").as_string();
+
+  // TF2初始化
+  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+
+  // 创建发布者 - 使用reliable()确保消息传递
+  route_publisher_ = this->create_publisher<autoware_planning_msgs::msg::Route>(
+    "output/route", rclcpp::QoS(1).reliable().transient_local());
+  
+  marker_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
+    "debug/route_marker", rclcpp::QoS(1).reliable().transient_local());
+
+  // 创建订阅者
+  goal_subscriber_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    "input/goal_pose", rclcpp::QoS(10).reliable(),
+    std::bind(&MissionPlanner::goalPoseCallback, this, std::placeholders::_1));
+  
+  checkpoint_subscriber_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    "input/checkpoint", rclcpp::QoS(10).reliable(),
+    std::bind(&MissionPlanner::checkpointCallback, this, std::placeholders::_1));
+}
+
+bool MissionPlanner::getEgoVehiclePose(geometry_msgs::msg::PoseStamped &ego_vehicle_pose)
+{
+  geometry_msgs::msg::PoseStamped base_link_origin;
+  base_link_origin.header.frame_id = base_link_frame_;
+  base_link_origin.pose.position.x = 0;
+  base_link_origin.pose.position.y = 0;
+  base_link_origin.pose.position.z = 0;
+  base_link_origin.pose.orientation.x = 0;
+  base_link_origin.pose.orientation.y = 0;
+  base_link_origin.pose.orientation.z = 0;
+  base_link_origin.pose.orientation.w = 1;
+
+  //  transform base_link frame origin to map_frame to get vehicle positions
+  return transformPose(base_link_origin, ego_vehicle_pose, map_frame_);
+}
+
+bool MissionPlanner::transformPose(
+  const geometry_msgs::msg::PoseStamped & input_pose, geometry_msgs::msg::PoseStamped &output_pose,
+  const std::string &target_frame)
+{
+  geometry_msgs::msg::TransformStamped transform;
+  try {
+    auto transform = tf_buffer_->lookupTransform(
+      target_frame, 
+      input_pose.header.frame_id, 
+      rclcpp::Time(0),
+      rclcpp::Duration::from_seconds(0.5));
+
+    tf2::doTransform(input_pose, output_pose, transform);
+    return true;
+
+  } catch (tf2::TransformException & ex) {
+    RCLCPP_WARN(rclcpp::get_logger("1"),"TF exception: %s", ex.what());
+    return false;
+  }    
+  
+}
+
+void MissionPlanner::goalPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr goal_msg_ptr)
+{
+  // set start pose
+  if (!getEgoVehiclePose(start_pose_)) {
+    RCLCPP_ERROR(rclcpp::get_logger("1"),"Failed to get ego vehicle pose in map frame. Aborting mission planning");
+    return;
+  }
+  // set goal pose
+  if (!transformPose(*goal_msg_ptr, goal_pose_, map_frame_)) {
+    RCLCPP_ERROR(rclcpp::get_logger("1"),"Failed to get goal pose in map frame. Aborting mission planning");
+    return;
+  }
+
+  RCLCPP_INFO(rclcpp::get_logger("1"),"New goal pose is set. Reset checkpoints.");
+  checkpoints_.clear();
+  checkpoints_.push_back(start_pose_);
+  checkpoints_.push_back(goal_pose_);
+
+  if (!isRoutingGraphReady()) {
+    RCLCPP_ERROR(rclcpp::get_logger("1"),"RoutingGraph is not ready. Aborting mission planning");
+    return;
+  }
+
+  autoware_planning_msgs::msg::Route route = planRoute();
+  publishRoute(route);
+}  // namespace mission_planner
+
+void MissionPlanner::checkpointCallback(
+  const geometry_msgs::msg::PoseStamped::SharedPtr checkpoint_msg_ptr)
+{
+  if (checkpoints_.size() < 2) {
+    RCLCPP_ERROR(rclcpp::get_logger("1"),"You must set start and goal before setting checkpoints. Aborting mission planning");
+    return;
+  }
+
+  geometry_msgs::msg::PoseStamped transformed_checkpoint;
+  if (!transformPose(*checkpoint_msg_ptr, transformed_checkpoint, map_frame_)) {
+    RCLCPP_ERROR(rclcpp::get_logger("1"),"Failed to get checkpoint pose in map frame. Aborting mission planning");
+    return;
+  }
+
+  // insert checkpoint before goal
+  checkpoints_.insert(checkpoints_.end() - 1, transformed_checkpoint);
+
+  autoware_planning_msgs::msg::Route route = planRoute();
+  publishRoute(route);
+}
+
+void MissionPlanner::publishRoute(const autoware_planning_msgs::msg::Route & route) const
+{
+  if (!route.route_sections.empty()) {
+    RCLCPP_INFO(rclcpp::get_logger("1"),"Route successfuly planned. Publishing...");
+    route_publisher_->publish(route);
+    visualizeRoute(route);
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("1"),"Calculated route is empty!");
+  }
+}
+
+}  // namespace mission_planner

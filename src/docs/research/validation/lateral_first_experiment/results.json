@@ -1,0 +1,54 @@
+{
+  "case": "multi_blocks",
+  "duration_s": 90.0,
+  "reached": false,
+  "distance_to_goal_m": 0.8097134919053427,
+  "minimum_conservative_circle_gap_m": 0.2282958355108471,
+  "mode_requests": [
+    {
+      "t": 24.08,
+      "target_mode": 4
+    },
+    {
+      "t": 30.2,
+      "target_mode": 0
+    }
+  ],
+  "steering_sign_flips_over_half_degree": 1,
+  "maximum_command_steer_rate_deg_s": 45.000000000000014,
+  "plan_p95_ms": 36.230625002644956,
+  "plan_max_ms": 45.16416700062109,
+  "stop_reasons": {
+    "motion": 805,
+    "spin_requested": 1,
+    "spin_session": 64,
+    "mode_recovery": 30
+  },
+  "path_length_m_10hz_model": 11.25852128534469,
+  "yaw_to_global_goal_rmse_rad_10hz_model": 1.4256326650051598,
+  "speed_jerk_max_mps3_10hz_model": 7.999999999999887,
+  "mode_switch_count": 2,
+  "mode_wait_s_10hz": 5.9,
+  "trap_entries": 1,
+  "trap_reentries": 0,
+  "plan_p50_ms": 13.34474999748636,
+  "plan_p99_ms": 38.5847500001546,
+  "deadline_misses_100ms": 0,
+  "hard_deadline_misses_300ms": 0,
+  "failure_type": "safe_stop_or_local_failure",
+  "minimum_oracle_gap_m": 0.2282958355108471,
+  "ttc": null,
+  "ttc_reason": "real vehicle TTC unavailable; separate synthetic CV-circle TTC reported when known",
+  "actual_steering_measurement": null,
+  "metrics_scope": "synthetic geometry / bounded actuator model; command steer rate; 10Hz model jerk, not vehicle measurements",
+  "oracle_margin_violation_obstacle_ticks_50hz": 0,
+  "minimum_physical_aabb_oracle_gap_lower_bound_m": 0.2282958355108471,
+  "physical_aabb_collision_free_oracle": true,
+  "collision_free_oracle": true,
+  "configured_margin_preserved_oracle": true,
+  "minimum_cv_circle_ttc_s_model": null,
+  "ttc_model_known_dynamic_seen": false,
+  "ttc_model_assumption": "constant velocities and enclosing circles from synthetic oracle; separate from safety checker and real TTC",
+  "gap_method": "SAT separation lower bound for static AABB; exact point-to-vehicle rectangle minus circle radius for dynamic",
+  "navigation_success_with_no_oracle_collision": false
+}

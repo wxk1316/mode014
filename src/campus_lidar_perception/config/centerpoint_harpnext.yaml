@@ -1,0 +1,3 @@
+campus_lidar_perception:
+  ros__parameters:
+    profile: centerpoint_harpnext

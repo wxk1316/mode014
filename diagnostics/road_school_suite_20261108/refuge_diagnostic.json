@@ -1,0 +1,11 @@
+{
+  "vehicle_circle_radius_m": 0.7211102550927978,
+  "actor_circle_radius_m": 0.7211102550927978,
+  "required_lateral_circle_clearance_m": 1.5622205101855955,
+  "road_allowed_centred_vehicle_y_m": 1.48,
+  "example_parked_y_m": 1.2,
+  "exact_rectangle_gap_at_closest_pass_m": 0.3999999999999999,
+  "example_road_gap_m": 0.3999999999999999,
+  "future_refuge_accepted": false,
+  "note": "This proves the parked circle test rejects one physically clear footprint; it does not prove a collision-free path to that footprint from 4m."
+}

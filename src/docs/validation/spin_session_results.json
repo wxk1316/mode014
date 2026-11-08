@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "mode_requests": [
+    {
+      "t": 0.28,
+      "mode": 4
+    },
+    {
+      "t": 6.68,
+      "mode": 0
+    }
+  ],
+  "transitions": [
+    {
+      "t": 0.0,
+      "mode": "ACK",
+      "stage": "HOLD"
+    },
+    {
+      "t": 0.28,
+      "mode": "SPIN",
+      "stage": "HOLD"
+    },
+    {
+      "t": 3.2800000000000002,
+      "mode": "SPIN",
+      "stage": "RUN"
+    },
+    {
+      "t": 6.18,
+      "mode": "STOP",
+      "stage": "RUN"
+    },
+    {
+      "t": 6.68,
+      "mode": "RECOVER",
+      "stage": "RUN"
+    },
+    {
+      "t": 9.68,
+      "mode": "ACK",
+      "stage": "RUN"
+    }
+  ],
+  "first_actual_rotation_s": 3.2800000000000002,
+  "spin_request_s": 0.28,
+  "ack_request_s": 6.68,
+  "ack_resumed_s": 9.68,
+  "final_error_deg": 3.918820859545082,
+  "motion_ticks_with_planner_w_zero": 131,
+  "scope": "Configured tracker + simulated yaw/mode actuator; no ROS/DDS/UDP"
+}

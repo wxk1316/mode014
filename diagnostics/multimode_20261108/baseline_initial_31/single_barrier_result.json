@@ -1,0 +1,25 @@
+{
+  "case": "single_barrier",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 15.32,
+  "goal_distance_m": 0.1883022290921662,
+  "min_gap_m": 0.2649815277122967,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.700243678334631,
+  "reasons": {
+    "motion": 153,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 2.8475459388573654,
+  "plan_max_ms": 3.276834002463147,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

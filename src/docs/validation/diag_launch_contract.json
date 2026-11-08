@@ -1,0 +1,30 @@
+{
+  "diagnostic_launch_parameters": {
+    "rec_hz": "float",
+    "out_dir": "str",
+    "config_path": "str",
+    "record_gps": "bool",
+    "record_messages": "bool",
+    "record_upstream_localization": "bool",
+    "record_parameter_events": "bool",
+    "rate_window": "float",
+    "drop_timeout": "float",
+    "source_stale_timeout": "float",
+    "queue_capacity": "int",
+    "max_segment_mb": "float",
+    "flush_interval": "float",
+    "writer_close_timeout": "float",
+    "mode_switch_min_wait": "float",
+    "mode_switch_timeout": "float",
+    "steering_sign_deadband_deg": "float"
+  },
+  "parent_config_and_diagnostic_argument_forwarding": {
+    "config_path": "config",
+    "rec_hz": "diag_rec_hz",
+    "out_dir": "diag_out_dir",
+    "record_messages": "diag_record_messages",
+    "max_segment_mb": "diag_max_segment_mb"
+  },
+  "passed": true,
+  "scope": "AST-executed launch factory with in-memory substitutions; not ROS launch/DDS validation"
+}

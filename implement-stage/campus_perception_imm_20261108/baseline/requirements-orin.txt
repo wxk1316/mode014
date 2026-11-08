@@ -1,0 +1,6 @@
+# Install in an isolated venv exposing /opt/ros/humble and the system CUDA runtime.
+# Install a CUDA-enabled NVIDIA Jetson PyTorch wheel separately; never PyPI CPU torch.
+numpy>=1.24,<2
+scipy>=1.8
+PyYAML>=6
+pypatchworkpp==1.4.1

@@ -1,0 +1,152 @@
+{
+  "rda_dwa_real_bridge": {
+    "configured_count": 92,
+    "undeclared_yaml_parameters": [],
+    "unread_yaml_parameters": [],
+    "subscriptions": [
+      "/rda/obstacles",
+      "/localization",
+      "/car_mode_ready",
+      "/move_base_simple/goal",
+      "/car_state",
+      "/car_bridge_state",
+      "/car_cmd"
+    ],
+    "publications": [
+      "/cmd_vel",
+      "/rda/command",
+      "/rda/diag",
+      "/rda/spin_target",
+      "/rda/status",
+      "/rda/traj",
+      "/rda/traj_mode",
+      "/rda/wheel_speed",
+      "/rda/wheel_steer"
+    ],
+    "effective": {
+      "planner_v_max": 0.4,
+      "planner_v_min": -0.3,
+      "horizon": 3.0,
+      "ack_wheelbase": 0.69,
+      "ack_length": 1.2,
+      "ack_width": 0.8,
+      "body_to_base_link_x": 0.0,
+      "footprint_center_offset": 0.0,
+      "reference_rear_offset": -0.345,
+      "spin_pivot_offset": 0.0,
+      "reaction_time": 0.6
+    }
+  },
+  "traj_tracker_node": {
+    "configured_count": 52,
+    "undeclared_yaml_parameters": [],
+    "unread_yaml_parameters": [],
+    "subscriptions": [
+      "/rda/traj",
+      "/rda/command",
+      "/cmd_vel",
+      "/localization",
+      "/rda/spin_target",
+      "/rda/traj_mode",
+      "/car_mode_ready",
+      "/car_state"
+    ],
+    "publications": [
+      "/car_bridge_state",
+      "/car_cmd",
+      "/rda/ctrl_status"
+    ],
+    "effective": {
+      "lookahead_base": 1.2,
+      "lookahead_short": 0.6,
+      "lookahead_v_gain": 0.75,
+      "lookahead_max": 1.2,
+      "steering_gain": 1.0,
+      "wheelbase": 0.69,
+      "max_steer_deg": 30.0,
+      "max_speed": 0.4,
+      "v_max": 0.4,
+      "v_min": -0.3,
+      "reference_center_to_rear": 0.345,
+      "direction_zero_hold": 0.2,
+      "speed_feedback_timeout": 0.3,
+      "direction_speed_eps": 0.03,
+      "speed_eps": 0.001,
+      "acc_lin_max": 0.5,
+      "dec_lin_max": 1.5,
+      "steer_rate_deg": 45.0,
+      "steer_hold_deg": 0.25,
+      "tracking_correction_max_deg": 0.0,
+      "traj_len_threshold": 0.075,
+      "traj_exit_threshold": 0.12,
+      "min_turn_radius": 1.195,
+      "spin_curvature_sat": 0.9,
+      "rotate_entry_deg": 10.0,
+      "spin_w_deadband": 0.06,
+      "enter_hold": 0.3,
+      "resume_hold": 0.3,
+      "spin_hyst": 0.2,
+      "spin_w_max": 0.8,
+      "spin_stop_hold": 0.5,
+      "spin_wait_time": 3.0,
+      "recover_delay": 3.0,
+      "switch_timeout": 8.0,
+      "ready_timeout": 0.3,
+      "spin_timeout": 12.0,
+      "spin_progress_timeout": 2.0,
+      "spin_progress_deg": 0.5,
+      "spin_acc_max": 0.8,
+      "spin_min_run": 0.0,
+      "rotate_precision_deg": 4.0,
+      "rotate_decel_deg": 25.0,
+      "cmd_timeout": 0.5,
+      "traj_timeout": 0.5,
+      "localization_timeout": 0.5,
+      "pose_speed_limit": 0.5,
+      "pose_yaw_rate_limit": 0.8,
+      "pose_jump_margin": 0.15,
+      "pose_yaw_jump_margin_deg": 5.0,
+      "mode_timeout": 0.5,
+      "target_timeout": 0.5,
+      "v_resolution": 0.05,
+      "omega_resolution": 0.1
+    }
+  },
+  "lidar_track_node": {
+    "configured_count": 44,
+    "undeclared_yaml_parameters": [],
+    "unread_yaml_parameters": [],
+    "subscriptions": [
+      "/rslidar_points",
+      "/localization"
+    ],
+    "publications": [
+      "/rda/obstacles",
+      "/rda/obstacles_markers"
+    ],
+    "effective": {
+      "body_to_base_link_x": 0.0,
+      "max_obstacle_range": 12.0,
+      "lidar_filter": {
+        "lidar_height": 0.45,
+        "z_min": -0.3,
+        "z_max": 1.5,
+        "use_z_filter": true,
+        "x_min": -12.0,
+        "x_max": 12.0,
+        "y_min": -12.0,
+        "y_max": 12.0,
+        "base_z_min": 0.15,
+        "base_z_max": 1.95,
+        "half_length": 0.6,
+        "half_width": 0.4,
+        "max_range": 12.0,
+        "vehicle_center_x": 0.0,
+        "sensor_x": 0.0,
+        "sensor_y": 0.0,
+        "sensor_yaw": 0.0
+      }
+    }
+  },
+  "failures": []
+}

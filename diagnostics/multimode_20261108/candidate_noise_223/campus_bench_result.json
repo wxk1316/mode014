@@ -1,0 +1,32 @@
+{
+  "case": "campus_bench",
+  "baseline": false,
+  "noise": true,
+  "seed": 223,
+  "reached": true,
+  "duration_s": 14.22,
+  "goal_distance_m": 0.16099723468832877,
+  "min_gap_m": 0.21116703078833435,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.26575926158266266,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "mode_switch_wait": 2,
+    "planning_pending": 3,
+    "motion": 135,
+    "goal_braking": 1,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 3.340141725493595,
+  "plan_max_ms": 4.593874968122691,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

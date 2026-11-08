@@ -1,0 +1,3324 @@
+--- a/control/car_ctr/src/car_ctr.cpp
++++ b/control/car_ctr/src/car_ctr.cpp
+@@ -67,7 +67,7 @@
+         last_cmd_at = now;
+         const int mode = msg->turnmode;
+         cmd_valid = msg->enable != 0 && msg->ctr_mode == 1
+-            && (mode == 0 || mode == 1 || mode == 2 || mode == 4)
++            && (mode == 0 || mode == 4)
+             && std::isfinite(msg->speed) && std::isfinite(msg->angle);
+         if (!cmd_valid || !run_enable) {
+             zero_motion(now);
+@@ -136,6 +136,7 @@
+         nh->declare_parameter<double>("cmd_timeout", 0.3);
+         nh->declare_parameter<double>("feedback_timeout", 0.3);
+         nh->declare_parameter<int>("spin_feedback_mode", 4);
++        nh->declare_parameter<int>("mode_max_retries", 2);
+         nh->declare_parameter<double>("mode_change_time", 3.0);  // 模式切换空窗期(秒)，默认3.0与原硬编码行为一致
+         nh->declare_parameter<double>("check/node_rate", 10.0);
+         nh->declare_parameter<double>("check/track_rate", 10.0);
+@@ -155,6 +156,7 @@
+         nh->get_parameter("cmd_timeout", cmd_timeout);
+         nh->get_parameter("feedback_timeout", mode_guard.feedback_timeout);
+         nh->get_parameter("spin_feedback_mode", mode_guard.spin_feedback_mode);
++        nh->get_parameter("mode_max_retries", mode_guard.max_retries);
+         if (!std::isfinite(configured_wait) || configured_wait < 3.0
+             || !std::isfinite(cmd_timeout) || cmd_timeout <= 0.0
+             || !std::isfinite(mode_guard.feedback_timeout) || mode_guard.feedback_timeout <= 0.0)
+@@ -317,4 +319,4 @@
+     myCar.shutdown();
+     rclcpp::shutdown();
+     return 0;
+-};
+\ No newline at end of file
++};
+--- a/control/car_ctr/src/mode_switch_guard.hpp
++++ b/control/car_ctr/src/mode_switch_guard.hpp
+@@ -12,6 +12,8 @@
+     double last_sent_at = -std::numeric_limits<double>::infinity();
+     int raw_feedback = -1;
+     int spin_feedback_mode = 4;
++    int max_retries = 2;
++    int send_count = 0;
+     int target = -1;
+     int feedback = -1;
+     double requested_at = 0.0;
+@@ -21,14 +23,15 @@
+         if (!std::isfinite(switch_wait) || switch_wait < 3.0
+             || !std::isfinite(feedback_timeout) || feedback_timeout <= 0.0
+             || !std::isfinite(retry_period) || retry_period < switch_wait
+-            || spin_feedback_mode < 1 || spin_feedback_mode > 4)
++            || spin_feedback_mode < 1 || spin_feedback_mode > 4 || max_retries < 0)
+             throw std::invalid_argument("Invalid mechanical wait, retry period or feedback timeout");
+     }
+-    void mark_sent(double now) { last_sent_at = now; }
++    void mark_sent(double now) { last_sent_at = now; ++send_count; }
+     bool should_retry(double now) const {
+         // Fresh intermediate feedback confirms progress; never restart that motion.
+         if (fresh(now) && raw_feedback == 1 && spin_feedback_mode != 1) return false;
+-        return target >= 0 && !ready(now) && now-last_sent_at >= retry_period;
++        return target >= 0 && !ready(now) && send_count <= max_retries
++            && now-last_sent_at >= retry_period;
+     }
+ 
+     int command_mode(int state_mode) const {
+@@ -36,8 +39,10 @@
+         switch (state_mode) {
+         case 0: return 0;
+         case 2: return -1; // a configured alternate spin feedback must not accept both IDs
+-        case 3: return 2;
+-        case 4: return 1;
++        // Crab/translation feedback IDs and units are not confirmed on this car.
++        // No legacy mapping authorizes an unverified motion mode.
++        case 3: return -1;
++        case 4: return -1;
+         default: return -1;
+         }
+     }
+@@ -51,10 +56,12 @@
+     }
+     // Do not reverse an in-flight mechanical request. Stop is always independent.
+     bool request(int mode, double now) {
++        if (mode != 0 && mode != 4) return false;
+         if (mode == target || (target >= 0 && !ready(now))) return false;
+         target = mode;
+         requested_at = now;
+         last_sent_at = -std::numeric_limits<double>::infinity();
++        send_count = 0;
+         return true;
+     }
+     void observe(int state_mode, double now) {
+--- a/docs/validation/run_closed_loop.py
++++ b/docs/validation/run_closed_loop.py
+@@ -90,6 +90,10 @@
+             if info.get('reached'):
+                 reached = True
+         tracker.set_pose(x, y)
++        # Synthetic source-rate observation for the production yaw-stop gate.
++        # This is model feedback, not measured vehicle angular velocity.
++        if tick % 5 == 0 and hasattr(tracker, 'set_yaw_feedback'):
++            tracker.set_yaw_feedback(yaw, 1000.+t, t)
+         command = tracker.step(info['v_cmd'], info['w_cmd'], yaw, trajectory,
+                                info.get('spin_target', yaw), t, dt, reference_seq)
+         bridge.set_tracker_cmd_speed(command['speed'], command['angle'],
+--- a/docs/validation/run_spin_session.py
++++ b/docs/validation/run_spin_session.py
+@@ -31,6 +31,10 @@
+         core.set_mode_ready(ready, t)
+         core.set_speed_feedback(0., t)
+         core.set_pose(0., 0.)
++        # Inject a new 10Hz synthetic localization observation. Repeated control
++        # ticks do not count as new source feedback for physical stop readiness.
++        if tick % 5 == 0 and hasattr(core, 'set_yaw_feedback'):
++            core.set_yaw_feedback(yaw, 1000.+t, t)
+         # A normal ACK intent during RUN is not a physical yaw completion.
+         if 4. <= t < 4.2:
+             core.set_traj_mode(0)
+--- a/rda_dwa/rda_dwa/collision_checker.py
++++ b/rda_dwa/rda_dwa/collision_checker.py
+@@ -523,6 +523,118 @@
+                          pa.min(axis=1) - pb.max(axis=1))
+         return sep.max(axis=1) - inflation
+ 
++    def begin_scene(self, obstacles):
++        """Prepare one immutable planning snapshot; never cache across plans."""
++        self._scene_obstacles = obstacles
++        self._scene_geometry = self._prepare_temporal_scene(obstacles)
++
++    def end_scene(self):
++        self._scene_obstacles = None
++        self._scene_geometry = None
++
++    def _prepare_temporal_scene(self, obstacles):
++        rows, generic = [], []
++        valid = True
++        for index, o in enumerate(obstacles):
++            values = (o.x, o.y, o.heading, o.speed, getattr(o, 'radius', 0.0),
++                      getattr(o, 'shape_heading', o.heading),
++                      getattr(o, 'velocity_heading', o.heading),
++                      getattr(o, 'length', 0.0), getattr(o, 'width', 0.0),
++                      getattr(o, 'velocity_uncertainty', getattr(o, 'max_unknown_speed', 0.0)))
++            vals = tuple(float(x) for x in values)
++            if not all(math.isfinite(x) for x in vals) or any(vals[i] < 0 for i in (3, 4, 7, 8, 9)):
++                valid = False
++                vals = (0.0,) * 10  # avoid trig on NaN/Inf; caller fails closed
++            x, y, _, speed, radius, shape, heading, length, width, unknown_rate = vals
++            unknown = bool(getattr(o, 'velocity_unknown', False))
++            dynamic = unknown or speed > 1e-3 or getattr(o, 'obstacle_type', '') not in ('block', 'static_large')
++            rectangle = _is_rect_obstacle(o)
++            static_box = rectangle and not dynamic
++            if static_box and abs((shape + math.pi) % (2 * math.pi) - math.pi) >= 1e-12:
++                generic.append((index, o))
++            if rectangle:
++                radius = max(radius, math.hypot(length / 2, width / 2))
++            rows.append((x, y, speed * math.cos(heading), speed * math.sin(heading),
++                         radius, length / 2, width / 2, float(static_box),
++                         unknown_rate if unknown else 0.0, max(speed, unknown_rate if unknown else 0.0),
++                         float(dynamic)))
++        return np.asarray(rows, dtype=float).reshape((-1, 11)), generic, valid
++
++    def _temporal_scene(self, obstacles):
++        if getattr(self, '_scene_obstacles', None) is obstacles:
++            return self._scene_geometry
++        return self._prepare_temporal_scene(obstacles)
++
++    def temporal_gaps_many(self, traj, times, obstacles, position_uncertainty=0.0,
++                           uncertainty_rate=0.0):
++        """Same SAT/circle lower bounds as temporal_gaps, vectorized by object.
++
++        Return [time, obstacle]. Chunking in the caller bounds temporary memory.
++        Generic oriented boxes retain the independently testable scalar path.
++        """
++        traj, ts = np.asarray(traj, dtype=float), np.asarray(times, dtype=float)
++        if not getattr(self, 'batch_temporal_enabled', True):
++            return np.column_stack([self.temporal_gaps(traj, ts, o, position_uncertainty,
++                                   uncertainty_rate) for o in obstacles]) if obstacles else np.empty((len(ts), 0))
++        scene, generic, valid = self._temporal_scene(obstacles)
++        if not valid:
++            return np.full((len(ts), len(obstacles)), np.nan)
++        return self._temporal_gaps_prepared(traj, ts, scene, generic, position_uncertainty, uncertainty_rate)
++
++    def _temporal_gaps_prepared(self, traj, ts, scene, generic, position_uncertainty, uncertainty_rate):
++        if len(scene) == 0:
++            return np.empty((len(ts), 0))
++        L, W, _ = self._rect_dims()
++        ct, st = np.cos(traj[:, 2])[:, None], np.sin(traj[:, 2])[:, None]
++        cx, cy = traj[:, 0, None] + self._rect_hb() * ct, traj[:, 1, None] + self._rect_hb() * st
++        ox, oy = scene[None, :, 0] + ts[:, None] * scene[None, :, 2], scene[None, :, 1] + ts[:, None] * scene[None, :, 3]
++        dx, dy = ox - cx, oy - cy
++        inflation = position_uncertainty + ts[:, None] * np.maximum(uncertainty_rate, scene[None, :, 8]) * scene[None, :, 10]
++        u, v = dx * ct + dy * st, -dx * st + dy * ct
++        gaps = np.hypot(np.maximum(np.abs(u) - L / 2, 0), np.maximum(np.abs(v) - W / 2, 0)) - scene[None, :, 4] - inflation
++        static = scene[:, 7].astype(bool)
++        if np.any(static):
++            ac, ast = np.abs(ct), np.abs(st)
++            half_l, half_w = scene[None, :, 5], scene[None, :, 6]
++            sep_x = np.abs(dx) - (L / 2 * ac + W / 2 * ast + half_l)
++            sep_y = np.abs(dy) - (L / 2 * ast + W / 2 * ac + half_w)
++            sep_long = np.abs(u) - (L / 2 + half_l * ac + half_w * ast)
++            sep_lat = np.abs(v) - (W / 2 + half_l * ast + half_w * ac)
++            gaps[:, static] = (np.maximum(np.maximum(sep_x, sep_y), np.maximum(sep_long, sep_lat)) - inflation)[:, static]
++        for index, o in generic:
++            gaps[:, index] = self.temporal_gaps(traj, ts, o, position_uncertainty, uncertainty_rate)
++        return gaps
++
++    def min_temporal_gap(self, traj, times, obstacles, uncertainty_rate=0.0):
++        if not obstacles:
++            return math.inf
++        if not getattr(self, 'batch_temporal_enabled', True) or len(obstacles) <= 4:
++            return min(float(np.min(self.temporal_gaps(traj, times, o, uncertainty_rate=uncertainty_rate))) for o in obstacles)
++        traj, ts = np.asarray(traj, dtype=float), np.asarray(times, dtype=float)
++        scene, generic, valid = self._temporal_scene(obstacles)
++        if not valid:
++            return float('nan')
++        # Lower bounds select only objects that can improve the current exact
++        # minimum. Static AABBs always include world x/y SAT axes; dynamic circles
++        # use the triangle inequality. Generic OBBs are kept unconditionally.
++        travel = float(np.max(np.linalg.norm(traj[:, :2]-traj[0, :2],axis=1)))
++        radius = self.vehicle_clearance_radius()+abs(self._rect_hb())
++        horizon = float(np.max(ts))
++        dx, dy = np.abs(scene[:, 0]-traj[0, 0]), np.abs(scene[:, 1]-traj[0, 1])
++        lower = np.hypot(dx,dy)-travel-radius-scene[:, 4]-np.hypot(scene[:, 2],scene[:, 3])*horizon
++        lower -= np.maximum(uncertainty_rate,scene[:, 8])*scene[:, 10]*horizon
++        static = scene[:, 7].astype(bool)
++        lower[static] = np.maximum(dx-travel-radius-scene[:, 5],dy-travel-radius-scene[:, 6])[static]
++        for index, _ in generic:
++            lower[index] = -math.inf
++        first = int(np.argmin(lower))
++        best = float(np.min(self.temporal_gaps(traj,ts,obstacles[first],uncertainty_rate=uncertainty_rate)))
++        indices = np.flatnonzero(lower <= best+1e-9)
++        remap = {int(index):new for new,index in enumerate(indices)}
++        fallback = [(remap[index],o) for index,o in generic if index in remap]
++        gaps = self._temporal_gaps_prepared(traj,ts,scene[indices],fallback,0.,uncertainty_rate)
++        return min(best,float(np.min(gaps)))
++
+     def time_collision_free(self, traj, times, obstacles, margin=0.1,
+                             uncertainty_rate=0.05):
+         """Check t=0 and all future samples, with an intersample motion bound."""
+@@ -542,7 +654,44 @@
+             sweep = float(np.max(trans + radius * angle)) / 2.0
+         else:
+             sweep = 0.0
++        if getattr(self, 'batch_temporal_enabled', True) and len(obstacles) > 4:
++            scene, generic, valid = self._temporal_scene(obstacles)
++            if not valid:
++                return False
++            # A bounding-circle lower bound rejects objects that cannot reach
++            # any footprint in this whole horizon. It only skips hard collision
++            # work; soft clearance/risk still sees every object.
++            if len(scene):
++                centre0 = traj[0, :2] + self._rect_hb() * np.array([math.cos(traj[0, 2]), math.sin(traj[0, 2])])
++                travel = float(np.max(np.linalg.norm(traj[:, :2] - traj[0, :2], axis=1)))
++                radius = self.vehicle_clearance_radius() + abs(self._rect_hb())
++                horizon = float(np.max(ts))
++                reach = np.hypot(scene[:, 2], scene[:, 3]) * horizon
++                inflation = np.maximum(uncertainty_rate, scene[:, 8]) * scene[:, 10] * horizon
++                distances = np.linalg.norm(scene[:, :2] - centre0, axis=1)
++                required = margin + sweep + scene[:, 9] * max_step / 2.0
++                keep = distances <= radius + travel + scene[:, 4] + reach + inflation + required
++                indices = np.flatnonzero(keep)
++                remap = {int(index): new for new, index in enumerate(indices)}
++                generic = [(remap[index], o) for index, o in generic if index in remap]
++                scene = scene[keep]
++            chunk_size = 64
++            for start in range(0, len(scene), chunk_size):
++                check = getattr(self, 'deadline_check', None)
++                if check is not None:
++                    check()
++                end = start + chunk_size
++                subset = scene[start:end]
++                fallback = [(i - start, o) for i, o in generic if start <= i < end]
++                gaps = self._temporal_gaps_prepared(traj, ts, subset, fallback, 0.0, uncertainty_rate)
++                required = margin + sweep + subset[None, :, 9] * max_step / 2.0
++                if not np.isfinite(gaps).all() or np.any(gaps <= required):
++                    return False
++            return True
+         for o in obstacles:
++            check = getattr(self, "deadline_check", None)
++            if check is not None:
++                check()
+             vals = (o.x, o.y, o.heading, o.speed, getattr(o, 'radius', 0.0),
+                     getattr(o,'shape_heading',o.heading),getattr(o,'velocity_heading',o.heading),
+                     getattr(o,'length',0.0),getattr(o,'width',0.0),
+@@ -550,7 +699,8 @@
+             if not all(math.isfinite(float(v)) for v in vals):
+                 return False
+             if float(o.speed)<0.0 or float(getattr(o,'radius',0.0))<0.0 \
+-                    or float(getattr(o,'length',0.0))<0.0 or float(getattr(o,'width',0.0))<0.0:
++                    or float(getattr(o,'length',0.0))<0.0 or float(getattr(o,'width',0.0))<0.0 \
++                    or float(getattr(o,'velocity_uncertainty',getattr(o,'max_unknown_speed',0.0)))<0.0:
+                 return False
+             gaps = self.temporal_gaps(traj, ts, o, uncertainty_rate=uncertainty_rate)
+             if not np.isfinite(gaps).all():
+--- a/rda_dwa/rda_dwa/enhanced_dwa.py
++++ b/rda_dwa/rda_dwa/enhanced_dwa.py
+@@ -5,12 +5,13 @@
+       M5 前置 α-β（在 predictor 中）/ M6 兜底受限减速 /
+       C1 截断归一化 / C2 IMM-UKF（在 predictor 中）/ C3 前瞻+U形逃逸 / C4 APF 缩窄。
+ 
+-算法逻辑与参数严格对应 MATLAB 源码，禁止改动。
++旧仿真分支保留 MATLAB 对应关系；real_vehicle_safety 是单独的实车安全分支。
+ """
+ from __future__ import annotations
+ 
+ import copy
+ import math
++import time
+ 
+ import numpy as np
+ 
+@@ -42,7 +43,7 @@
+ 
+ class VelocitySample:
+     """struct {v, omega, score, feasible} 等价。"""
+-    __slots__ = ('v', 'omega', 'score', 'feasible', 'relaxed')
++    __slots__ = ('v', 'omega', 'score', 'feasible', 'relaxed', 'nominal_trajectory', 'nominal_times')
+ 
+     def __init__(self, v=0.0, omega=0.0, score=0.0, feasible=True, relaxed=False):
+         self.v = v
+@@ -50,6 +51,7 @@
+         self.score = score
+         self.feasible = feasible
+         self.relaxed = relaxed
++        self.nominal_trajectory = self.nominal_times = None
+ 
+ 
+ class CostTerms:
+@@ -76,6 +78,10 @@
+     def to_list(self):
+         return [self.head, self.dist, self.clear, self.future, self.risk,
+                 self.count, self.headon, self.unc, self.smooth]
++
++
++class PlanningDeadlineExceeded(RuntimeError):
++    """A deadline is a compute failure, not a proof of blocked geometry."""
+ 
+ 
+ class EnhancedDWA:
+@@ -135,6 +141,9 @@
+         self.current_delta = 0.0
+         self.last_has_forward = False
+         self.last_has_motion = False
++        self.last_failure_reason = ""
++        self.last_candidate_count = self.last_feasible_count = self.last_checked_count = None
++        self._deadline_at = None
+ 
+     # ------------------------------------------------------------------
+     # 代价平滑项 + 死区粘性：上周期指令注入
+@@ -148,7 +157,67 @@
+     # ------------------------------------------------------------------
+     # plan(): 公式(13) (v*,ω*) = argmax J，含兜底链
+     # ------------------------------------------------------------------
++    def _check_deadline(self):
++        if self._deadline_at is not None and time.perf_counter() >= self._deadline_at:
++            raise PlanningDeadlineExceeded()
++
+     def plan(self, robot: RobotState, goal, obstacles, trap=None):
++        """Bounded complete-candidate planning; timeout discards the whole result."""
++        budget = float(getattr(self.params, 'planning_budget_s', 0.0))
++        self._deadline_at = time.perf_counter() + budget if budget > 0 else None
++        self.last_failure_reason = ''
++        self.last_candidate_count = self.last_feasible_count = None
++        self.last_checked_count = 0
++        self.last_has_forward = self.last_has_motion = False
++        self.cc.batch_temporal_enabled = bool(getattr(self.params, 'batch_temporal_enable', True))
++        self.cc.deadline_check = self._check_deadline
++        old_horizon, old_samples = self.params.sim_time, self.params.n_trajectory_samples
++        try:
++            self.cc.begin_scene(obstacles)
++            result = self._plan_impl(robot, goal, obstacles, trap)
++            self._check_deadline()
++            if not result[0]:
++                self.last_failure_reason = 'no_safe_candidate'
++            return result
++        except PlanningDeadlineExceeded:
++            self.last_failure_reason = 'deadline'
++            self.last_has_forward = self.last_has_motion = False
++            return False, 0.0, 0.0
++        finally:
++            self.params.sim_time, self.params.n_trajectory_samples = old_horizon, old_samples
++            self.cc.end_scene()
++            self.cc.deadline_check = None
++            self._deadline_at = None
++
++    def has_safe_motion(self, robot, obstacles, budget_s=0.02):
++        """Static counterfactual probe: True/False/None (compute deadline).
++
++        Use the same physical command set and full braking guard. The snapshot
++        must contain only observed confirmed-static objects; it is no oracle.
++        Never overwrite the main plan's last_has_motion or failure diagnostics.
++        """
++        old_deadline = self._deadline_at
++        old_check = getattr(self.cc, 'deadline_check', None)
++        old_scene = getattr(self.cc, '_scene_obstacles', None)
++        old_geometry = getattr(self.cc, '_scene_geometry', None)
++        old_flags = self.last_has_forward, self.last_has_motion
++        old_counts = self.last_candidate_count, self.last_feasible_count, self.last_checked_count
++        self._deadline_at = time.perf_counter() + max(0.0, budget_s)
++        self.cc.deadline_check = self._check_deadline
++        self.cc.begin_scene(obstacles)
++        try:
++            window = self._executable_window(robot, obstacles, stop_on_motion=True)
++            return any(s.feasible and abs(s.v) >= self.params.spin_v_eps - 1e-9 for s in window)
++        except PlanningDeadlineExceeded:
++            return None
++        finally:
++            self._deadline_at = old_deadline
++            self.cc.deadline_check = old_check
++            self.cc._scene_obstacles, self.cc._scene_geometry = old_scene, old_geometry
++            self.last_has_forward, self.last_has_motion = old_flags
++            self.last_candidate_count, self.last_feasible_count, self.last_checked_count = old_counts
++
++    def _plan_impl(self, robot: RobotState, goal, obstacles, trap=None):
+         """返回 (ok, v_out, omega_out)。trap: dict 或 None。"""
+         v_out = 0.0
+         omega_out = 0.0
+@@ -724,11 +793,11 @@
+                     window.append(s)
+         return window
+ 
+-    def _executable_window(self, robot, obstacles):
++    def _executable_window(self, robot, obstacles, stop_on_motion=False):
+         """Stable physical samples, including straight/stop/last commands.
+ 
+         Commands are sampled in steering space; trajectory prediction models the
+-        rate limit from the measured steering state rather than clipping raw w.
++        rate limit from the current steering estimate rather than clipping raw w.
+         """
+         p, ap = self.params, self.cc.ack
+         dt = max(0.005, min(0.2, p.dt))
+@@ -748,6 +817,9 @@
+         window, seen = [], set()
+         for v in sorted(vs):
+             for delta in sorted(ds):
++                check = getattr(self.cc, "deadline_check", None)
++                if check is not None:
++                    check()
+                 w = v * math.tan(delta) / ap.wheelbase if abs(v) >= ap.v_eps-1e-9 else 0.0
+                 w = max(p.min_angular_velocity, min(p.max_angular_velocity, w))
+                 key = (round(v, 8), round(w, 8))
+@@ -756,7 +828,12 @@
+                 seen.add(key)
+                 sample = VelocitySample(v, w)
+                 sample.feasible = self.is_feasible(sample, robot, obstacles, True)
++                self.last_checked_count = (self.last_checked_count or 0) + 1
+                 window.append(sample)
++                if stop_on_motion and sample.feasible and abs(sample.v) >= self.params.spin_v_eps-1e-9:
++                    return window
++        self.last_candidate_count = len(window)
++        self.last_feasible_count = sum(s.feasible for s in window)
+         self.last_has_forward = any(s.feasible and s.v >= self.params.spin_v_eps-1e-9 for s in window)
+         self.last_has_motion = any(s.feasible and abs(s.v) >= self.params.spin_v_eps-1e-9 for s in window)
+         return window
+@@ -888,17 +965,19 @@
+             if not sample.feasible:
+                 continue
+             found=True
+-            traj,times=self.reference_trajectory(sample.v,self._eff_omega(sample),robot)
++            self._check_deadline()
++            if sample.nominal_trajectory is not None and getattr(p, "reuse_nominal_rollouts", True):
++                traj,times=sample.nominal_trajectory,sample.nominal_times
++            else:
++                traj,times=self.reference_trajectory(sample.v,self._eff_omega(sample),robot)
+             end=traj[-1]
+             end_distance=math.hypot(goal[0]-end[0],goal[1]-end[1])
+             progress=max(-1.0,min(1.0,(start_distance-end_distance)/d_scale))
+             desired=math.atan2(goal[1]-end[1],goal[0]-end[0])
+             motion_heading=end[2]+(math.pi if sample.v<0.0 else 0.0)
+             heading=abs(wrap_angle(desired-motion_heading))/math.pi
+-            gap=math.inf
+-            for o in obstacles:
+-                gap=min(gap,float(np.min(self.cc.temporal_gaps(traj,times,o,
+-                                    uncertainty_rate=p.obstacle_uncertainty_rate))))
++            gap=self.cc.min_temporal_gap(traj,times,obstacles,
++                                        uncertainty_rate=p.obstacle_uncertainty_rate)
+             clearance=1.0 if not obstacles else min(max(gap-p.safety_margin,0.0)/max(p.d_safe,0.1),1.0)
+             risk=0.0 if not obstacles else math.exp(-max(gap,0.0)/max(p.risk_sigma_x0,0.1))
+             delta=math.atan(self._eff_omega(sample)*ap.wheelbase/sample.v) if abs(sample.v)>=ap.v_eps else self.current_delta
+@@ -1077,7 +1156,7 @@
+     def is_feasible(self, s: VelocitySample, robot: RobotState, obstacles,
+                     use_predicted_obstacle: bool, relax: bool = False) -> bool:
+         if self.params.real_vehicle_safety:
+-            return self.command_safe(s.v, self._eff_omega(s), robot, obstacles)
++            return self.command_safe(s.v, self._eff_omega(s), robot, obstacles, sample=s)
+         use_rect = self.collision_model in ("rectangle", "rect4wis", "rect_diff")
+         # 统一净距口径：base_gap=0（接触即不可行）；矩形现实障碍按矩形-矩形精确净距，
+         # 旧圆形障碍按 圆心距-r_obs（兼容）。C9 机动膨胀在净距上叠加 c9_infl。
+@@ -1304,9 +1383,11 @@
+                                            initial_v=robot.v, initial_delta=self.current_delta)
+         return traj, np.arange(1, n + 1, dtype=float) * dt
+ 
+-    def command_safe(self, v, omega, robot, obstacles, include_braking=True):
++    def command_safe(self, v, omega, robot, obstacles, include_braking=True, sample=None):
+         """Nominal full horizon plus a bounded response-and-braking trajectory."""
+         traj, times = self.reference_trajectory(v, omega, robot)
++        if sample is not None and getattr(self.params, "reuse_nominal_rollouts", True):
++            sample.nominal_trajectory, sample.nominal_times = traj, times
+         start = np.array([[robot.x, robot.y, robot.theta]], dtype=float)
+         if self.cc.initial_direction!=0 and v*self.cc.initial_direction<0.0:
+             # Wheel/odometry confirmation may delay the direction change. A
+--- /dev/null
++++ b/rda_dwa/rda_dwa/hybrid_primitives.py
+@@ -0,0 +1,149 @@
++"""Offline multi-mode action schedules with physical waiting and footprint risk.
++
++Only ACK command/feedback=0 and SPIN=4 have user-confirmed production meaning.
++CRAB/TRANSLATE are parameterized simulation hypotheses, disabled for deployment.
++This module does not publish ROS messages, contact hardware, or alter localization.
++"""
++from __future__ import annotations
++
++from dataclasses import dataclass
++import math
++import numpy as np
++
++
++@dataclass(frozen=True)
++class ModeProtocol:
++    command_mode: int | None
++    feedback_mode: int | None
++    angle_unit: str | None
++    speed_unit: str | None
++    enabled: bool = False
++    verified: bool = False
++    max_angle_rad: float = math.pi/2
++
++
++DEFAULT_PROTOCOLS = {
++    'ACK': ModeProtocol(0,0,'degree','m/s',True,True,math.radians(30)),
++    'SPIN': ModeProtocol(4,4,'degree','rad/s',True,True,0.),
++    # User confirmed linear speed and +/-45 degree crab steering on 2026-11-06.
++    # Command/ready IDs and positive directions remain unverified; keep disabled.
++    'CRAB': ModeProtocol(None,None,'degree','m/s',False,False,math.radians(45)),
++    # Translation has only a speed command. The simulated +/-pi/2 direction is
++    # a body-frame hypothesis, not a hardware angle field or confirmed sign.
++    'TRANSLATE': ModeProtocol(None,None,'unused','m/s',False,False,math.pi/2),
++}
++
++
++@dataclass
++class ManeuverResult:
++    status: str
++    safe: bool
++    trajectory: np.ndarray
++    times: np.ndarray
++    phases: list[str]
++    minimum_gap_m: float | None
++    nominal_duration_s: float
++    protocol_verified: bool
++
++
++def evaluate_maneuver(cc, robot, obstacles, mode='ACK', speed=.2, steering=0.,
++                      yaw_change=0., motion_time=2., translation_angle=None,
++                      protocols=None, simulation=False, ready_at_s=3.,
++                      ready_lost_at_s=None, wait_min_s=3., ready_timeout_s=8.,
++                      dt=.05, safety_margin=.2, uncertainty_rate=.05):
++    """Stop → >=3s wheel switch + real ready → action → brake → recovery wait.
++
++    Source obstacle positions are map positions at schedule time zero. All waits
++    participate in the same future reachable-set collision check. A real-ready
++    loss truncates the action into a bounded braking tail, never an instant ACK
++    command. ACK reversal includes a stationary .2s confirmation hypothesis;
++    deployment still uses the actual tracker measured-stop gate.
++    """
++    protocols = protocols or DEFAULT_PROTOCOLS
++    protocol = protocols.get(mode)
++    if translation_angle is None:
++        translation_angle = math.pi/4 if mode == 'CRAB' else math.pi/2
++    empty = np.empty((0,3)); zero = np.empty(0)
++    if protocol is None or (not simulation and not (protocol.enabled and protocol.verified)):
++        return ManeuverResult('protocol_unverified',False,empty,zero,[],None,0.,False)
++    if mode not in DEFAULT_PROTOCOLS or dt<=0. or speed < cc.ack.v_min or speed > cc.ack.v_max:
++        return ManeuverResult('invalid_request',False,empty,zero,[],None,0.,protocol.verified)
++    if mode=='ACK' and abs(steering)>cc.ack.delta_max+1e-9:
++        return ManeuverResult('steering_limit',False,empty,zero,[],None,0.,protocol.verified)
++    if mode in ('CRAB','TRANSLATE') and abs(translation_angle)>protocol.max_angle_rad+1e-9:
++        return ManeuverResult('angle_limit',False,empty,zero,[],None,0.,protocol.verified)
++    pts = [[float(robot.x),float(robot.y),float(robot.theta)]]
++    times = [0.]; phases = ['STOP']
++    speed_cur = float(robot.v)
++    delta = float(getattr(cc,'initial_delta',0.) or 0.)
++    t=0.
++    def append(pose,phase):
++        nonlocal t
++        t += dt; pts.append(list(pose)); times.append(t); phases.append(phase)
++    def ack_tick(target_v,target_delta,phase):
++        nonlocal speed_cur,delta
++        from .ackermann_model import limit_signed_speed
++        speed_cur = limit_signed_speed(target_v,speed_cur,cc.ack.a_max,cc.ack.dec_max,dt)
++        delta += max(-cc.ack.delta_dot_max*dt,min(cc.ack.delta_dot_max*dt,target_delta-delta))
++        x,y,yaw=pts[-1]
++        offset=cc.ack.reference_rear_offset
++        rx=x+offset*math.cos(yaw)+speed_cur*math.cos(yaw)*dt
++        ry=y+offset*math.sin(yaw)+speed_cur*math.sin(yaw)*dt
++        yaw += speed_cur*math.tan(delta)/cc.ack.wheelbase*dt
++        append((rx-offset*math.cos(yaw),ry-offset*math.sin(yaw),yaw),phase)
++    # Preserve present curvature while stopping before any wheel-mode request.
++    while abs(speed_cur)>1e-9:
++        ack_tick(0.,delta,'STOP')
++    switching = mode!='ACK'
++    if switching:
++        wait = max(3.,wait_min_s,ready_at_s if ready_at_s is not None else ready_timeout_s)
++        for _ in range(int(math.ceil(wait/dt))): append(pts[-1],'WAIT_READY')
++        if ready_at_s is None or ready_at_s>ready_timeout_s:
++            trajectory=np.asarray(pts);ts=np.asarray(times)
++            safe=cc.time_collision_free(trajectory,ts,obstacles,safety_margin,uncertainty_rate)
++            gap=cc.min_temporal_gap(trajectory,ts,obstacles,uncertainty_rate)
++            return ManeuverResult('ready_timeout',False,trajectory,ts,phases,gap if math.isfinite(gap) else None,t,protocol.verified)
++    elif robot.v*speed < 0.:
++        for _ in range(int(math.ceil(.2/dt))): append(pts[-1],'DIRECTION_STOP_CONFIRM')
++    action_started=t
++    omega=0.; target_yaw=pts[-1][2]+yaw_change
++    status='complete'
++    steps=max(1,int(math.ceil(motion_time/dt)))
++    if mode=='SPIN': steps=max(steps,int(math.ceil((abs(yaw_change)/.12+2.)/dt)))
++    for _ in range(steps):
++        if ready_lost_at_s is not None and t-action_started>=ready_lost_at_s:
++            status='ready_lost';break
++        if mode=='ACK':
++            ack_tick(speed,steering,'ACTION_ACK_REVERSE' if speed<0 else 'ACTION_ACK_FORWARD')
++        elif mode=='SPIN':
++            err=target_yaw-pts[-1][2]
++            target_omega=math.copysign(min(.8,math.sqrt(2*.8*abs(err))),err) if abs(err)>.005 else 0.
++            omega += max(-.8*dt,min(.8*dt,target_omega-omega))
++            x,y,yaw=pts[-1];append((x,y,yaw+omega*dt),'ACTION_SPIN')
++            if abs(err)<.02 and abs(omega)<.05:break
++        else:
++            from .ackermann_model import limit_signed_speed
++            speed_cur=limit_signed_speed(speed,speed_cur,cc.ack.a_max,cc.ack.dec_max,dt)
++            x,y,yaw=pts[-1]
++            angle=yaw+translation_angle
++            append((x+speed_cur*math.cos(angle)*dt,y+speed_cur*math.sin(angle)*dt,yaw),'ACTION_'+mode)
++    if mode=='ACK':
++        while abs(speed_cur)>1e-9:ack_tick(0.,delta,'BRAKE')
++    elif mode=='SPIN':
++        while abs(omega)>1e-9:
++            omega=math.copysign(max(0.,abs(omega)-.8*dt),omega)
++            x,y,yaw=pts[-1];append((x,y,yaw+omega*dt),'BRAKE')
++    else:
++        while abs(speed_cur)>1e-9:
++            speed_cur=math.copysign(max(0.,abs(speed_cur)-cc.ack.dec_max*dt),speed_cur)
++            x,y,yaw=pts[-1];angle=yaw+translation_angle
++            append((x+speed_cur*math.cos(angle)*dt,y+speed_cur*math.sin(angle)*dt,yaw),'BRAKE')
++    if switching:
++        # No assumed instant return to ACK. This is recovery dwell; actual ready
++        # must still be confirmed by the production mechanical guard.
++        for _ in range(int(math.ceil(max(3.,wait_min_s)/dt))):append(pts[-1],'RECOVERY_WAIT')
++    trajectory=np.asarray(pts);ts=np.asarray(times)
++    safe=cc.time_collision_free(trajectory,ts,obstacles,safety_margin,uncertainty_rate)
++    gap=cc.min_temporal_gap(trajectory,ts,obstacles,uncertainty_rate)
++    if not safe:status='unsafe_'+status
++    return ManeuverResult(status,safe,trajectory,ts,phases,gap if math.isfinite(gap) else None,t,protocol.verified)
+--- /dev/null
++++ b/rda_dwa/rda_dwa/local_guide.py
+@@ -0,0 +1,164 @@
++"""Bounded local Hybrid-A* guidance from observed confirmed-static geometry.
++
++This is not a global map, a complete planner, or an executable command sequence.
++Kinematic arcs choose a persistent topology; production DWA must independently
++check its rate-limited trajectory, current dynamics, reaction and braking.
++"""
++from __future__ import annotations
++
++import heapq
++import math
++import time
++import numpy as np
++
++
++class LocalStaticGuide:
++    def __init__(self, collision_checker, resolution=.3, primitive_length=.9,
++                 budget_s=.03, max_expansions=400, replan_interval=2.0):
++        self.cc = collision_checker
++        self.resolution = float(resolution)
++        self.primitive_length = float(primitive_length)
++        self.budget_s = float(budget_s)
++        self.max_expansions = int(max_expansions)
++        self.replan_interval = float(replan_interval)
++        self.heading_bins = 24
++        self.path = []
++        self.cursor = 0
++        self.status = 'idle'
++        self.expansions = 0
++        self.elapsed_s = 0.0
++        self._since = float('-inf')
++        self._goal = None
++        self._retry_after = float('-inf')
++
++    def reset(self):
++        self.path = []
++        self.cursor = 0
++        self._goal = None
++        self._retry_after = float('-inf')
++        self.status = 'idle'
++
++    def _key(self, pose, origin):
++        return (int(round((pose[0]-origin[0])/self.resolution)),
++                int(round((pose[1]-origin[1])/self.resolution)),
++                int(round((pose[2] % (2*math.pi))/(2*math.pi)*self.heading_bins)) % self.heading_bins)
++
++    def _arc(self, pose, direction, steering):
++        ap = self.cc.ack
++        count = 6
++        ds = direction*self.primitive_length/count
++        x, y, yaw = pose
++        offset = ap.reference_rear_offset
++        x += offset*math.cos(yaw)
++        y += offset*math.sin(yaw)
++        result = [pose]
++        for _ in range(count):
++            x += ds*math.cos(yaw)
++            y += ds*math.sin(yaw)
++            yaw += ds*math.tan(steering)/ap.wheelbase
++            result.append((x-offset*math.cos(yaw), y-offset*math.sin(yaw), yaw))
++        return np.asarray(result)
++
++    def update(self, robot, goal, obstacles, now, margin=.2, budget_s=None):
++        """Return persistent map waypoint, or None with an explicit status.
++
++        Unknown or moving objects never become static obstacles. They remain in
++        the downstream DWA input; guidance grants no dynamic safety exemption.
++        New goals invalidate all memory. Reused geometry is guidance only.
++        """
++        goal = tuple(float(x) for x in goal[:2])
++        if self._goal is not None and math.hypot(goal[0]-self._goal[0],goal[1]-self._goal[1]) > .3:
++            self.reset()
++        static = [o for o in obstacles if getattr(o, 'obstacle_type', '') in ('block','static_large')
++                  and float(o.speed) <= .05 and not getattr(o, 'velocity_unknown', False)]
++        if not static:
++            self.status = 'no_static_evidence'
++            self.path = []
++            return None
++        if self.path and now-self._since <= self.replan_interval:
++            while self.cursor < len(self.path)-1 and math.hypot(robot.x-self.path[self.cursor][0],robot.y-self.path[self.cursor][1]) < .45:
++                self.cursor += 1
++            if self.cursor == len(self.path)-1 and math.hypot(robot.x-goal[0],robot.y-goal[1]) < .5:
++                self.status = 'complete'
++                self.path = []
++                return None
++            self.status = 'path'
++            return self.path[self.cursor][:2]
++        if now < self._retry_after:
++            return None
++        started = time.perf_counter()
++        deadline = started+max(0.,self.budget_s if budget_s is None else float(budget_s))
++        origin = (float(robot.x),float(robot.y))
++        source = (float(robot.x),float(robot.y),float(robot.theta))
++        # Source and goal must lie within the finite observed local search patch.
++        radius = max(4.,min(8.,math.hypot(goal[0]-source[0],goal[1]-source[1])+2.))
++        if math.hypot(goal[0]-source[0],goal[1]-source[1]) > radius:
++            self.status = 'goal_outside_patch'
++            self._retry_after = now+self.replan_interval
++            return None
++        source_key = self._key(source,origin)+(0,)
++        states = {source_key:source}
++        parents = {}
++        g = {source_key:0.}
++        queue = [(math.hypot(goal[0]-source[0],goal[1]-source[1]),0,source_key)]
++        counter = 0
++        self.expansions = 0
++        terminal = None
++        old_scene = getattr(self.cc,'_scene_obstacles',None)
++        old_geometry = getattr(self.cc,'_scene_geometry',None)
++        self.cc.begin_scene(static)
++        try:
++            while queue and self.expansions < self.max_expansions:
++                if time.perf_counter() >= deadline:
++                    self.status = 'timeout'
++                    break
++                _,_,key = heapq.heappop(queue)
++                pose = states[key]
++                if math.hypot(pose[0]-goal[0],pose[1]-goal[1]) <= .55:
++                    terminal = key
++                    self.status = 'path'
++                    break
++                self.expansions += 1
++                for direction in (1,-1):
++                    for steering in (0.,-self.cc.ack.delta_max,self.cc.ack.delta_max):
++                        if time.perf_counter() >= deadline:
++                            self.status = 'timeout'
++                            break
++                        arc = self._arc(pose,direction,steering)
++                        end = tuple(arc[-1])
++                        if abs(end[0]-origin[0])>radius or abs(end[1]-origin[1])>radius:
++                            continue
++                        if not self.cc.time_collision_free(arc,np.arange(len(arc))*.1,static,margin,0.):
++                            continue
++                        successor = self._key(end,origin)+(direction,)
++                        transition = self.primitive_length*(1. if direction>0 else 1.3)
++                        transition += .15*abs(steering)/max(self.cc.ack.delta_max,1e-9)
++                        if key[-1] and key[-1] != direction:
++                            transition += .8  # stop and reversal preference, not elapsed time
++                        cost = g[key]+transition
++                        if cost >= g.get(successor,float('inf'))-1e-9:
++                            continue
++                        g[successor] = cost
++                        states[successor] = end
++                        parents[successor] = key
++                        counter += 1
++                        h = math.hypot(goal[0]-end[0],goal[1]-end[1])
++                        heapq.heappush(queue,(cost+h,counter,successor))
++            if terminal is not None:
++                path = []
++                key = terminal
++                while key != source_key:
++                    path.append(states[key]); key = parents[key]
++                self.path = list(reversed(path))
++                self.cursor = 0
++                self._goal = goal
++                self._since = now
++                return self.path[0][:2] if self.path else None
++            self.path = []
++            if self.status != 'timeout':
++                self.status = 'expansion_limit' if queue else 'no_path'
++            self._retry_after = now+self.replan_interval
++            return None
++        finally:
++            self.elapsed_s = time.perf_counter()-started
++            self.cc._scene_obstacles,self.cc._scene_geometry = old_scene,old_geometry
+--- a/rda_dwa/rda_dwa/params.py
++++ b/rda_dwa/rda_dwa/params.py
+@@ -2,8 +2,7 @@
+ params.py — Python 移植版参数结构（一一对应 MATLAB params.m）。
+ RDA-DWA 改进 DWA 局部路径规划算法（Actuators 2025, 14, 207 框架下的扩展实现）。
+ 
+-移植规则：所有参数名/取值与 params.m 完全一致；算法逻辑与参数禁止改动，
+-只做语言/平台迁移。
++旧仿真参数保留移植对应关系；实车安全分支由 launch/YAML 显式覆盖。
+ """
+ from __future__ import annotations
+ 
+@@ -33,8 +32,8 @@
+         self.omega_spin_max = 0.8           # rad/s
+         self.spin_v_eps = 0.05              # v 低于此值视为近似静止（允许原地转向）
+         # 4WIS 后退脱困（真实车双向驱动；仅在旋转净空不足的贴墙死锁时启用）
+-        # ★第四轮 改动3：实车不支持负线速度，禁用后退机动（backup_v 倒车段不再输出）。
+-        #   突围改由正向/原地自转（SPIN）完成；末道闸在 vehicle_bridge 钳 v≥0 兜底。
++        # 旧仿真后退兜底保持关闭。当前实车支持倒车，使用带符号动态窗和
++        #   独立后方时域安全/真实停稳换向检查，不能使用这条开放环兜底。
+         self.backup_enabled = False         # 是否允许后退机动（不进正常窗口，仅兜底）
+         self.backup_v = 0.4                 # 后退速度 (m/s)
+         # [v16_kinematic] Ackermann 多点转向 (3-point turn) 逃逸原语
+@@ -99,6 +98,9 @@
+         self.reaction_time = 0.6
+         self.obstacle_uncertainty_rate = 0.05
+         self.steer_resolution = math.radians(3.0)
++        self.batch_temporal_enable = True
++        self.reuse_nominal_rollouts = True
++        self.planning_budget_s = 0.0  # standalone compatibility; ROS config supplies a deadline
+ 
+         # ---------------- 朝向/风险口径 ----------------
+         self.use_predicted_heading = True
+--- a/rda_dwa_real/config/real_vehicle.yaml
++++ b/rda_dwa_real/config/real_vehicle.yaml
+@@ -29,6 +29,7 @@
+     localization_jump_yaw_deg: 5.0
+     obstacle_timeout: 0.5
+     planning_timeout: 0.3
++    planning_budget_s: 0.08 # bounded candidate evaluation; 10Hz period reserve, requires vehicle CPU validation
+     reaction_time: 0.6  # >= tracker watchdog 0.5s + scheduling/transport reserve 0.1s
+     direction_zero_hold: 0.2
+     emergency_stop: true
+@@ -47,6 +48,9 @@
+     static_obstacle_aabb: true # active lidar emits map AABBs for all types; generic OBB input must set false
+     static_detour_enable: true
+     static_detour_timeout: 24.0
++    static_search_enable: true
++    static_search_budget: 0.015 # bounded SE2 local guidance; shared cycle budget, no dynamic safety waiver
++    static_search_max_expansions: 200
+     vehicle_length: 1.2
+     vehicle_width: 0.8
+     v_max: 0.4
+@@ -77,19 +81,25 @@
+     safety_dt: 0.05
+     obstacle_uncertainty_rate: 0.05
+     blocked_duration: 1.5
++    moving_stall_duration: 6.0 # new-source motion window; static goal/route progress, distinct from yielding
++    moving_recovery_enable: false # experimental: U escape improved, open multi-block regressed; observe only by default
+     ack_guard_time: 2.0
+     spin_reset_progress: 0.5
+     spin_entry_deg: 10.0
+     spin_wait_time: 3.0
+     spin_recover_time: 3.0
+     spin_timeout: 12.0
++    spin_stop_timeout: 3.0 # bounds pre-switch physical-stop confirmation; tracker value must match
+     spin_w_min: 0.12
+     spin_acc_max: 0.8
+     spin_request_timeout: 24.0
+     spin_cooldown: 5.0
+     max_spin_attempts: 2
+-    trap_max_duration: 16.0
++    trap_max_duration: 24.0 # finite ACK-action budget for retreat/escape/rejoin; mechanical waits tracked separately
+     trap_exit_hold: 1.0
++    trap_exit_progress: 0.10 # actual progress toward global goal during safe rejoin, metres
++    trap_cooldown: 5.0
++    trap_static_probe_budget: 0.02 # seconds; inconclusive static probe freezes recovery
+     trap_exit_dist: 0.3
+     trap_exit_goal_ang_deg: 20.0
+     trap_exit_sector_deg: 60.0        # legacy diagnostics; no count-based clearance test
+@@ -127,6 +137,10 @@
+     spin_progress_timeout: 2.0
+     spin_progress_deg: 0.5
+     spin_stop_hold: 0.5
++    spin_require_stopped_feedback: true # fresh ACK wheel feedback must confirm stopping before switching
++    spin_require_yaw_stop_feedback: true # new-source localization yaw rate confirms stop before ACK recovery
++    spin_yaw_stop_rate: 0.03 # rad/s; estimator threshold, requires logs to validate
++    spin_stop_timeout: 3.0
+     rotate_entry_deg: 10.0
+     rotate_precision_deg: 4.0
+     rotate_decel_deg: 25.0
+@@ -192,6 +206,10 @@
+     track_lost_ttl: 10
+     kf_q: 0.3
+     kf_r: 0.15
++    motion_guard_enable: true
++    measurement_position_slack: 0.15 # metres; association/model guard assumption, validate with logs
++    velocity_innovation_limit: 0.8 # m/s; large innovation becomes unknown until reconfirmed
++    velocity_reconfirm_time: 0.2 # seconds of compatible real source observations
+     obstacle_max_speed: 1.5
+     dyn_speed_thr: 0.3
+     dyn_hold_frames: 5
+--- a/rda_dwa_real/launch/rl_dwa_car.launch.py
++++ b/rda_dwa_real/launch/rl_dwa_car.launch.py
+@@ -44,7 +44,7 @@
+             output='screen',
+             parameters=[LaunchConfiguration('config')],
+         ),
+-        # 2) 规划主节点：话题全部硬编码（无 remap）——订阅 /localization + /rda/obstacles + /move_base_simple/goal + /amcl_pose → 发布 /cmd_vel
++        # 2) 规划主节点：唯一定位源/localization；输出同epoch command/Path和模式意图。
+         Node(
+             package='rda_dwa_real',
+             executable='bridge_node',
+@@ -52,8 +52,8 @@
+             output='screen',
+             parameters=[LaunchConfiguration('config')],
+         ),
+-        # 3) 轨迹跟踪控制：/rda/traj + /cmd_vel + /localization + /rda/spin_target → /car_cmd
+-        #    （固定 50Hz 纯跟踪 + 自转状态机，替代 control_bridge_node 的 5~7Hz 直发转角；
++        # 3) /rda/command + /rda/traj + /localization + 模式/目标/ready → /car_cmd
++        #    （50Hz前馈转角与自转航向闭环，cmd_vel仅兼容诊断；
+         #    旧控制桥不在当前启动链，回滚需使用基线压缩备份）
+         Node(
+             package='rda_dwa_real',
+@@ -74,6 +74,7 @@
+                 'run_enable': True,
+                 'mode_change_time': 3.0,
+                 'mode_retry_period': 3.5,
++                'mode_max_retries': 2,
+                 'cmd_timeout': 0.3,
+                 'feedback_timeout': 0.3,
+                 'spin_feedback_mode': 4,
+--- a/rda_dwa_real/rda_dwa_real/bridge_node.py
++++ b/rda_dwa_real/rda_dwa_real/bridge_node.py
+@@ -108,7 +108,7 @@
+         self.declare_parameter('sensor_x', 0.0)
+         self.declare_parameter('sensor_y', 0.0)
+         self.declare_parameter('sensor_yaw', 0.0)
+-        # body→base_link x 偏移（实测 -0.15m；base_link 在 body 后方 0.15m）
++        # 定位已经在几何中心；当前补偿为0，不重复修改定位参考点。
+         self.declare_parameter('body_to_base_link_x', 0.0)
+         self.declare_parameter('localization_timeout', 0.5)
+         self.declare_parameter('obstacle_timeout', 0.5)
+@@ -171,7 +171,7 @@
+         self.declare_parameter('traj_cache_past_margin', 0.2)   # 缓存保留的过去时间窗 s
+         self.declare_parameter('traj_cache_future_margin', 0.2)  # 缓存保留的未来余量 s
+         self.declare_parameter('smooth_weight', 0.3)    # → planner.params.alpha_smooth（轨迹平滑权重）
+-        self.declare_parameter('sticky_eps', 0.05)    # → planner.params.sticky_eps（指令黏滞死区 m/s）
++        self.declare_parameter('sticky_eps', 0.05)    # 固定尺度score差，非速度死区
+         # ---- APF 自转目标角参数（/rda/spin_target 用；v15_latesc 构建不覆盖 params.py 默认 1.0/0.6/1.5）----
+         self.declare_parameter('apf_k_att', 1.0)
+         self.declare_parameter('apf_k_rep', 0.6)
+@@ -199,12 +199,22 @@
+             'footprint_center_offset': 0.0, 'reference_center_to_rear': 0.345, 'planning_timeout': 0.3, 'reaction_time': 0.6,
+             'localization_jump_residual': 0.15, 'localization_jump_yaw_deg': 5.0,
+             'direction_zero_hold': 0.2,
++            'spin_stop_timeout': 3.0,
+         }.items():
+             self.declare_parameter(name, default)
+         self.declare_parameter('mode_ready_topic', '/car_mode_ready')
+         self.declare_parameter('static_obstacle_aabb', True)
+         self.declare_parameter('static_detour_enable', True)
+         self.declare_parameter('static_detour_timeout', 24.0)
++        self.declare_parameter('planning_budget_s', 0.08)
++        self.declare_parameter('trap_exit_progress', 0.10)
++        self.declare_parameter('trap_cooldown', 5.0)
++        self.declare_parameter('trap_static_probe_budget', 0.02)
++        self.declare_parameter('static_search_enable', True)
++        self.declare_parameter('static_search_budget', 0.015)
++        self.declare_parameter('static_search_max_expansions', 200)
++        self.declare_parameter('moving_stall_duration', 6.0)
++        self.declare_parameter('moving_recovery_enable', False)
+         cfg = BridgeConfig()
+         cfg.algorithm_frame = self.get_parameter('algorithm_frame').value
+         cfg.body_frames = list(self.get_parameter('body_frames').value)
+@@ -238,12 +248,22 @@
+         cfg.static_obstacle_aabb = bool(self.get_parameter('static_obstacle_aabb').value)
+         cfg.static_detour_enable=bool(self.get_parameter('static_detour_enable').value)
+         cfg.static_detour_timeout=float(self.get_parameter('static_detour_timeout').value)
++        for name in ('trap_exit_progress', 'trap_cooldown', 'trap_static_probe_budget'):
++            setattr(cfg, name, float(self.get_parameter(name).value))
++        cfg.static_search_enable = bool(self.get_parameter('static_search_enable').value)
++        cfg.static_search_budget = float(self.get_parameter('static_search_budget').value)
++        cfg.static_search_max_expansions = int(self.get_parameter('static_search_max_expansions').value)
++        cfg.moving_stall_duration = float(self.get_parameter('moving_stall_duration').value)
++        cfg.moving_recovery_enable = bool(self.get_parameter('moving_recovery_enable').value)
++        if cfg.static_search_max_expansions < 1:
++            raise ValueError('static_search_max_expansions must be positive')
+         cfg.control_dt = 1.0 / float(self.get_parameter('control_rate').value)
+         for name in ('blocked_duration', 'spin_entry_deg', 'spin_wait_time',
+                      'spin_recover_time', 'spin_timeout', 'spin_w_min', 'spin_acc_max',
+                      'spin_cooldown', 'max_spin_attempts', 'trap_exit_hold',
+                      'spin_pivot_offset', 'mode_ready_timeout'):
+             setattr(cfg, name, self.get_parameter(name).value)
++        cfg.spin_stop_timeout = float(self.get_parameter('spin_stop_timeout').value)
+         cfg.localization_jump_residual=float(self.get_parameter('localization_jump_residual').value)
+         cfg.localization_jump_yaw_deg=float(self.get_parameter('localization_jump_yaw_deg').value)
+         cfg.spin_wait_time = max(3.0, cfg.spin_wait_time)
+@@ -255,7 +275,9 @@
+             'ack_delta_max_deg','ack_delta_dot_max_deg','ack_a_max','ack_dec_max',
+             'v_max','ack_v_max','omega_max','omega_spin_max','omega_acc','spin_acc_max',
+             'localization_timeout','obstacle_timeout','mode_ready_timeout',
+-            'blocked_duration','spin_timeout','trap_max_duration','spin_request_timeout')
++            'blocked_duration','spin_timeout','trap_max_duration','spin_request_timeout',
++            'planning_budget_s','trap_exit_progress','trap_cooldown','trap_static_probe_budget',
++            'static_search_budget','spin_stop_timeout','moving_stall_duration')
+         for name in positive_parameters:
+             value=float(self.get_parameter(name).value)
+             if not math.isfinite(value) or value<=0.0:
+@@ -272,6 +294,10 @@
+             raise ValueError('static_detour_timeout must be finite and positive')
+         if float(self.get_parameter('reaction_time').value) < self._planning_timeout:
+             raise ValueError('reaction_time must cover planning_timeout')
++        if float(self.get_parameter('planning_budget_s').value) >= cfg.control_dt:
++            raise ValueError('planning_budget_s must leave time within control_rate period')
++        if float(self.get_parameter('planning_budget_s').value) >= self._planning_timeout:
++            raise ValueError('planning_budget_s must be less than planning_timeout')
+ 
+         # ---------------- 算法核心（与仿真同构） ----------------
+         pp = module_config('v15_latesc')
+@@ -290,6 +316,7 @@
+         pp.max_linear_velocity = float(self.get_parameter('v_max').value)
+         pp.min_linear_velocity = float(self.get_parameter('v_min').value)
+         pp.real_vehicle_safety = True
++        pp.planning_budget_s = float(self.get_parameter('planning_budget_s').value)
+         pp.max_angular_velocity = abs(float(self.get_parameter('omega_max').value))
+         pp.min_angular_velocity = -pp.max_angular_velocity
+         pp.omega_spin_max = cfg.spin_w_max
+@@ -953,8 +980,11 @@
+             'planning_timeout_s': self._planning_timeout, 'mode_ready_timeout_s': core.cfg.mode_ready_timeout,
+             'spin_pivot_offset_m': core.cfg.spin_pivot_offset, 'spin_wait_s': core.cfg.spin_wait_time,
+             'spin_recover_s': core.cfg.spin_recover_time, 'spin_timeout_s': core.cfg.spin_timeout,
++            'spin_stop_timeout_s': core.cfg.spin_stop_timeout,
+             'spin_max_rad_s': core.cfg.spin_w_max, 'spin_acc_max_rad_s2': core.cfg.spin_acc_max,
+             'trap_timeout_s': core.cfg.trap_max_duration, 'max_spin_attempts': core.cfg.max_spin_attempts}
++        effective.update(moving_stall_window_s=core.cfg.moving_stall_duration,
++                         moving_recovery_enabled=core.cfg.moving_recovery_enable)
+         planned_this_cycle = info.get('plan_ok') is not None
+         ref_epoch = self._diag_reference_publish.get('ref_epoch_ns')
+         return _telemetry_clean({'diag_version': 2, 'ref_epoch_ns': ref_epoch,
+@@ -983,6 +1013,18 @@
+                 'subgoal_xy_m': trap.get('sub_goal'), 'escape_heading_rad': trap.get('escape_heading'),
+                 'static_detour': detour, 'spin_target_latched_rad': core._spin_target},
+             'trap_state': {'active': bool(trap.get('active', False)), 'origin_xy_m': core._trap_origin,
++                'recovery_phase': trap.get('recovery_phase'),
++                'phase_spin_started': trap.get('phase_spin_started'),
++                'phase_spin_result': trap.get('phase_spin_result'),
++                'ack_action_budget_remaining_s': max(0.0, core.cfg.trap_max_duration-core._trap_elapsed),
++                'moving_minimum_observed': getattr(core, '_moving_minimum_observed', False),
++                'moving_minimum_confined': getattr(core, '_moving_minimum_confined', False),
++                'moving_source_sample_count': len(getattr(core, '_motion_history', [])),
++                'moving_rolling_sample_count': sum(bool(h[7]) for h in getattr(core, '_motion_history', []) if len(h)>7),
++                'stall_class': getattr(core, '_stall_class', None),
++                'episode_failed': getattr(core, '_episode_failed', None),
++                'episode_goal_distance_m': getattr(core, '_episode_goal_distance', None),
++                'trap_reason': getattr(core, '_trap_last_reason', None),
+                 'actual_position_progress_m': _telemetry_distance(robot, core._trap_origin),
+                 'active_progress_time_s': core._trap_elapsed, 'active_since_mono_s': core._trap_active_since,
+                 'exit_candidate_since_mono_s': core._trap_exit_since,
+@@ -1003,11 +1045,15 @@
+                 'last_spin_result_message': self._diag_last_spin_result_seen,
+                 'last_stop_reason': core._safety_reason},
+             'safety': {'cycle_info': dict(info), 'pre_node_guard_info': self._diag_cycle.get('pre_node_guard_info'),
++                'planner_failure_reason': getattr(self.planner, 'last_failure_reason', None),
+                 'node_guard': self._diag_cycle.get('node_guard'),
+                 'last_plan_ok': core._last_plan_ok, 'plan_ran_this_cycle': planned_this_cycle,
+                 'choice_flags_scope': 'this_plan' if planned_this_cycle else 'previous_or_unavailable',
+                 'has_safe_forward': self.planner.last_has_forward, 'has_safe_motion': self.planner.last_has_motion,
+-                'candidate_count': None, 'feasible_count': None, 'choice_counts_available': False},
++                'candidate_count': getattr(self.planner, 'last_candidate_count', None),
++                'feasible_count': getattr(self.planner, 'last_feasible_count', None),
++                'checked_candidate_count': getattr(self.planner, 'last_checked_count', None),
++                'choice_counts_available': getattr(self.planner, 'last_candidate_count', None) is not None},
+             'obstacles_summary': obs_summary, 'effective_params': effective})
+ 
+     @staticmethod
+--- a/rda_dwa_real/rda_dwa_real/kf_tracker.py
++++ b/rda_dwa_real/rda_dwa_real/kf_tracker.py
+@@ -1,6 +1,12 @@
+-"""Source-time CV tracking, predicted association, conservative occlusion hold."""
++"""Source-time CV tracking with observed-motion consistency guards.
++
++Motion bounds are configurable operating assumptions, not vehicle calibration or
++statistical confidence bounds. An incompatible detection stays represented as a
++new/updated unknown obstacle; it never disappears because a model gate failed.
++"""
+ from __future__ import annotations
+ import math
++from collections import deque
+ import numpy as np
+ try:
+     from scipy.optimize import linear_sum_assignment
+@@ -13,9 +19,21 @@
+ class KFTrack:
+     def __init__(self, tid, x, y, dt, q=0.3, r=0.15, obs_type='unknown',
+                  length=1.0, width=1.0, max_speed=1.5, dyn_speed_thr=0.3,
+-                 dyn_hold_frames=5, static_speed_thr=0.15, static_hold_frames=10):
++                 dyn_hold_frames=5, static_speed_thr=0.15, static_hold_frames=10,
++                 motion_guard_enable=True, measurement_position_slack=0.15,
++                 velocity_innovation_limit=0.8, velocity_reconfirm_time=0.2):
+         self.id, self.dt, self.q = int(tid), float(dt), float(q)
+         self.max_speed = float(max_speed)
++        self.motion_guard_enable = bool(motion_guard_enable)
++        self.measurement_position_slack = float(measurement_position_slack)
++        self.velocity_innovation_limit = float(velocity_innovation_limit)
++        self.velocity_reconfirm_time = float(velocity_reconfirm_time)
++        self.velocity_trusted = False
++        self.motion_status = 'first_observation'
++        self._reconfirm_elapsed = 0.0
++        self._last_raw_velocity = None
++        self._measurement_elapsed = 0.0
++        self._motion_window = deque([(0.0,float(x),float(y))])
+         self.dyn_speed_thr, self.static_speed_thr = dyn_speed_thr, static_speed_thr
+         self._mv_required, self._st_required = dyn_hold_frames*self.dt, static_hold_frames*self.dt
+         self._mv_duration = self._st_duration = 0.0
+@@ -45,21 +63,59 @@
+ 
+     def update(self, zx, zy, measurement_dt=None):
+         z = np.array([zx,zy],dtype=float)
++        elapsed = max(float(measurement_dt or self.dt),1e-6)
++        raw_velocity = (z-np.asarray(self._last_measurement))/elapsed
++        self._measurement_elapsed += elapsed
++        self._motion_window.append((self._measurement_elapsed,float(zx),float(zy)))
++        # A source-time window avoids interpreting high-rate centroid noise as
++        # repeated extreme acceleration. Keep the sample bracketing its start.
++        cutoff = self._measurement_elapsed-self.velocity_reconfirm_time
++        while len(self._motion_window)>2 and self._motion_window[1][0] <= cutoff+1e-9:
++            self._motion_window.popleft()
++        anchor_time,anchor_x,anchor_y = self._motion_window[0]
++        window_velocity = (z-np.array([anchor_x,anchor_y]))/max(self._measurement_elapsed-anchor_time,1e-6)
++        raw_speed = float(np.linalg.norm(window_velocity))
++        innovation = z-self.H@self.x
++        velocity_change = float(np.linalg.norm(raw_velocity-self.x[2:]))
++        inconsistent = bool(self.motion_guard_enable and (
++            raw_speed > self.max_speed+1e-9 or
++            (self._measurement_count >= 2 and self.velocity_trusted
++             and float(np.linalg.norm(innovation)) > self.measurement_position_slack
++             and velocity_change > self.velocity_innovation_limit)))
+         S = self.H @ self.P @ self.H.T + self.R
+-        K = self.P @ self.H.T @ np.linalg.inv(S)
+-        self.x += K @ (z-self.H@self.x)
++        K = np.linalg.solve(S, (self.P @ self.H.T).T).T
++        self.x += K @ innovation
+         A = np.eye(4)-K@self.H
+         self.P = A@self.P@A.T + K@self.R@K.T
+-        if self._measurement_count == 1:
+-            # The second source observation establishes a velocity prior; a
+-            # position-only initial KF otherwise takes many frames to discover
+-            # a newly entering pedestrian's motion.
+-            elapsed = max(float(measurement_dt or self.dt),1e-6)
+-            self.x[2] = (zx-self._last_measurement[0])/elapsed
+-            self.x[3] = (zy-self._last_measurement[1])/elapsed
++        if inconsistent:
++            # A clipped vector is not evidence for a measured velocity. Keep
++            # the current detection position and use an isotropic reachable
++            # envelope until real source observations establish motion again.
++            self.x[:2],self.x[2:] = z,0.0
++            self.velocity_trusted = False
++            self._reconfirm_elapsed = 0.0
++            self.motion_status = 'speed_bound' if raw_speed > self.max_speed else 'motion_innovation'
++            self.moving = self.static_confirmed = False
++            self._mv_duration = self._st_duration = 0.0
++        elif self._measurement_count == 1:
++            self.x[2:] = raw_velocity
++            self.velocity_trusted = True
++            self.motion_status = 'measured_velocity'
++        elif not self.velocity_trusted:
++            compatible = (elapsed <= self.velocity_reconfirm_time+1e-9 and
++                self._last_raw_velocity is not None and
++                float(np.linalg.norm(window_velocity-self._last_raw_velocity)) <= self.velocity_innovation_limit)
++            self._reconfirm_elapsed = self._reconfirm_elapsed+elapsed if compatible else 0.0
++            self.x[:2],self.x[2:] = z,0.0
++            if self._reconfirm_elapsed+1e-9 >= self.velocity_reconfirm_time:
++                self.x[2:] = window_velocity
++                self.velocity_trusted = True
++                self.motion_status = 'reconfirmed_velocity'
++            else:
++                self.motion_status = 'reconfirming_velocity'
++        self._last_raw_velocity = window_velocity.copy()
+         self._last_measurement = (float(zx),float(zy))
+         self._measurement_count += 1
+-        # Model speed limit applies to prediction, not just published speed.
+         speed = math.hypot(self.x[2],self.x[3])
+         if speed > self.max_speed:
+             self.x[2:] *= self.max_speed/speed
+@@ -77,6 +133,8 @@
+         return (0.0,0.0) if speed < 0.05 else (min(speed,self.max_speed),math.atan2(vy,vx))
+ 
+     def update_motion(self):
++        if not self.velocity_trusted:
++            return
+         speed = math.hypot(self.x[2],self.x[3])
+         if speed > self.dyn_speed_thr:
+             self._mv_duration += self.dt
+@@ -103,7 +161,7 @@
+     def __init__(self, gate: float = 1.0):
+         self.gate = float(gate)
+ 
+-    def match(self, pred: list, dets: list) -> tuple:
++    def match(self, pred: list, dets: list, allowed=None) -> tuple:
+         """pred: [(px, py)] 预测位置；dets: [(dx, dy)] 检测位置。
+ 
+         返回 (matched, unmatched_det_idx)：
+@@ -114,12 +172,12 @@
+         m = len(dets)
+         if n == 0 or m == 0:
+             return [], list(range(m))
+-        cost = np.full((n, m), 1e6, dtype=np.float64)
+-        for i, (px, py) in enumerate(pred):
+-            for j, (dx, dy) in enumerate(dets):
+-                d = math.hypot(px - dx, py - dy)
+-                if d <= self.gate:
+-                    cost[i, j] = d
++        delta = np.asarray(pred,dtype=np.float64)[:,None,:]-np.asarray(dets,dtype=np.float64)[None,:,:]
++        distances = np.hypot(delta[:,:,0],delta[:,:,1])
++        admissible = distances <= self.gate
++        if allowed is not None:
++            admissible &= np.asarray(allowed,dtype=bool)
++        cost = np.where(admissible,distances,1e6)
+         if _HAS_SCIPY:
+             rows, cols = linear_sum_assignment(cost)
+             matched = [(int(ri), int(ci)) for ri, ci in zip(rows, cols)
+@@ -152,11 +210,22 @@
+     def __init__(self, dt=0.1, gate=1.0, lost_ttl=10, q=0.3, r=0.15,
+                  max_speed=1.5, dyn_speed_thr=0.3, dyn_hold_frames=5,
+                  static_speed_thr=0.15, static_hold_frames=10,
+-                 static_small_thr=0.6, lost_ttl_seconds=None):
++                 static_small_thr=0.6, lost_ttl_seconds=None, motion_guard_enable=True,
++                 measurement_position_slack=0.15, velocity_innovation_limit=0.8,
++                 velocity_reconfirm_time=0.2):
+         self.dt, self.gate = float(dt), float(gate)
+         self.lost_ttl = int(lost_ttl)
+         self.lost_ttl_seconds = float(lost_ttl_seconds if lost_ttl_seconds is not None else lost_ttl*self.dt)
+         self.q,self.r,self.max_speed = float(q),float(r),float(max_speed)
++        self.motion_guard_enable = bool(motion_guard_enable)
++        self.measurement_position_slack = float(measurement_position_slack)
++        self.velocity_innovation_limit = float(velocity_innovation_limit)
++        self.velocity_reconfirm_time = float(velocity_reconfirm_time)
++        values = (self.dt,self.gate,self.lost_ttl_seconds,self.r,self.max_speed,
++                  self.measurement_position_slack,self.velocity_innovation_limit,self.velocity_reconfirm_time)
++        if not all(math.isfinite(v) and v > 0.0 for v in values) or not math.isfinite(self.q) or self.q < 0.0:
++            raise ValueError('Invalid tracking bounds or timing')
++        self.stats = {}
+         self.dyn_speed_thr,self.dyn_hold_frames = dyn_speed_thr,dyn_hold_frames
+         self.static_speed_thr,self.static_hold_frames = static_speed_thr,static_hold_frames
+         self.static_small_thr = static_small_thr
+@@ -188,7 +257,17 @@
+         valid_indices = [item[0] for item in valid]
+         dets = [item[1] for item in valid]
+         self.last_detection_ids = {}
+-        matched,unmatched = self._matcher.match(pred,[(d[0],d[1]) for d in dets])
++        allowed = None
++        if self.motion_guard_enable:
++            anchors = np.asarray([self.tracks[tid]._last_measurement for tid in ids],dtype=float).reshape(-1,2)
++            observations = np.asarray([(d[0],d[1]) for d in dets],dtype=float).reshape(-1,2)
++            reachable = np.asarray([self.max_speed*max(self._now-self.tracks[tid].last_seen,0.0)
++                                    +2.0*self.measurement_position_slack for tid in ids])
++            delta = anchors[:,None,:]-observations[None,:,:]
++            allowed = np.hypot(delta[:,:,0],delta[:,:,1]) <= reachable[:,None]+1e-9
++        matched,unmatched = self._matcher.match(pred,[(d[0],d[1]) for d in dets],allowed=allowed)
++        self.stats = {'association_bound_rejections':int(np.count_nonzero(~allowed)) if allowed is not None else 0}
++
+         matched_ids = set()
+         for ti,di in matched:
+             tr = self.tracks[ids[ti]]
+@@ -204,7 +283,11 @@
+             tr = KFTrack(tid,dx,dy,self.dt,q=self.q,r=self.r,obs_type=otype,
+                          length=L,width=W,max_speed=self.max_speed,dyn_speed_thr=self.dyn_speed_thr,
+                          dyn_hold_frames=self.dyn_hold_frames,static_speed_thr=self.static_speed_thr,
+-                         static_hold_frames=self.static_hold_frames)
++                         static_hold_frames=self.static_hold_frames,
++                         motion_guard_enable=self.motion_guard_enable,
++                         measurement_position_slack=self.measurement_position_slack,
++                         velocity_innovation_limit=self.velocity_innovation_limit,
++                         velocity_reconfirm_time=self.velocity_reconfirm_time)
+             tr.last_seen = self._now
+             self.tracks[tid] = tr
+             self.last_detection_ids[valid_indices[di]] = tid
+@@ -236,7 +319,9 @@
+                 # legacy ROS type, even when empty cloud frames keep predicting
+                 # this object. A predicted miss must not masquerade as a second
+                 # real position measurement at the downstream adapter.
+-                otype = 'unknown' if tr._measurement_count < 2 else 'pedestrian'
++                otype = 'unknown' if not tr.velocity_trusted else 'pedestrian'
++                if not tr.velocity_trusted:
++                    speed,heading = 0.0,0.0
+             else:
+                 speed,heading = 0.0,0.0
+                 otype = 'block' if max(tr.length,tr.width)<=self.static_small_thr else 'static_large'
+@@ -244,7 +329,7 @@
+             # Carry its first-observation reachable bound in the published shape
+             # so downstream refreshing the array cannot reset that uncertainty.
+             age = max(self._now-tr.last_seen,0.0)
+-            unknown_rate = self.max_speed if tr._measurement_count < 2 else 0.0
++            unknown_rate = self.max_speed if not tr.velocity_trusted else 0.0
+             growth = (0.4+2*unknown_rate)*age
+             result.append((tid,x,y,speed,heading,otype,tr.length+growth,tr.width+growth))
+         return result
+--- a/rda_dwa_real/rda_dwa_real/lidar_track_node.py
++++ b/rda_dwa_real/rda_dwa_real/lidar_track_node.py
+@@ -80,6 +80,10 @@
+         self.declare_parameter('cluster_max_radius', 30.0)
+         # 卡尔曼 + 关联
+         self.declare_parameter('track_dt', 0.1)       # 控制周期（雷达 10Hz 时 0.1）
++        self.declare_parameter('motion_guard_enable', True)
++        self.declare_parameter('measurement_position_slack', 0.15)
++        self.declare_parameter('velocity_innovation_limit', 0.8)
++        self.declare_parameter('velocity_reconfirm_time', 0.2)
+         self.declare_parameter('track_gate', 1.0)     # 匈牙利关联门限 m
+         self.declare_parameter('track_lost_ttl', 10)  # 连续 miss 帧数 → 删除（10 帧≈1s）
+         self.declare_parameter('kf_q', 0.3)           # 过程噪声
+@@ -161,6 +165,10 @@
+             max_radius=float(self.get_parameter('cluster_max_radius').value),
+         )
+         self._tracker = GlobalKFTracker(
++            motion_guard_enable=bool(self.get_parameter('motion_guard_enable').value),
++            measurement_position_slack=float(self.get_parameter('measurement_position_slack').value),
++            velocity_innovation_limit=float(self.get_parameter('velocity_innovation_limit').value),
++            velocity_reconfirm_time=float(self.get_parameter('velocity_reconfirm_time').value),
+             dt=float(self.get_parameter('track_dt').value),
+             lost_ttl_seconds=float(self.get_parameter("track_lost_ttl_seconds").value),
+             gate=float(self.get_parameter('track_gate').value),
+--- a/rda_dwa_real/rda_dwa_real/obstacle_fusion.py
++++ b/rda_dwa_real/rda_dwa_real/obstacle_fusion.py
+@@ -331,7 +331,7 @@
+                 tiled = key is not None
+                 if tiled:
+                     kind = ('block' if parent.static_confirmed else
+-                            'pedestrian' if speed>.05 else 'unknown')
++                            'pedestrian' if parent.velocity_trusted else 'unknown')
+                 identity = (pid,key)
+                 if identity not in self._ids:
+                     self._ids[identity],self._next_id = self._next_id,self._next_id+1
+--- a/rda_dwa_real/rda_dwa_real/traj_tracker_core.py
++++ b/rda_dwa_real/rda_dwa_real/traj_tracker_core.py
+@@ -136,6 +136,12 @@
+         self.rotate_entry_deg = 10.0
+         self.spin_w_deadband = 0.06
+         self.enter_hold = 0.3
++        # Pure legacy harnesses may opt out; the ROS adapter defaults to True.
++        # A zero command is not evidence that the vehicle has physically stopped.
++        self.spin_require_stopped_feedback = False
++        self.spin_require_yaw_stop_feedback = False
++        self.spin_stop_timeout = 3.0
++        self.spin_yaw_stop_rate = 0.03
+         self.resume_hold = 0.3
+         self.spin_hyst = 0.2
+         self.spin_w_max = 0.8
+@@ -180,6 +186,10 @@
+                     'speed_feedback_timeout', 'direction_speed_eps')
+         if any(getattr(self, name) <= 0 for name in positive):
+             raise ValueError('Tracker geometry, rates and timeouts must be positive')
++        if (type(self.spin_require_stopped_feedback) is not bool
++                or type(self.spin_require_yaw_stop_feedback) is not bool
++                or self.spin_stop_timeout <= 0 or self.spin_yaw_stop_rate <= 0):
++            raise ValueError('spin_require_stopped_feedback must be bool and stop timeout positive')
+         nonnegative = ('lookahead_v_gain', 'steer_hold_deg', 'tracking_correction_max_deg',
+                        'spin_hyst', 'spin_min_run', 'v_resolution', 'omega_resolution',
+                        'pose_jump_margin', 'pose_yaw_jump_margin_deg', 'reference_center_to_rear')
+@@ -215,6 +225,12 @@
+         self.mode = self.MODE_ACK
+         self._mode_since = 0.0
+         self._enter_timer = self._resume_timer = 0.0
++        self._spin_stop_requested_since = None
++        self._yaw_feedback = None
++        self._yaw_feedback_rate = None
++        self._yaw_feedback_stamp = None
++        self._yaw_feedback_at = -math.inf
++        self._yaw_stopped_since = None
+         self._spin_stage = 'HOLD'
+         self._spin_run_since = 0.0
+         self._traj_seq = -1
+@@ -225,6 +241,7 @@
+         self._last_drive_direction = 0
+         self._direction_zero_since = None
+         self._speed_feedback = None
++        self._stop_feedback = None
+         self._speed_feedback_ts = -math.inf
+         self._control_now = 0.0
+         self._mode_cmd = 0
+@@ -311,14 +328,47 @@
+         if self._on_transition:
+             self._on_transition(mode, now, None)
+ 
+-    def set_speed_feedback(self, speed, now):
++    def set_speed_feedback(self, speed, now, stop_speed=None):
+         if speed is None or not math.isfinite(speed):
+             self._speed_feedback, self._speed_feedback_ts = None, -math.inf
++            self._stop_feedback = None
+             self._direction_zero_since = None
+         else:
+             self._speed_feedback, self._speed_feedback_ts = speed, now
++            self._stop_feedback = abs(speed) if stop_speed is None else abs(float(stop_speed))
++            if not math.isfinite(self._stop_feedback):
++                self._stop_feedback = None
+             if abs(speed) > self.p.direction_speed_eps:
+                 self._direction_zero_since = None
++
++    def set_yaw_feedback(self, yaw, source_stamp, arrival):
++        """Use only genuinely new accepted localization observations for rate.
++
++        A 50 Hz republished pose must not manufacture 50 Hz zero angular speed.
++        """
++        if not all(math.isfinite(v) for v in (yaw,source_stamp,arrival)):
++            return False
++        if self._yaw_feedback_stamp is not None:
++            dt=source_stamp-self._yaw_feedback_stamp
++            if dt<=0:return False
++            self._yaw_feedback_rate=(wrap_angle(yaw-self._yaw_feedback)/dt
++                                     if dt <= self.p.localization_timeout else None)
++        self._yaw_feedback,self._yaw_feedback_stamp=yaw,source_stamp
++        self._yaw_feedback_at=arrival
++        if self._yaw_feedback_rate is None or abs(self._yaw_feedback_rate)>self.p.spin_yaw_stop_rate:
++            self._yaw_stopped_since=None
++        return True
++
++    def _yaw_stopped(self, now):
++        return (self._yaw_feedback_rate is not None
++                and 0<=now-self._yaw_feedback_at<=self.p.speed_feedback_timeout
++                and abs(self._yaw_feedback_rate)<=self.p.spin_yaw_stop_rate)
++
++    def _physically_stopped(self, now):
++        return (self._speed_feedback is not None
++                and self._stop_feedback is not None
++                and 0 <= now-self._speed_feedback_ts <= self.p.speed_feedback_timeout
++                and self._stop_feedback <= self.p.direction_speed_eps)
+ 
+     def _ramp_speed(self, target, dt):
+         target = max(self.p.v_min, -self.p.max_speed, min(self.p.v_max, self.p.max_speed, target))
+@@ -335,7 +385,7 @@
+                      or (direction < 0 and self._last_drive_direction == 0))
+         if switching:
+             self._last_out_speed = 0.0
+-            stopped = actual_fresh and abs(self._speed_feedback) <= self.p.direction_speed_eps
++            stopped = actual_fresh and self._physically_stopped(self._control_now)
+             if not stopped:
+                 self._direction_zero_since = None
+                 return 0.0
+@@ -466,6 +516,18 @@
+             return self.safety_stop('planner_abort', now)
+         if self.mode == self.MODE_FAULT:
+             if self._mode_cmd == 0:
++                # Persistent mode0 heartbeats are not a new recovery attempt.
++                # After an ACK mechanical failure, wait for genuine readiness
++                # rather than looping FAULT -> RECOVER every eight seconds.
++                if self._failure_reason == 'ack_mode_switch_timeout' and not self._ready(0,now):
++                    return self.emergency_cmd()
++                if self._wire_mode == 4 and self.p.spin_require_yaw_stop_feedback:
++                    if not self._yaw_stopped(now):
++                        self._yaw_stopped_since=None
++                        return self.emergency_cmd()
++                    if self._yaw_stopped_since is None:self._yaw_stopped_since=now
++                    if now-self._yaw_stopped_since<self.p.spin_stop_hold:
++                        return self.emergency_cmd()
+                 self._set_mode(self.MODE_REC, now)
+                 self._wire_mode = 0
+             return self.emergency_cmd()
+@@ -477,6 +539,14 @@
+             if self._mode_cmd == 1 and not self._armed:
+                 return self.emergency_cmd()
+             if self._mode_cmd == 1 and self._armed:
++                if self._spin_stop_requested_since is None:
++                    self._spin_stop_requested_since = now
++                if (self.p.spin_require_stopped_feedback
++                        and not self._physically_stopped(now)):
++                    self._enter_timer = 0.0
++                    if now-self._spin_stop_requested_since >= self.p.spin_stop_timeout:
++                        return self.safety_stop('spin_stop_feedback_timeout', now)
++                    return self.emergency_cmd()
+                 self._enter_timer += dt
+                 if self._enter_timer >= self.p.enter_hold:
+                     if spin_target is None or not math.isfinite(spin_target):
+@@ -484,6 +554,7 @@
+                     self._armed = False
+                     self._session_target = wrap_angle(spin_target)
+                     self._resume_timer = self._enter_timer = 0.0
++                    self._spin_stop_requested_since = None
+                     self._last_spin_result = None
+                     self._failure_reason = ''
+                     self._spin_stage = 'HOLD'
+@@ -492,6 +563,7 @@
+                 return self.emergency_cmd()
+             else:
+                 self._enter_timer = 0.0
++                self._spin_stop_requested_since = None
+             speed, angle = self._pure_pursuit(v, traj, self._px, self._py, yaw, traj_seq, dt, w)
+             return self._cmd(0, speed, angle)
+         if self.mode == self.MODE_SPIN:
+@@ -513,10 +585,17 @@
+                     return self.spin_stop_cmd()
+             if not self._ready(4, now):
+                 return self.safety_stop('spin_mode_feedback_lost', now)
++            if (self.p.spin_require_yaw_stop_feedback
++                    and now-self._spin_run_since>=self.p.spin_timeout):
++                self._last_spin_result='timeout'
++                self._failure_reason='spin_execution_timeout'
++                self._set_mode(self.MODE_STOP,now)
++                return self.spin_stop_cmd()
+             reached = abs(err) <= math.radians(self.p.rotate_precision_deg)
+             self._resume_timer = self._resume_timer+dt if reached else 0.0
+             if self._resume_timer >= self.p.resume_hold:
+-                self._last_spin_result = 'reached'
++                self._last_spin_result = ('settling' if self.p.spin_require_yaw_stop_feedback else 'reached')
++                self._yaw_stopped_since = None
+                 self._set_mode(self.MODE_STOP, now)
+                 return self.spin_stop_cmd()
+             if now-self._spin_run_since >= self.p.spin_timeout:
+@@ -530,6 +609,31 @@
+                 return self.safety_stop('spin_no_yaw_progress', now)
+             return self._spin_run_cmd(w, yaw, target, dt)
+         if self.mode == self.MODE_STOP:
++            if self.p.spin_require_yaw_stop_feedback:
++                if not self._ready(4,now):
++                    return self.safety_stop('spin_stop_mode_feedback_lost',now)
++                if self._last_spin_result == 'settling':
++                    err=wrap_angle(self._session_target-yaw)
++                    if abs(err)>math.radians(self.p.rotate_precision_deg):
++                        # Braking drift outside tolerance cannot claim completion.
++                        # Correct under the original RUN budget and ongoing safety.
++                        if now-self._spin_run_since>=self.p.spin_timeout:
++                            return self.safety_stop('spin_stop_alignment_timeout',now)
++                        self._last_spin_result=None
++                        self._resume_timer=0.0
++                        self._spin_stage='RUN'
++                        self._progress_yaw,self._progress_since=yaw,now
++                        self._set_mode(self.MODE_SPIN,now)
++                        return self.spin_stop_cmd()
++                if self._yaw_stopped(now):
++                    if self._yaw_stopped_since is None:self._yaw_stopped_since=now
++                else:self._yaw_stopped_since=None
++                if now-self._mode_since>=self.p.spin_stop_timeout:
++                    return self.safety_stop('spin_yaw_stop_feedback_timeout',now)
++                if (self._yaw_stopped_since is None
++                        or now-self._yaw_stopped_since<self.p.spin_stop_hold):
++                    return self.spin_stop_cmd()
++                if self._last_spin_result=='settling':self._last_spin_result='reached'
+             if now-self._mode_since >= self.p.spin_stop_hold:
+                 self._set_mode(self.MODE_REC, now)
+                 return self._cmd(0)
+@@ -549,7 +653,7 @@
+     def bridge_state(self):
+         if self.mode == self.MODE_FAULT:
+             return 4
+-        if self.mode in (self.MODE_STOP, self.MODE_REC) and self._last_spin_result:
++        if self.mode in (self.MODE_STOP, self.MODE_REC) and self._last_spin_result in ('reached','timeout'):
+             return 3 if self._last_spin_result == 'reached' else 4
+         if self.mode == self.MODE_ACK:
+             return 0 if self._ready_mode == 0 else 1
+@@ -564,4 +668,6 @@
+                 f'spin_err={self._last_spin_err:.4f} traj_arc={self._last_traj_arc:.3f} '
+                 f'nearest_idx={self._last_nearest_idx} lx={lx:.3f} ly={ly:.3f} '
+                 f'mode_cmd={self._mode_cmd} need_spin_d=0 spin_res={self._last_spin_result} '
+-                f'physical_ready={self._ready_mode} fault={self._failure_reason or "none"} {extra}')
++                f'physical_ready={self._ready_mode} fault={self._failure_reason or "none"} '
++                f'stop_wheel_max={self._stop_feedback} yaw_source_rate={self._yaw_feedback_rate} '
++                f'yaw_stop_age={self._control_now-self._yaw_feedback_at} {extra}')
+--- a/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
++++ b/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
+@@ -53,9 +53,12 @@
+     def __init__(self):
+         super().__init__('traj_tracker_node')
+         pp = TrajTrackerParams()
++        pp.spin_require_stopped_feedback = True
++        pp.spin_require_yaw_stop_feedback = True
+         for name, default in vars(pp).items():
+-            self.declare_parameter(name, float(default))
+-            setattr(pp, name, float(self.get_parameter(name).value))
++            self.declare_parameter(name, default if isinstance(default, bool) else float(default))
++            value = self.get_parameter(name).value
++            setattr(pp, name, value if isinstance(default, bool) else float(value))
+         for name, default in {
+             'rate': 50.0, 'body_to_base_link_x': 0.0,
+             'algorithm_frame': 'map', 'traj_topic': '/rda/traj',
+@@ -191,6 +194,7 @@
+             candidate = body_pose_to_base_link(float(values[0]), float(values[1]), yaw, self._body_to_base_x)
+             if self._pose_guard.accept(candidate, stamp_seconds(msg.header.stamp)):
+                 self._loc = candidate
++                self.core.set_yaw_feedback(yaw,stamp_seconds(msg.header.stamp),self._loc_guard.received)
+                 accepted = True
+                 self._diag_loc_accepted = {'source_stamp_ns': _telemetry_stamp_ns(msg.header.stamp),
+                     'arrival_mono_s': self._loc_guard.received, 'pose_xy_yaw': tuple(candidate)}
+@@ -244,7 +248,8 @@
+                 and max(values) > self.core.p.direction_speed_eps):
+             self.core.set_speed_feedback(None, time.monotonic())
+             return
+-        self.core.set_speed_feedback(sum(values)/4.0, time.monotonic())
++        self.core.set_speed_feedback(sum(values)/4.0, time.monotonic(),
++                                     stop_speed=max(abs(value) for value in values))
+ 
+     def _on_mode_transition(self, mode, t, stage=None):
+         self.get_logger().info(f'[DIAG] MODE->{mode} stage={stage} t={t:.3f}')
+--- a/rda_dwa_real/rda_dwa_real/vehicle_bridge.py
++++ b/rda_dwa_real/rda_dwa_real/vehicle_bridge.py
+@@ -46,6 +46,7 @@
+ )
+ from rda_dwa.ackermann_model import AckermannModel, AckermannState
+ from rda_dwa.ackermann_model import limit_signed_speed
++from rda_dwa.local_guide import LocalStaticGuide
+ from rda_dwa.trial_runner import ClassicTrapController
+ from rda_dwa.predictor import ObstaclePredictor, IMMUKFPredictor
+ from rda_dwa.obstacle import Obstacle
+@@ -90,6 +91,7 @@
+         self.blocked_duration = 1.5
+         self.spin_entry_deg = 10.0
+         self.spin_wait_time = 3.0
++        self.spin_stop_timeout = 3.0
+         self.spin_recover_time = 3.0
+         self.spin_timeout = 10.0
+         self.spin_w_max = 0.8
+@@ -98,12 +100,20 @@
+         self.spin_cooldown = 5.0
+         self.max_spin_attempts = 2
+         self.trap_exit_hold = 1.0
++        self.trap_exit_progress = 0.10
++        self.trap_cooldown = 5.0
++        self.trap_static_probe_budget = 0.02
+         self.spin_pivot_offset = 0.0
+         self.mode_ready_timeout = 0.5
+         self.localization_jump_residual = 0.15
+         self.localization_jump_yaw_deg = 5.0
+         self.static_detour_enable = True
+         self.static_detour_timeout = 24.0
++        self.static_search_enable = True
++        self.static_search_budget = 0.015
++        self.static_search_max_expansions = 200
++        self.moving_stall_duration = 6.0
++        self.moving_recovery_enable = False  # experimental automatic moving recovery
+ 
+ 
+ class VehicleBridgeCore:
+@@ -166,6 +176,11 @@
+         self._trap_origin = None
+         self._trap_elapsed = 0.0
+         self._trap_exit_since = None
++        self._trap_rejoin_goal_distance = None
++        self._episode_goal_distance = None
++        self._episode_failed = False
++        self._trap_last_reason = 'idle'
++        self._stall_class = 'idle'
+         self._trap_active_since = None
+         self._trap_initial_sub_goal = None
+         self._spin_in_trap_count = 0
+@@ -174,6 +189,16 @@
+         self._abort_once = False
+         self._reference = []
+         self._static_detour = None
++        self._static_search = LocalStaticGuide(self.planner.cc,
++            budget_s=self.cfg.static_search_budget,
++            max_expansions=self.cfg.static_search_max_expansions)
++        self._cycle_started = None
++        self._motion_history = []
++        self._static_search_lock = None
++        self._trap_just_activated = False
++        self._trap_tick_checkpoint = None
++        self._moving_minimum_observed = False
++        self._moving_minimum_confined = False
+         self._safety_reason = ''
+ 
+     def set_localization(self, x, y, theta, stamp=None, arrival=None, source_age=0.0):
+@@ -243,6 +268,9 @@
+         self._goal = float(gx), float(gy)
+         self._goal_received = True
+         self._static_detour = None
++        self._static_search.reset()
++        self._static_search_lock = None
++        self._motion_history = []
+         if self._arbit != 'ACK' or self._bridge_state != 0:
+             self._arbit, self._abort_once = 'ABORT', True
+         self._reset_spin_problem()
+@@ -307,6 +335,9 @@
+                 max(0.0,self._t_now-self._t_obs)+self._obs_source_age)
+ 
+     def _stop_info(self, info, reason, abort=True):
++        if reason in ('planner_budget_timeout','cycle_budget_timeout','planning_deadline_or_input_age',
++                      'planner_exception','invalid_planner_command'):
++            self._rollback_trap_tick()
+         info.update(ok=False, v_cmd=0.0, w_cmd=0.0, reason=reason,
+                     traj_mode=-1 if abort else 0, arbit=self._arbit,
+                     spin_target=self._spin_target if self._spin_target is not None else self.robot.theta)
+@@ -316,6 +347,14 @@
+         self.planner.set_last_cmd(0.0,0.0)
+         if abort:
+             self._arbit = 'ABORT'
++            self._blocked_since = None
++            self._progress_anchor = None
++            self._trap_exit_since = None
++            self._trap_rejoin_goal_distance = None
++            self._freeze_stall = True
++            self._motion_history = []
++        info.update(stall_class=self._stall_class, trap_reason=self._trap_last_reason,
++                    trap_episode_failed=self._episode_failed,trap_active=bool(self.trap['active']))
+         return info
+ 
+     def _obstacles_now(self):
+@@ -330,6 +369,8 @@
+         return self.tracker.snapshot(self._t_now)
+ 
+     def step(self, dt=None, now=None):
++        self._cycle_started = time.perf_counter()
++        self._trap_tick_checkpoint = None
+         dt = max(0.005,min(0.2,float(dt or self.cfg.control_dt)))
+         self._t_now = self._t_now+dt if now is None else float(now)
+         elapsed = dt if self._last_step_wall is None else max(0.0, self._t_now-self._last_step_wall)
+@@ -398,6 +439,8 @@
+             if self._bridge_state in (1,2,3,4):
+                 self._spin_saw_exec=True
+             if self._last_spin_result is not None:
++                if self.trap.get('recovery_phase') in ('ALIGN','RETURN_ALIGN'):
++                    self.trap['phase_spin_result'] = self._last_spin_result
+                 self._cooldown_until=self._t_now+self.cfg.spin_cooldown
+                 self._arbit='RECOVER'
+                 self._last_spin_result=None
+@@ -416,20 +459,44 @@
+                 self._ack_since=self._t_now
+                 self._blocked_since=None
+                 self._progress_anchor=None
++                self._motion_history = []
+             else:
+                 info.update(traj_mode=0,arbit='RECOVER',reason='mode_recovery')
+                 return info
+         if self._mode_ready!=0 or self._bridge_state!=0:
+             return self._stop_info(info,'ack_not_ready')
+         detour_goal=self._update_static_detour(obs)
++        self._checkpoint_trap_tick()
+         self._update_trap(obs,elapsed)
+-        if self._trap_exit_since is not None:
++        if self.trap['active'] and self.trap.get('recovery_phase') in ('ALIGN','RETURN_ALIGN') \
++                and self._arbit == 'ACK':
+             if self.planner.command_safe(0.0,0.0,self.robot,obs):
+-                return self._stop_info(info,'trap_rejoin_hold',abort=False)
+-            return self._stop_info(info,'trap_rejoin_hold_unsafe')
+-        target=self.trap.get('sub_goal') if self.trap['active'] else (detour_goal or self._goal)
++                return self._stop_info(info,'trap_align_stop',abort=False)
++            return self._stop_info(info,'trap_align_stop_unsafe')
++        if self._arbit == 'SPIN_REQUEST':
++            info.update(traj_mode=1,arbit=self._arbit,spin_target=self._spin_target,
++                        trap_active=True,reason='trap_phase_spin_requested')
++            self.planner.set_last_cmd(0.0,0.0)
++            return info
++        # Reconnection is a motion-confirmation phase. Holding zero at the same
++        # pose could satisfy a wall-clock timer without proving useful progress.
++        rejoining = self.trap['active'] and self._trap_exit_since is not None
++        target = self._goal if rejoining else (self.trap.get('sub_goal')
++                    if self.trap['active'] else (detour_goal or self._goal))
+         try:
+-            ok,v_cmd,w_cmd=self.planner.plan(self.robot,target,obs,self.trap if self.trap['active'] else None)
++            budget = float(getattr(self.pp, 'planning_budget_s', 0.0))
++            if budget > 0.0:
++                remaining = max(0.0, self.cfg.control_dt-(time.perf_counter()-self._cycle_started)-0.005)
++                if remaining <= 0.0:
++                    self._stall_class = 'computation_timeout'
++                    return self._stop_info(info, 'cycle_budget_timeout')
++                self.pp.planning_budget_s = min(budget, remaining)
++            try:
++                plan_trap=self.trap if self.trap['active'] and not rejoining else None
++                ok,v_cmd,w_cmd=self.planner.plan(self.robot,target,obs,plan_trap)
++            finally:
++                if budget > 0.0:
++                    self.pp.planning_budget_s = budget
+         except Exception:
+             _logger.exception('DWA planning failed')
+             return self._stop_info(info,'planner_exception')
+@@ -437,14 +504,25 @@
+         info.update(plan_ok=bool(ok),raw_v_cmd=float(v_cmd),raw_w_cmd=float(w_cmd))
+         if not all(math.isfinite(float(v)) for v in (v_cmd,w_cmd)):
+             return self._stop_info(info,'invalid_planner_command')
++        if getattr(self.planner, 'last_failure_reason', '') == 'deadline':
++            self._stall_class = 'computation_timeout'
++            return self._stop_info(info, 'planner_budget_timeout')
+         blocked = (not ok) or not self.planner.last_has_motion
+-        self._arbitration_step(self.robot,obs,gx,gy,dt,blocked=blocked)
++        if rejoining and blocked:
++            self._trap_exit_since = self._trap_rejoin_goal_distance = None
++        if not rejoining:
++            self._arbitration_step(self.robot,obs,gx,gy,dt,blocked=blocked)
+         if self._arbit=='SPIN_REQUEST':
+             info.update(traj_mode=1,arbit=self._arbit,spin_target=self._spin_target,
+                         trap_active=bool(self.trap['active']),reason='spin_requested')
+             self.planner.set_last_cmd(0.0,0.0)
+             self._reference=[]
+             return info
++        if self._trap_just_activated:
++            self._trap_just_activated = False
++            if self.planner.command_safe(0.0,0.0,self.robot,obs):
++                return self._stop_info(info,'trap_recovery_started',abort=False)
++            return self._stop_info(info,'trap_recovery_stop_unsafe')
+         if not ok:
+             return self._stop_info(info,'no_safe_trajectory',abort=False)
+         if self.ack_model is not None:
+@@ -478,6 +556,11 @@
+                     spin_target=self._spin_target if self._spin_target is not None else self.robot.theta,
+                     spin_attempts=self._spin_attempts,reference_dt=float(times[0]))
+         info['static_detour_phase']=None if self._static_detour is None else self._static_detour['phase']
++        info.update(stall_class=self._stall_class, trap_reason=self._trap_last_reason,
++                    trap_episode_failed=self._episode_failed,
++                    trap_rejoin_active=bool(self._trap_exit_since is not None),
++                    static_search_status=self._static_search.status,
++                    static_search_expansions=self._static_search.expansions)
+         return info
+ 
+     def _update_static_detour(self,obs):
+@@ -535,7 +618,7 @@
+                 continue
+             candidates.append((along,o,lateral,front,side_extent))
+         if not candidates:
+-            return None
++            return self._search_static_goal(obs)
+         along,o,lateral,front,side_extent=min(candidates,key=lambda entry:entry[0])
+         pre=along-front-ap.length/2-0.3
+         after=along+front+ap.length/2+self.pp.safety_margin
+@@ -555,10 +638,78 @@
+                            math.atan2(y-self.robot.y,x-self.robot.x),4.0) for x,y in points)
+             choices.append((clearance,points,sign))
+         if not choices:
+-            return None
++            return self._search_static_goal(obs)
+         _,points,sign=max(choices,key=lambda item:item[0])
+         self._static_detour=dict(id=o.id,points=points,phase=0,side=sign,since=self._t_now)
+         return points[0]
++
++    def _search_static_goal(self, obs):
++        """Bounded guidance when an early two-waypoint detour is unavailable.
++
++        Confirmed static geometry supplies topology. The returned waypoint is
++        never an executable shortcut; DWA checks the complete scene afterwards.
++        """
++        import numpy as np
++        if not self.cfg.static_search_enable:
++            self._static_search.status = 'disabled'
++            return None
++        static = [o for o in obs if o.obstacle_type in ('block','static_large')
++                  and o.speed <= 0.05 and not getattr(o,'velocity_unknown',False)]
++        if not static:
++            self._static_search.reset()
++            self._static_search.status = 'no_static_evidence'
++            return None
++        if self._static_search_lock is not None:
++            lock = self._static_search_lock
++            point = lock['points'][lock['cursor']]
++            distance = math.hypot(self.robot.x-point[0],self.robot.y-point[1])
++            if distance < 0.45 and lock['cursor'] < len(lock['points'])-1:
++                lock['cursor'] += 1
++                point = lock['points'][lock['cursor']]
++                distance = math.hypot(self.robot.x-point[0],self.robot.y-point[1])
++                lock['best_distance'],lock['progress_at'] = distance,self._t_now
++            elif distance < lock['best_distance']-0.03:
++                lock['best_distance'],lock['progress_at'] = distance,self._t_now
++            if (self._t_now-lock['since']<=self.cfg.static_detour_timeout
++                    and self._t_now-lock['progress_at']<=self.cfg.moving_stall_duration):
++                self._static_search.cursor=lock['cursor']
++                self._static_search.status='locked_path'
++                return point[:2]
++            self._static_search_lock=None
++            self._static_search.reset()
++            self._static_search.status='route_progress_timeout'
++        # Close obstacles belong to the checked reverse/spin recovery policy.
++        # A new guidance waypoint must not silently change a near-field stop
++        # into a reverse manoeuvre before static constraint confirmation.
++        if not self.planner.cc.time_collision_free(
++                [[self.robot.x,self.robot.y,self.robot.theta]],[0.0],static,
++                self.pp.safety_margin+0.3,0.0):
++            self._static_search.status = 'near_field_recovery_required'
++            return None
++        # Do not invoke a search because a harmless side obstacle exists.
++        # Straight-line geometry is only a search trigger, never a drive plan.
++        if not self._static_search.path:
++            dx,dy=self._goal[0]-self.robot.x,self._goal[1]-self.robot.y
++            length=math.hypot(dx,dy)
++            fraction=min(1.0,6.0/max(length,0.001))
++            n=max(2,int(math.ceil(min(length,6.0)/0.1)))
++            s=np.linspace(0.0,fraction,n+1)
++            line=np.column_stack((self.robot.x+dx*s,self.robot.y+dy*s,
++                                  np.full_like(s,math.atan2(dy,dx))))
++            if self.planner.cc.time_collision_free(line,np.arange(n+1)*0.1,
++                                                   static,self.pp.safety_margin,0.0):
++                self._static_search.status = 'direct_corridor_clear'
++                return None
++        remaining = self.cfg.static_search_budget
++        if self._cycle_started is not None:
++            remaining=min(remaining,max(0.0,self.cfg.control_dt-(time.perf_counter()-self._cycle_started)-0.005))
++        waypoint=self._static_search.update(self.robot,self._goal,static,self._t_now,
++                        margin=self.pp.safety_margin,budget_s=remaining)
++        if waypoint is not None and self._static_search.path:
++            self._static_search_lock=dict(points=list(self._static_search.path),
++                cursor=self._static_search.cursor,since=self._t_now,progress_at=self._t_now,
++                best_distance=math.hypot(self.robot.x-waypoint[0],self.robot.y-waypoint[1]))
++        return waypoint
+ 
+     def _reset_spin_problem(self):
+         self._spin_used=False
+@@ -568,11 +719,16 @@
+         self._blocked_since=None
+         self._progress_anchor=None
+         self._last_spin_result=None
++        self._episode_goal_distance = None
++        self._episode_failed = False
+ 
+     def _activate_trap(self,robot,obs,goal):
+         self._static_detour=None
++        self._static_search_lock=None
++        self._motion_history=[]
+         sub,heading=self.planner.generate_local_goal(robot,obs,goal)
+-        self.trap.update(active=True,sub_goal=tuple(sub),escape_heading=float(heading))
++        self.trap.update(active=True,sub_goal=tuple(sub),escape_heading=float(heading),
++                         recovery_phase='ESCAPE_GENERIC')
+         self.trap_ctrl.trap_steps=0
+         self.trap_ctrl.n_trap_activations+=1
+         self._trap_origin=(robot.x,robot.y)
+@@ -580,6 +736,10 @@
+         self._trap_elapsed=0.0
+         self._trap_active_since=self._t_now
+         self._trap_exit_since=None
++        self._trap_rejoin_goal_distance = None
++        if self._episode_goal_distance is None:
++            self._episode_goal_distance = math.hypot(goal[0]-robot.x, goal[1]-robot.y)
++        self._trap_last_reason = 'static_constraint_recovery'
+         self._spin_in_trap_count=0
+ 
+     def _force_trap_off(self,reason=''):
+@@ -587,9 +747,15 @@
+         self.trap_ctrl.trap_steps=0
+         self._trap_elapsed=0.0
+         self._trap_exit_since=None
++        self._trap_rejoin_goal_distance = None
++        self._trap_last_reason = reason
++        if reason == 'trap_timeout':
++            self._episode_failed = True
+         # Do not clear attempt history on timeout: that would restart the cycle.
+ 
+     def _trap_exit(self,robot,obs,gx,gy):
++        if self.trap.get('recovery_phase') in ('RETREAT','ALIGN','ESCAPE','RETURN_ALIGN'):
++            return False
+         if self._trap_origin is None:
+             return False
+         progress=math.hypot(robot.x-self._trap_origin[0],robot.y-self._trap_origin[1])
+@@ -626,20 +792,101 @@
+             return
+         if self._bridge_state!=0 or self._arbit!='ACK':
+             return
+-        self._trap_elapsed+=dt
+-        self.trap_ctrl.trap_steps+=1
+-        self.trap_ctrl.trap_total_steps+=1
+-        if self._trap_exit(self.robot,obs,*self._goal):
++        # Stopped for uncertain/moving traffic is lawful yielding, not a failed
++        # recovery action. Still run the DWA/phase safety checks every cycle.
++        # Actual moving recovery remains charged to the finite ACK budget.
++        yield_wait=(abs(self.robot.v)<=0.03 and any(o.speed>0.05
++                    or getattr(o,'velocity_unknown',False) for o in obs))
++        if not yield_wait:
++            self._trap_elapsed+=dt
++            self.trap_ctrl.trap_steps+=1
++            self.trap_ctrl.trap_total_steps+=1
++        else:
++            self._trap_exit_since=None
++            self._trap_rejoin_goal_distance=None
++        phase=self.trap.get('recovery_phase')
++        if phase in ('RETREAT','ALIGN','ESCAPE','RETURN_ALIGN'):
++            if self._trap_elapsed>self.cfg.trap_max_duration:
++                self._force_trap_off('trap_timeout')
++                self._cooldown_until=self._t_now+self.cfg.trap_cooldown
++                return
++            sx,sy=self.trap['sub_goal']
++            distance=math.hypot(self.robot.x-sx,self.robot.y-sy)
++            if phase=='RETREAT' and distance<0.20:
++                heading=self.trap['rear_heading']
++                candidates=[]
++                for sign in (-1.0,1.0):
++                    target=(self.robot.x-sign*3.0*math.sin(heading),
++                            self.robot.y+sign*3.0*math.cos(heading))
++                    angle=heading+sign*math.pi/2
++                    if self.planner.cc.time_collision_free([[*target,angle]],[0.0],obs,
++                                                           self.pp.safety_margin,0.0):
++                        clearance=self.planner.free_distance(self.robot,obs,angle,3.0)
++                        candidates.append((clearance,target,angle))
++                if candidates:
++                    _,target,angle=max(candidates,key=lambda x:x[0])
++                    self.trap.update(sub_goal=target,escape_heading=angle,recovery_phase='ALIGN',
++                                     phase_spin_started=False,phase_spin_result=None)
++            elif phase in ('ALIGN','RETURN_ALIGN'):
++                if self.trap.get('phase_spin_started'):
++                    if self.trap.get('phase_spin_result')=='reached':
++                        self.trap['recovery_phase']='REJOIN' if phase=='RETURN_ALIGN' else 'ESCAPE'
++                        self.trap['phase_spin_started']=False
++                    elif self.trap.get('phase_spin_result')=='failed':
++                        self._episode_failed=True
++                        self._force_trap_off('phase_spin_failed')
++                        self._cooldown_until=self._t_now+self.cfg.trap_cooldown
++                elif (self._wheel_speeds and self._t_now-self._wheel_ts<=self.cfg.wheel_feedback_timeout
++                        and max(abs(v) for v in self._wheel_speeds)<=0.03
++                        and abs(self.robot.v)<=0.03):
++                    target=self.trap['escape_heading']
++                    if abs(wrap_angle(target-self.robot.theta))<math.radians(self.cfg.spin_entry_deg):
++                        self.trap['recovery_phase']='REJOIN' if phase=='RETURN_ALIGN' else 'ESCAPE'
++                    elif self._spin_attempts<self.cfg.max_spin_attempts and self._spin_safe(target,obs):
++                        self._start_spin_session(target)
++                        self.trap['phase_spin_started']=True
++                        self.trap['phase_spin_result']=None
++            elif phase=='ESCAPE' and distance<0.30:
++                self.trap.update(recovery_phase='RETURN_ALIGN',
++                    escape_heading=math.atan2(self._goal[1]-self.robot.y,self._goal[0]-self.robot.x),
++                    phase_spin_started=False,phase_spin_result=None)
++            return
++        if not yield_wait and self._trap_exit(self.robot,obs,*self._goal):
++            goal_distance = math.hypot(self._goal[0]-self.robot.x,self._goal[1]-self.robot.y)
+             if self._trap_exit_since is None:
+                 self._trap_exit_since=self._t_now
+-            if self._t_now-self._trap_exit_since >= self.cfg.trap_exit_hold:
++                self._trap_rejoin_goal_distance = goal_distance
++                self._trap_last_reason = 'rejoin_confirming'
++            goal_progress = self._trap_rejoin_goal_distance-goal_distance
++            if (self._t_now-self._trap_exit_since >= self.cfg.trap_exit_hold
++                    and goal_progress >= self.cfg.trap_exit_progress):
+                 self._force_trap_off('progress_and_clear')
+                 self._reset_spin_problem()
++                self._cooldown_until = self._t_now+self.cfg.trap_cooldown
++                self._blocked_since = None
+         else:
+             self._trap_exit_since=None
++            self._trap_rejoin_goal_distance = None
+         if self._trap_elapsed > self.cfg.trap_max_duration:
+             self._force_trap_off('trap_timeout')
+-            self._cooldown_until=self._t_now+self.cfg.spin_cooldown
++            self._cooldown_until=self._t_now+self.cfg.trap_cooldown
++
++    def _checkpoint_trap_tick(self):
++        fields=('_trap_elapsed','_trap_exit_since','_trap_rejoin_goal_distance',
++                '_trap_last_reason','_episode_failed','_episode_goal_distance','_cooldown_until',
++                '_trap_origin','_trap_initial_sub_goal','_trap_active_since',
++                '_trap_just_activated')
++        self._trap_tick_checkpoint=({name:getattr(self,name) for name in fields},dict(self.trap),
++                self.trap_ctrl.trap_steps,self.trap_ctrl.trap_total_steps,self.trap_ctrl.n_trap_activations)
++
++    def _rollback_trap_tick(self):
++        if self._trap_tick_checkpoint is None:return
++        fields,trap,steps,total,activations=self._trap_tick_checkpoint
++        for name,value in fields.items():setattr(self,name,value)
++        self.trap.clear();self.trap.update(trap)
++        self.trap_ctrl.trap_steps,self.trap_ctrl.trap_total_steps=steps,total
++        self.trap_ctrl.n_trap_activations=activations
++        self._trap_tick_checkpoint=None
+ 
+     def _spin_safe(self,target,obs,ongoing=False):
+         if target is None:
+@@ -650,6 +897,8 @@
+         # Conservative minimum speed bounds the longest supported rotation.
+         rotation=min(self.cfg.spin_timeout,abs(err)/max(self.cfg.spin_w_min,0.01)+1.0)
+         wait=0.0 if ongoing and self._bridge_state==2 else self.cfg.spin_wait_time
++        if not ongoing or self._bridge_state==0:
++            wait += self.cfg.spin_stop_timeout+0.3  # physical stop + tracker entry hold
+         total=wait+rotation+self.cfg.spin_recover_time
+         n=max(2,int(math.ceil(total/self.pp.safety_dt)))
+         ts=np.linspace(0,total,n+1)
+@@ -670,13 +919,17 @@
+         radius=self.planner.cc.vehicle_clearance_radius()+abs(
+             self.planner.cc._rect_hb()-pivot)
+         for o in obs:
+-            if o.speed <= 1e-3:
++            unknown = bool(getattr(o, 'velocity_unknown', False))
++            if o.speed <= 1e-3 and not unknown:
+                 continue
+             vh=getattr(o,'velocity_heading',o.heading)
+             ox=o.x+o.speed*math.cos(vh)*ts
+             oy=o.y+o.speed*math.sin(vh)*ts
+-            required=radius+o.radius+self.pp.safety_margin+self.pp.obstacle_uncertainty_rate*ts
+-            if np.any(np.hypot(ox-cx,oy-cy) <= required+o.speed*self.pp.safety_dt/2):
++            rate = max(self.pp.obstacle_uncertainty_rate,
++                       float(getattr(o, 'velocity_uncertainty',
++                                     getattr(o, 'max_unknown_speed', self.cfg.obstacle_max_speed))) if unknown else 0.0)
++            required=radius+o.radius+self.pp.safety_margin+rate*ts
++            if np.any(np.hypot(ox-cx,oy-cy) <= required+max(o.speed, rate)*self.pp.safety_dt/2):
+                 return False
+         return self.planner.cc.time_collision_free(traj,ts,obs,self.pp.safety_margin,
+                                                    self.pp.obstacle_uncertainty_rate)
+@@ -705,18 +958,9 @@
+             n=20
+             path=np.array([[after.x+0.05*i*math.cos(target),after.y+0.05*i*math.sin(target),target]
+                            for i in range(n+1)])
+-            import copy
+-            delay=self.cfg.spin_wait_time+min(self.cfg.spin_timeout,
++            delay=self.cfg.spin_stop_timeout+0.3+self.cfg.spin_wait_time+min(self.cfg.spin_timeout,
+                 err/max(self.cfg.spin_w_min,0.01)+1.0)+self.cfg.spin_recover_time
+-            after_obs=[]
+-            for o in obs:
+-                future=copy.copy(o)
+-                vh=getattr(o,'velocity_heading',o.heading)
+-                future.x=o.x+o.speed*math.cos(vh)*delay
+-                future.y=o.y+o.speed*math.sin(vh)*delay
+-                if o.speed>1e-3:
+-                    future.radius=o.radius+self.pp.obstacle_uncertainty_rate*delay
+-                after_obs.append(future)
++            after_obs=self._obstacles_after_delay(obs,delay)
+             if not self.planner.cc.time_collision_free(path,np.arange(n+1)*0.25,after_obs,
+                                                        self.pp.safety_margin,self.pp.obstacle_uncertainty_rate):
+                 continue
+@@ -728,16 +972,63 @@
+                 best=(score,target)
+         return None if best is None else best[1]
+ 
++    def _obstacles_after_delay(self, obs, delay):
++        """Rebase a future ACK-exit check without erasing unknown velocity age.
++
++        Snapshot radius already contains past source-age uncertainty. Delay is
++        future time spent stopping, switching, turning and recovering; subsequent
++        collision-check timestamps start at zero and need this reachable set.
++        """
++        import copy
++        future_obs=[]
++        for o in obs:
++            future=copy.copy(o)
++            vh=getattr(o,'velocity_heading',o.heading)
++            future.x=o.x+o.speed*math.cos(vh)*delay
++            future.y=o.y+o.speed*math.sin(vh)*delay
++            unknown=bool(getattr(o,'velocity_unknown',False))
++            if o.speed>1e-3 or unknown:
++                rate=max(self.pp.obstacle_uncertainty_rate,
++                    float(getattr(o,'velocity_uncertainty',getattr(o,'max_unknown_speed',
++                                                                 self.cfg.obstacle_max_speed))) if unknown else 0.0)
++                future.radius=o.radius+rate*delay
++            future_obs.append(future)
++        return future_obs
++
+     def _arbitration_step(self,robot,obs,gx,gy,dt,blocked=False):
+-        if self._spin_anchor is not None and math.hypot(robot.x-self._spin_anchor[0],
+-                                                       robot.y-self._spin_anchor[1]) >= self.cfg.spin_reset_progress:
++        if self._moving_local_minimum(robot,obs,gx,gy):
++            return
++        if self.trap['active'] and self.trap.get('recovery_phase') in ('RETREAT','ALIGN','RETURN_ALIGN'):
++            return
++        distance = math.hypot(gx-robot.x,gy-robot.y)
++        # Per-action lateral displacement cannot renew an episode's attempt
++        # allowance. Reset only on successful reconnection or substantial global
++        # progress after the failed episode has been released.
++        if (not self.trap['active'] and self._episode_goal_distance is not None
++                and self._episode_goal_distance-distance >= self.cfg.spin_reset_progress
++                and self._t_now >= self._cooldown_until):
+             self._reset_spin_problem()
+         if not obs or not self.cfg.enable_trap or self._bridge_state!=0 \
+                 or self._t_now-self._ack_since<self.cfg.ack_guard_time:
++            self._stall_class = 'mechanical_or_guard_wait' if self._bridge_state!=0 else 'idle'
+             self._blocked_since=None
+             self._progress_anchor=None
+             return
++        if distance < max(1.0, self.pp.goal_tolerance*2.0):
++            self._stall_class = 'near_goal'
++            self._blocked_since = self._progress_anchor = None
++            return
++        if not blocked:
++            intent = (self._tracker_cmd_v if self._tracker_cmd_v is not None
++                      else getattr(self.planner, '_last_cmd_v', 0.0))
++            intent = float(intent or 0.0)
++            if not self._moving_minimum_observed:
++                self._stall_class = ('execution_stall' if abs(robot.v) < self.cfg.v_streak_threshold
++                                    and abs(intent) > 0.01 else 'executable_motion')
++            self._blocked_since = self._progress_anchor = None
++            return
+         if self._blocked_since is None:
++            self._stall_class = 'blocked_confirmation'
+             self._blocked_since=self._t_now
+             self._progress_anchor=(robot.x,robot.y)
+             self._progress_goal_distance=math.hypot(gx-robot.x,gy-robot.y)
+@@ -751,8 +1042,35 @@
+             self._progress_goal_distance=math.hypot(gx-robot.x,gy-robot.y)
+             return
+         if self._t_now-self._blocked_since<self.cfg.blocked_duration \
+-                or self._t_now<self._cooldown_until or self._spin_attempts>=self.cfg.max_spin_attempts:
+-            return
++                or self._t_now<self._cooldown_until or self._spin_attempts>=self.cfg.max_spin_attempts \
++                or self._episode_failed:
++            self._stall_class = 'blocked_confirmation_or_cooldown'
++            return
++        static = [o for o in obs if o.obstacle_type in ('block','static_large')
++                  and o.speed <= 0.05 and not getattr(o,'velocity_unknown',False)]
++        if not static:
++            self._stall_class = 'dynamic_or_unknown_yield'
++            self._blocked_since = self._progress_anchor = None
++            return
++        # A counterfactual using only confirmed static geometry distinguishes
++        # mechanical/geometric infeasibility from lawful dynamic-agent yielding.
++        probe = getattr(self.planner, 'has_safe_motion', None)
++        if probe is None:
++            self._stall_class = 'static_probe_unavailable'
++            return
++        probe_budget = self.cfg.trap_static_probe_budget
++        if self._cycle_started is not None:
++            probe_budget=min(probe_budget,max(0.0,self.cfg.control_dt-(time.perf_counter()-self._cycle_started)-0.005))
++        static_motion = probe(robot, static, budget_s=probe_budget)
++        if static_motion is None:
++            self._stall_class = 'static_probe_timeout'
++            self._blocked_since = self._progress_anchor = None
++            return
++        if static_motion:
++            self._stall_class = 'dynamic_or_unknown_yield'
++            self._blocked_since = self._progress_anchor = None
++            return
++        self._stall_class = 'confirmed_static_constraint'
+         target=self._select_spin_target(obs)
+         if target is None or abs(wrap_angle(target-robot.theta)) < math.radians(self.cfg.spin_entry_deg):
+             self._safety_reason='no_safe_spin_target'
+@@ -763,17 +1081,141 @@
+             self.trap['sub_goal']=(robot.x+1.5*math.cos(target),robot.y+1.5*math.sin(target))
+             self.trap['escape_heading']=target
+             self._trap_initial_sub_goal=self.trap['sub_goal']
++        self._start_spin_session(target)
++        self._blocked_since=None
++        self._progress_anchor=None
++
++    def _start_spin_session(self,target):
+         self._arbit='SPIN_REQUEST'
+         self._spin_target=target
+         self._spin_req_since=self._t_now
+-        self._spin_anchor=(robot.x,robot.y)
++        self._spin_anchor=(self.robot.x,self.robot.y)
+         self._spin_attempts+=1
+         self._spin_in_trap_count+=1
+         self._spin_used=True
+         self._spin_saw_exec=False
+         self._last_spin_result=None
+-        self._blocked_since=None
+-        self._progress_anchor=None
++        self._motion_history=[]
++
++    def _moving_local_minimum(self,robot,obs,gx,gy):
++        """New-source real movement with no useful goal/locked-route progress.
++
++        This independent window survives alternating feasible/stop candidates.
++        Pure execution-stall, dynamic yielding, faults and mechanical waiting
++        cannot provide this evidence. Thresholds are engineering values, not a
++        vehicle noise calibration or a proof that a global route is impossible.
++        """
++        self._moving_minimum_observed=False
++        self._moving_minimum_confined=False
++        if (not self.cfg.enable_trap or self.trap['active'] or self._bridge_state!=0
++                or self._arbit!='ACK' or self._mode_ready!=0
++                or math.hypot(gx-robot.x,gy-robot.y)<1.0
++                or not obs or any(o.obstacle_type not in ('block','static_large')
++                    or o.speed>0.05 or getattr(o,'velocity_unknown',False) for o in obs)):
++            self._motion_history=[]
++            return False
++        source=self._loc_source_stamp if self._loc_source_stamp is not None else self._t_loc
++        if not math.isfinite(source) or (self._motion_history and source<=self._motion_history[-1][1]):
++            return False
++        route=None
++        if self._static_detour is not None:
++            route=self._static_detour['points'][self._static_detour['phase']]
++        elif self._static_search_lock is not None:
++            route=self._static_search_lock['points'][self._static_search_lock['cursor']]
++        distance=math.hypot(gx-robot.x,gy-robot.y)
++        route_distance=None if route is None else math.hypot(route[0]-robot.x,route[1]-robot.y)
++        # Qualitative encoder rolling evidence is required alongside pose travel.
++        # It is not a calibrated longitudinal speed estimate. Exact zero wheels
++        # plus centimetre-scale localization jitter must never initiate recovery.
++        wheel_roll=(bool(self._wheel_speeds) and self._t_now-self._wheel_ts<=self.cfg.wheel_feedback_timeout
++                    and max(abs(v) for v in self._wheel_speeds)>0.005)
++        self._motion_history.append((self._t_now,source,robot.x,robot.y,distance,route,route_distance,wheel_roll))
++        window=self.cfg.moving_stall_duration
++        self._motion_history=[h for h in self._motion_history if h[0]>=self._t_now-window-1e-8][-256:]
++        hist=self._motion_history
++        if (len(hist)<2 or self._t_now-hist[0][0]<window-0.11
++                or self._t_now-self._ack_since<self.cfg.ack_guard_time
++                or self._t_now<self._cooldown_until or self._episode_failed
++                or self._spin_attempts>=self.cfg.max_spin_attempts):return False
++        travel=sum(math.hypot(b[2]-a[2],b[3]-a[3]) for a,b in zip(hist,hist[1:]))
++        rolling_time=sum(max(0.0,b[0]-a[0]) for a,b in zip(hist,hist[1:]) if a[7] or b[7])
++        if rolling_time<min(1.0,window/4.0):return False
++        threshold=min(0.03,self.pp.goal_tolerance*0.1)
++        if travel<self.pp.goal_tolerance*0.2 or hist[0][4]-min(h[4] for h in hist)>threshold:
++            return False
++        if route is not None:
++            comparable=[h for h in hist if h[5] is not None and math.hypot(h[5][0]-route[0],h[5][1]-route[1])<0.1]
++            if comparable and comparable[0][6]-min(h[6] for h in comparable)>threshold:
++                return False
++        import numpy as np
++        # Static geometry must obstruct a direct goal corridor; side clutter
++        # alone is no local-minimum evidence. This ray is only a trigger test.
++        d=math.hypot(gx-robot.x,gy-robot.y)
++        along=np.linspace(0.0,min(1.0,4.0/max(d,0.001)),41)
++        heading=math.atan2(gy-robot.y,gx-robot.x)
++        direct=np.column_stack((robot.x+(gx-robot.x)*along,robot.y+(gy-robot.y)*along,
++                                np.full_like(along,heading)))
++        if self.planner.cc.time_collision_free(direct,np.arange(41)*0.1,obs,self.pp.safety_margin,0.0):
++            return False
++        self._moving_minimum_observed=True
++        self._moving_minimum_confined=self._goal_relative_confinement(robot,obs,gx,gy)
++        self._stall_class=('moving_local_minimum_observed_confined' if self._moving_minimum_confined
++                           else 'moving_local_minimum_observed_open')
++        if not self.cfg.moving_recovery_enable or not self._moving_minimum_confined:
++            return False
++        rear=(robot.x-3.0*math.cos(robot.theta),robot.y-3.0*math.sin(robot.theta))
++        s=np.linspace(0.0,1.0,31)
++        corridor=np.column_stack((robot.x+(rear[0]-robot.x)*s,robot.y+(rear[1]-robot.y)*s,
++                                  np.full_like(s,robot.theta)))
++        if (not self.planner.cc.time_collision_free(corridor,np.arange(31)*0.1,obs,self.pp.safety_margin,0.0)
++                or not any(self.planner.command_safe(v,0.0,robot,obs) for v in (-0.05,-0.1,-0.15))):
++            self._stall_class='moving_local_minimum_rear_blocked'
++            return False
++        # Compare already validated motion choices with their mechanical cost.
++        # A lateral bypass avoids an unnecessary 3m retreat; a nearly opposite
++        # target indicates backtracking, where a locked rear/outer-side episode
++        # is more suitable. This is an engineering heuristic, not an optimum.
++        spin_target=self._select_spin_target(obs)
++        lateral_spin=(spin_target is not None and math.radians(self.cfg.spin_entry_deg)
++                      <=abs(wrap_angle(spin_target-robot.theta))
++                      <=math.pi/2+math.radians(self.cfg.spin_entry_deg))
++        self._activate_trap(robot,obs,(gx,gy))
++        if lateral_spin:
++            self.trap.update(sub_goal=(robot.x+1.5*math.cos(spin_target),
++                                       robot.y+1.5*math.sin(spin_target)),
++                             escape_heading=spin_target,recovery_phase='ESCAPE_GENERIC')
++            self._trap_initial_sub_goal=self.trap['sub_goal']
++            self._trap_just_activated=False
++            self._trap_last_reason='moving_local_minimum_lateral_spin'
++            self._stall_class='moving_local_minimum'
++            self._start_spin_session(spin_target)
++            return True
++        self.trap.update(sub_goal=rear,escape_heading=wrap_angle(robot.theta+math.pi),
++                         recovery_phase='RETREAT',rear_heading=robot.theta)
++        self._trap_initial_sub_goal=rear
++        self._trap_just_activated=True
++        self._trap_last_reason='moving_local_minimum_retreat'
++        self._stall_class='moving_local_minimum'
++        return True
++
++    def _goal_relative_confinement(self,robot,obs,gx,gy):
++        """Both goal-normal 2m fixed-yaw footprint corridors are statically blocked.
++
++        This geometric trigger is not an executable sideways translation, nor a
++        certificate that no global route exists. Exact static footprint/SAT and
++        segment sweep checks avoid circularizing long walls for this predicate.
++        """
++        import numpy as np
++        heading=math.atan2(gy-robot.y,gx-robot.x)
++        travel=np.linspace(0.0,2.0,41)
++        for sign in (-1.0,1.0):
++            path=np.column_stack((robot.x-sign*math.sin(heading)*travel,
++                                  robot.y+sign*math.cos(heading)*travel,
++                                  np.full_like(travel,robot.theta)))
++            if self.planner.cc.time_collision_free(path,np.arange(41)*0.1,obs,
++                                                   self.pp.safety_margin,0.0):
++                return False
++        return True
+ 
+     def arbit_mode_spin_requested(self):
+         return self._arbit=='SPIN_REQUEST'
+--- a/rda_dwa_real_msgs/msg/Obstacle.msg
++++ b/rda_dwa_real_msgs/msg/Obstacle.msg
+@@ -4,7 +4,7 @@
+ string type             # pedestrian / bicycle / vehicle / static_large / block / unknown
+ float64 x               # 位置 x（该消息所在 frame）
+ float64 y               # 位置 y
+-float64 length          # 矩形长（沿 heading 方向，m；未知填 -1）
+-float64 width           # 矩形宽（垂直 heading，m；未知填 -1）
++float64 length          # active lidar: map轴对齐框x尺寸(m)；不是沿运动heading，未知填-1
++float64 width           # active lidar: map轴对齐框y尺寸(m)；其它源须明确shape契约
+ float64 heading         # 运动方向（rad；未知/静态填 0）
+ float64 speed           # 速度（m/s；未知填 -1）
+--- a/tests/test_planner_safety.py
++++ b/tests/test_planner_safety.py
+@@ -403,7 +403,10 @@
+ 
+     def test_persistent_front_wall_requests_one_latched_spin_then_waits(self):
+         c=core();c.set_goal(6,0)
+-        dets=[(1.32,0,'static_large',.4,2.,0.,0.,1),(-1.32,0,'static_large',.4,2.,0.,0.,2)]
++        # At +/-1.32m (and +/-1.20m) a safe 0.05m/s ACK candidate exists; fixed zero
++        # observations then represent an actuator stall, covered separately.
++        # These nearer walls genuinely block ACK while retaining spin clearance.
++        dets=[(1.14,0,'static_large',.4,2.,0.,0.,1),(-1.14,0,'static_large',.4,2.,0.,0.,2)]
+         seen=False;target=None
+         for i in range(12):
+             t=i*.1;fresh(c,t,dets)
+--- /dev/null
++++ b/tests/test_research_control.py
+@@ -0,0 +1,385 @@
++"""Recovery evidence and physical stop contracts. No ROS, UDP or vehicle motion."""
++import math
++import sys
++from pathlib import Path
++import unittest
++from unittest.mock import patch
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path[:0] = [str(ROOT/'tests'), str(ROOT/'rda_dwa'), str(ROOT/'rda_dwa_real')]
++from test_planner_safety import core, fresh, obstacle
++from rda_dwa_real.traj_tracker_core import TrajTrackerCore, TrajTrackerParams
++
++
++def seeded_blockage(c):
++    c.set_goal(6.,0.)
++    c._t_now = 2.
++    c._blocked_since = 0.
++    c._progress_anchor = (0.,0.)
++    c._progress_goal_distance = 6.
++
++
++class RecoveryEvidenceTests(unittest.TestCase):
++    def test_available_ack_command_but_unmoving_vehicle_never_requests_spin(self):
++        c=core();c.set_goal(6.,0.)
++        walls=[(1.32,0.,'static_large',.4,2.,0.,0.,1),(-1.32,0.,'static_large',.4,2.,0.,0.,2)]
++        for i in range(25):
++            now=i*.1;fresh(c,now,walls)
++            info=c.step(now=now)
++            self.assertEqual(info['traj_mode'],0)
++            self.assertFalse(c.trap['active'])
++        self.assertEqual(c._stall_class,'execution_stall')
++        self.assertEqual(c._spin_attempts,0)
++        self.assertTrue(c.planner.has_safe_motion(c.robot,c._last_obs,.05))
++
++    def test_confirmed_static_infeasibility_requests_one_safe_latched_spin(self):
++        c=core();c.set_goal(6.,0.)
++        walls=[(1.14,0.,'static_large',.4,2.,0.,0.,1),(-1.14,0.,'static_large',.4,2.,0.,0.,2)]
++        target=None
++        for i in range(12):
++            now=i*.1;fresh(c,now,walls)
++            if target is not None:c.set_bridge_state(1)
++            info=c.step(now=now)
++            if info['traj_mode']==1:
++                if target is None:target=info['spin_target']
++                self.assertEqual(info['spin_target'],target)
++                self.assertEqual(info['v_cmd'],0.)
++        self.assertIsNotNone(target)
++        self.assertEqual(c._spin_attempts,1)
++        self.assertTrue(c._spin_safe(target,c._last_obs))
++
++    def test_dynamic_and_unknown_blockage_are_yielding_without_static_evidence(self):
++        for unknown in (False,True):
++            c=core();seeded_blockage(c)
++            o=obstacle(4.,0.,speed=0. if unknown else .3)
++            o.velocity_unknown=unknown;o.max_unknown_speed=1.5
++            with patch.object(c,'_select_spin_target',return_value=math.pi/2) as select:
++                c._arbitration_step(c.robot,[o],6,0,.1,blocked=True)
++            self.assertEqual(c._stall_class,'dynamic_or_unknown_yield')
++            self.assertEqual(select.call_count,0)
++            self.assertEqual(c._spin_attempts,0)
++
++    def test_static_counterfactual_with_safe_ack_motion_labels_dynamic_yield(self):
++        c=core();seeded_blockage(c)
++        scene=[obstacle(5,4,kind='block'),obstacle(3,0,speed=.5)]
++        with patch.object(c.planner,'has_safe_motion',return_value=True), \
++             patch.object(c,'_select_spin_target',return_value=math.pi/2) as select:
++            c._arbitration_step(c.robot,scene,6,0,.1,blocked=True)
++        self.assertEqual(c._stall_class,'dynamic_or_unknown_yield')
++        self.assertEqual(select.call_count,0)
++
++    def test_static_probe_timeout_never_claims_static_infeasibility(self):
++        c=core();seeded_blockage(c)
++        with patch.object(c.planner,'has_safe_motion',return_value=None), \
++             patch.object(c,'_select_spin_target') as select:
++            c._arbitration_step(c.robot,[obstacle(1,0,kind='block')],6,0,.1,blocked=True)
++        self.assertEqual(c._stall_class,'static_probe_timeout')
++        self.assertEqual(select.call_count,0)
++        self.assertEqual(c._spin_attempts,0)
++
++    def test_planner_deadline_does_not_start_recovery(self):
++        c=core();c.set_goal(6,0);fresh(c,0)
++        c.planner.last_failure_reason='deadline'
++        with patch.object(c.planner,'plan',return_value=(False,0.,0.)):
++            info=c.step(now=0)
++        self.assertEqual(info['reason'],'planner_budget_timeout')
++        self.assertEqual(info['v_cmd'],0.)
++        self.assertEqual(c._spin_attempts,0)
++        self.assertIsNone(c._blocked_since)
++
++    def test_near_goal_stall_does_not_activate_trap(self):
++        c=core();seeded_blockage(c)
++        c._arbitration_step(c.robot,[obstacle(2,0,kind='block')],.8,0,.1,blocked=True)
++        self.assertEqual(c._stall_class,'near_goal')
++        self.assertFalse(c.trap['active'])
++
++    def test_lateral_progress_inside_episode_cannot_renew_attempt_allowance(self):
++        c=core();c.set_goal(6,0);c._activate_trap(c.robot,[],c._goal)
++        c._spin_anchor=(0,0);c._spin_attempts=2;c.robot.y=.7;c._t_now=10.
++        c._arbitration_step(c.robot,[obstacle(4,4,kind='block')],6,0,.1,blocked=False)
++        self.assertEqual(c._spin_attempts,2)
++        self.assertTrue(c.trap['active'])
++
++    def test_timeout_failed_episode_cannot_reenter_after_side_drift(self):
++        c=core();c.set_goal(6,0);c._activate_trap(c.robot,[],c._goal)
++        c._spin_attempts=1;c._spin_anchor=(0,0)
++        c._update_trap([],17.)
++        self.assertFalse(c.trap['active'])
++        self.assertTrue(c._episode_failed)
++        c.robot.y=.6;c._t_now=10.;c._blocked_since=0.;c._progress_anchor=(0,.6)
++        c._progress_goal_distance=math.hypot(6,.6)
++        with patch.object(c,'_select_spin_target',return_value=math.pi/2) as select:
++            c._arbitration_step(c.robot,[obstacle(1,0,kind='block')],6,0,.1,blocked=True)
++        self.assertEqual(c._spin_attempts,1)
++        self.assertEqual(select.call_count,0)
++
++    def prepare_rejoin(self):
++        c=core();c.set_goal(6,0);c._activate_trap(c.robot,[],c._goal)
++        c.robot.x=.6;c.trap['sub_goal']=(.6,0.);c._t_now=2.
++        c._update_trap([],0.1)
++        return c
++
++    def test_stationary_rejoin_timer_cannot_release_trap(self):
++        c=self.prepare_rejoin();c._t_now=3.2;c._update_trap([],1.2)
++        self.assertTrue(c.trap['active'])
++        self.assertEqual(c._trap_last_reason,'rejoin_confirming')
++
++    def test_rejoin_requires_global_motion_then_installs_cooldown(self):
++        c=self.prepare_rejoin();c.robot.x=.75;c._t_now=3.2;c._update_trap([],1.2)
++        self.assertFalse(c.trap['active'])
++        self.assertGreater(c._cooldown_until,c._t_now)
++        self.assertEqual(c._trap_last_reason,'progress_and_clear')
++
++    def test_rejoin_confirmation_executes_safe_global_reference(self):
++        c=self.prepare_rejoin();fresh(c,2.1,x=.6)
++        with patch.object(c.planner,'plan',wraps=c.planner.plan) as plan, \
++             patch.object(c.planner,'build_dynamic_window',wraps=c.planner.build_dynamic_window) as window:
++            info=c.step(now=2.1)
++        self.assertEqual(plan.call_args.args[1],(6.,0.))
++        self.assertIsNone(plan.call_args.args[3])
++        self.assertEqual(window.call_args.args[3],(6.,0.))
++        self.assertGreater(info['v_cmd'],0.)
++        self.assertTrue(info['trap_rejoin_active'])
++        self.assertTrue(c.planner.command_safe(info['v_cmd'],info['w_cmd'],c.robot,[]))
++
++    def test_unknown_velocity_covers_entire_spin_disk_during_wait(self):
++        c=core();o=obstacle(5,0);o.velocity_unknown=True;o.max_unknown_speed=1.5
++        # Isolate the uncertain-angle enclosing-disk gate from the scheduled-
++        # angle gate; no particular linear turn schedule can prove it safe.
++        with patch.object(c.planner.cc,'time_collision_free',return_value=True):
++            self.assertFalse(c._spin_safe(math.pi/2,[o]))
++            o.velocity_unknown=False
++            self.assertTrue(c._spin_safe(math.pi/2,[o]))
++
++    def test_unknown_reachable_set_survives_future_exit_time_rebase(self):
++        c=core();o=obstacle(8,0);o.velocity_unknown=True;o.max_unknown_speed=1.5
++        radius=o.radius
++        future=c._obstacles_after_delay([o],6.)[0]
++        self.assertAlmostEqual(future.radius,radius+9.)
++        self.assertEqual(future.x,8.)
++        self.assertEqual(o.radius,radius)  # source snapshot is immutable
++        self.assertTrue(future.velocity_unknown)
++
++
++class StopBeforeModeTests(unittest.TestCase):
++    def setUp(self):
++        p=TrajTrackerParams();p.spin_require_stopped_feedback=True
++        self.c=TrajTrackerCore(p);self.c.set_traj_mode(1);self.now=0.
++    def tick(self,measured=None,stop_speed=None):
++        self.now+=.02;self.c.set_mode_ready(0,self.now)
++        if measured is not None:self.c.set_speed_feedback(measured,self.now,stop_speed)
++        return self.c.step(0.,0.,0.,[(0.,0.,0.)]*60,math.pi/2,self.now,.02,0)
++    def test_moving_vehicle_cannot_start_mechanical_switch(self):
++        for _ in range(100):
++            out=self.tick(.2)
++            self.assertEqual(out['turnmode'],0)
++            self.assertEqual(out['speed'],0.)
++        self.assertEqual(self.c.mode,'ACK')
++    def test_missing_stop_feedback_times_out_holding_ack(self):
++        for _ in range(160):out=self.tick()
++        self.assertEqual(self.c.mode,'FAULT')
++        self.assertEqual(out['turnmode'],0)
++        self.assertEqual(self.c._failure_reason,'spin_stop_feedback_timeout')
++    def test_all_wheels_stopped_hold_precedes_three_second_switch(self):
++        for _ in range(10):self.tick(.1)
++        for _ in range(14):
++            out=self.tick(0.);self.assertEqual(out['turnmode'],0)
++        for _ in range(2):out=self.tick(0.)
++        self.assertEqual(out['turnmode'],4)
++        self.assertEqual(self.c.mode,'SPIN')
++        self.assertEqual(self.c._spin_stage,'HOLD')
++    def test_small_average_with_one_moving_wheel_cannot_switch(self):
++        for _ in range(100):out=self.tick(.025,stop_speed=.1)
++        self.assertEqual(self.c.mode,'ACK')
++        self.assertEqual(out['turnmode'],0)
++    def test_small_average_with_one_moving_wheel_cannot_reverse(self):
++        self.c.set_traj_mode(0);self.c._last_drive_direction=1
++        for _ in range(25):
++            self.now+=.02;self.c._control_now=self.now
++            self.c.set_speed_feedback(.025,self.now,stop_speed=.1)
++            self.assertEqual(self.c._ramp_speed(-.2,.02),0.)
++
++
++class MovingLocalMinimumTests(unittest.TestCase):
++    def simulate(self,c,scene,position,route=None,measured_speed=None,feedback=True,enabled=True):
++        c.set_goal(4.,0.)
++        c.cfg.moving_recovery_enable=enabled
++        if route is not None:c._static_detour={'points':[route],'phase':0}
++        activated=False
++        previous=None
++        for i in range(75):
++            t=i*.1;x,y=position(i)
++            speed=(0.0 if previous is None else (x-previous[0])/.1) if measured_speed is None else measured_speed
++            c._t_now=t;fresh(c,t,x=x,y=y,speed=speed)
++            if not feedback:c._wheel_speeds=[]
++            previous=(x,y)
++            obs=scene(c,x,y)
++            activated=c._moving_local_minimum(c.robot,obs,4.,0.)
++            if activated:break
++        return activated
++    def test_real_small_cycle_enters_finite_ack_retreat_episode(self):
++        c=core()
++        cavity=lambda c,x,y:[obstacle(1.8,0,width=2.85,kind='static_large'),
++            obstacle(.5,1.3,length=3.,width=.25,kind='static_large',id_=2),
++            obstacle(.5,-1.3,length=3.,width=.25,kind='static_large',id_=3)]
++        active=self.simulate(c,cavity,
++                             lambda i:(.65+(.01 if i%2 else 0.),0.))
++        self.assertTrue(active)
++        self.assertEqual(c.trap['recovery_phase'],'RETREAT')
++        self.assertEqual(c._spin_attempts,0)
++        self.assertLess(c.trap['sub_goal'][0],c.robot.x-2.9)
++        c._update_trap([obstacle(1.8,0,kind='block')],25.)
++        self.assertTrue(c._episode_failed)
++        self.assertFalse(c.trap['active'])
++    def test_open_lateral_space_logs_minimum_without_automatic_recovery(self):
++        c=core()
++        self.assertFalse(self.simulate(c,lambda c,x,y:[obstacle(1.8,0,kind='block')],
++                                      lambda i:(.65+(.01 if i%2 else 0.),0.)))
++        self.assertTrue(c._moving_minimum_observed)
++        self.assertFalse(c._moving_minimum_confined)
++        self.assertEqual(c._arbit,'ACK')
++        self.assertEqual(c._spin_attempts,0)
++    def test_default_moving_recovery_off_still_observes_confined_minimum(self):
++        c=core();self.assertFalse(c.cfg.moving_recovery_enable)
++        scene=lambda c,x,y:[obstacle(2.,0,length=.25,width=1.95,kind='static_large'),
++                            obstacle(.5,.85,length=3.,width=.25,kind='static_large',id_=2),
++                            obstacle(.5,-.85,length=3.,width=.25,kind='static_large',id_=3)]
++        self.assertFalse(self.simulate(c,scene,lambda i:(.65+(.01 if i%2 else 0.),0.),enabled=False))
++        self.assertTrue(c._moving_minimum_observed)
++        self.assertTrue(c._moving_minimum_confined)
++        self.assertFalse(c.trap['active'])
++        self.assertEqual(c._arbit,'ACK')
++    def test_stationary_execution_stall_cannot_supply_moving_evidence(self):
++        c=core()
++        self.assertFalse(self.simulate(c,lambda c,x,y:[obstacle(1.8,0,kind='block')],
++                                      lambda i:(.65,0.)))
++    def test_centimetre_pose_jitter_with_all_zero_wheels_cannot_trigger_moving_trap(self):
++        c=core()
++        self.assertFalse(self.simulate(c,lambda c,x,y:[obstacle(1.8,0,kind='block')],
++                                      lambda i:(.65+(.01 if i%2 else 0.),0.),measured_speed=0.))
++        self.assertFalse(c.trap['active'])
++    def test_pose_travel_without_wheel_feedback_cannot_trigger_moving_trap(self):
++        c=core()
++        self.assertFalse(self.simulate(c,lambda c,x,y:[obstacle(1.8,0,kind='block')],
++                                      lambda i:(.65+(.01 if i%2 else 0.),0.),feedback=False))
++    def test_dynamic_mixed_with_static_never_accumulates_moving_trap_window(self):
++        c=core()
++        scene=lambda c,x,y:[obstacle(1.8,0,kind='block'),obstacle(5,5,speed=.3)]
++        self.assertFalse(self.simulate(c,scene,lambda i:(.65+(.01 if i%2 else 0.),0.)))
++        self.assertEqual(c._motion_history,[])
++    def test_normal_locked_detour_progress_away_from_goal_is_credited(self):
++        c=core()
++        self.assertFalse(self.simulate(c,lambda c,x,y:[obstacle(1.8,0,kind='block')],
++                                      lambda i:(.65-.005*i,0.),route=(-2.,0.)))
++    def test_blocked_rear_corridor_cannot_start_retreat(self):
++        c=core()
++        scene=lambda c,x,y:[obstacle(1.8,0,kind='block'),obstacle(-1.,0,kind='block'),
++            obstacle(.5,.85,length=3.,width=.25,kind='static_large',id_=3),
++            obstacle(.5,-.85,length=3.,width=.25,kind='static_large',id_=4)]
++        self.assertFalse(self.simulate(c,scene,lambda i:(.65+(.01 if i%2 else 0.),0.)))
++        self.assertEqual(c._stall_class,'moving_local_minimum_rear_blocked')
++    def test_narrow_u_allows_checked_retreat_without_forcing_spin(self):
++        c=core()
++        scene=lambda c,x,y:[obstacle(2.,0,length=.25,width=1.95,kind='static_large'),
++                            obstacle(.5,.85,length=3.,width=.25,kind='static_large',id_=2),
++                            obstacle(.5,-.85,length=3.,width=.25,kind='static_large',id_=3)]
++        self.assertTrue(self.simulate(c,scene,lambda i:(.65+(.01 if i%2 else 0.),0.)))
++        self.assertEqual(c.trap['recovery_phase'],'RETREAT')
++        self.assertEqual(c._arbit,'ACK')
++        self.assertEqual(c._spin_attempts,0)
++        self.assertFalse(c._spin_safe(math.pi/2,scene(c,c.robot.x,c.robot.y)))
++    def test_existing_route_near_field_continues_but_new_route_is_blocked(self):
++        c=core();c.set_goal(4,0);c._t_now=1.
++        scene=[obstacle(1.1,0,kind='block')]
++        self.assertIsNone(c._search_static_goal(scene))
++        c._static_search_lock={'points':[(-.9,0.,0.)],'cursor':0,'since':0.,
++                              'progress_at':0.,'best_distance':.9}
++        self.assertEqual(c._search_static_goal(scene),(-.9,0.))
++        c._t_now=30.
++        self.assertIsNone(c._search_static_goal(scene))
++    def test_phase_spin_failure_preserves_budget_and_latches_episode(self):
++        c=core();c.set_goal(4,0);c._activate_trap(c.robot,[],c._goal)
++        c.trap.update(recovery_phase='ALIGN',phase_spin_started=True,phase_spin_result='failed')
++        c._spin_attempts=1;c._update_trap([],0.1)
++        self.assertFalse(c.trap['active'])
++        self.assertTrue(c._episode_failed)
++        self.assertEqual(c._spin_attempts,1)
++
++
++class YawStopBeforeRecoveryTests(unittest.TestCase):
++    def setUp(self):
++        p=TrajTrackerParams();p.spin_require_yaw_stop_feedback=True
++        self.c=TrajTrackerCore(p)
++        self.c.mode='STOP';self.c._wire_mode=4;self.c._mode_since=1.
++        self.c._session_target=0.;self.c._last_spin_result='settling'
++        self.c._spin_run_since=.5
++        self.c.set_traj_mode(1)
++    def tick(self,now,yaw,source_new=True):
++        self.c.set_mode_ready(4,now)
++        if source_new:self.c.set_yaw_feedback(yaw,100.+now,now)
++        return self.c.step(0.,0.,yaw,[(0.,0.,yaw)]*60,0.,now,.02,0)
++    def test_within_angle_tolerance_but_moving_yaw_never_reports_reached(self):
++        for i in range(10):
++            out=self.tick(1.+i*.1,i*.005)
++            self.assertEqual(out['turnmode'],4)
++            self.assertNotEqual(self.c.bridge_state(),3)
++        self.assertEqual(self.c.mode,'STOP')
++    def test_stopped_yaw_must_remain_aligned_for_hold_then_ack_wait(self):
++        for i in range(9):out=self.tick(1.+i*.1,0.)
++        self.assertEqual(self.c.mode,'RECOVER')
++        self.assertEqual(self.c.bridge_state(),3)
++        self.assertEqual(out['turnmode'],0)
++        self.assertEqual(out['speed'],0.)
++        self.assertGreaterEqual(self.c._mode_since,1.6)
++    def test_repeated_source_does_not_manufacture_zero_yaw_rate(self):
++        self.tick(1.,0.);self.tick(1.1,.02)
++        self.assertFalse(self.c.set_yaw_feedback(.02,101.1,1.2))
++        self.tick(1.2,.02,source_new=False)
++        self.assertFalse(self.c._yaw_stopped(1.2))
++        self.assertAlmostEqual(self.c._yaw_feedback_rate,.2)
++    def test_braking_drift_realigns_with_original_run_clock(self):
++        initial=self.c._spin_run_since
++        out=self.tick(1.2,.1)
++        self.assertEqual(self.c.mode,'SPIN')
++        self.assertEqual(self.c._spin_stage,'RUN')
++        self.assertEqual(self.c._spin_run_since,initial)
++        self.assertEqual(out['turnmode'],4)
++        self.assertNotEqual(self.c.bridge_state(),3)
++    def test_repeated_realign_cannot_renew_run_timeout(self):
++        out=self.tick(13.,.1)
++        self.assertEqual(self.c.mode,'FAULT')
++        self.assertEqual(self.c._failure_reason,'spin_stop_alignment_timeout')
++        self.assertEqual(out['turnmode'],4)
++        self.assertEqual(out['speed'],0.)
++    def test_stale_yaw_stop_feedback_times_out_holding_spin(self):
++        self.tick(1.,0.);self.tick(1.1,0.)
++        out=self.tick(4.1,0.,source_new=False)
++        self.assertEqual(self.c.mode,'FAULT')
++        self.assertEqual(self.c._failure_reason,'spin_yaw_stop_feedback_timeout')
++        self.assertEqual(out['turnmode'],4)
++
++
++class FailedAckRecoveryTests(unittest.TestCase):
++    def test_mode_zero_heartbeat_cannot_repeat_failed_ack_recovery(self):
++        c=TrajTrackerCore();c.mode='RECOVER';c._mode_since=0.;c._wire_mode=0
++        c.set_traj_mode(0)
++        for i in range(200):
++            now=8.1+i*.1;c.set_mode_ready(-1,now)
++            out=c.step(0.,0.,0.,[(0.,0.,0.)]*60,0.,now,.1,0)
++            self.assertEqual(c.mode,'FAULT')
++            self.assertEqual(c._failure_reason,'ack_mode_switch_timeout')
++            self.assertEqual(out['speed'],0.)
++        self.assertEqual(len([m for _,m in c._transitions if m=='RECOVER']),0)
++        c.set_mode_ready(0,30.)
++        c.step(0.,0.,0.,[(0.,0.,0.)]*60,0.,30.,.1,0)
++        self.assertEqual(c.mode,'RECOVER')
++        for now in (30.1,31.,32.99):
++            c.set_mode_ready(0,now)
++            c.step(0.,0.,0.,[(0.,0.,0.)]*60,0.,now,.1,0)
++            self.assertEqual(c.mode,'RECOVER')
++        c.set_mode_ready(0,33.)
++        c.step(0.,0.,0.,[(0.,0.,0.)]*60,0.,33.,.1,0)
++        self.assertEqual(c.mode,'ACK')
++
++
++if __name__=='__main__':unittest.main()
+--- /dev/null
++++ b/tests/test_research_cross_module.py
+@@ -0,0 +1,94 @@
++"""Independent cross-module geometry and unknown-time contract checks (no ROS)."""
++from pathlib import Path
++import sys,math,copy
++import numpy as np
++ROOT=Path(__file__).resolve().parents[1]
++sys.path[:0]=[str(ROOT/'rda_dwa'),str(ROOT/'rda_dwa_real'),str(ROOT/'tests')]
++from test_planner_safety import planner,core,obstacle
++from rda_dwa_real.obstacle_fusion import TrackManager
++from rda_dwa.predictor import ObstaclePredictor
++from rda_dwa_real.traj_tracker_core import TrajTrackerCore,TrajTrackerParams
++
++def corners(x,y,yaw,L,W):
++ c,s=math.cos(yaw),math.sin(yaw)
++ return [(x+c*u-s*v,y+s*u+c*v) for u,v in ((-L/2,-W/2),(L/2,-W/2),(L/2,W/2),(-L/2,W/2))]
++def point_seg(p,a,b):
++ ab=np.asarray(b)-a;ap=np.asarray(p)-a
++ t=min(1.,max(0.,float(ap@ab)/max(float(ab@ab),1e-15)))
++ return float(np.linalg.norm(np.asarray(p)-(a+t*ab)))
++def inside(p,poly):
++ crosses=[]
++ for a,b in zip(poly,poly[1:]+poly[:1]):
++  crosses.append((b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0]))
++ return min(crosses)>=-1e-12 or max(crosses)<=1e-12
++def segment_intersects(a,b,c,d):
++ def cross(x,y,z):return (y[0]-x[0])*(z[1]-x[1])-(y[1]-x[1])*(z[0]-x[0])
++ return (max(min(a[0],b[0]),min(c[0],d[0]))<=min(max(a[0],b[0]),max(c[0],d[0]))+1e-12
++         and max(min(a[1],b[1]),min(c[1],d[1]))<=min(max(a[1],b[1]),max(c[1],d[1]))+1e-12
++         and cross(a,b,c)*cross(a,b,d)<=1e-12 and cross(c,d,a)*cross(c,d,b)<=1e-12)
++def polygon_distance(A,B):
++ if inside(A[0],B) or inside(B[0],A):return 0.
++ if any(segment_intersects(a,b,c,d) for a,b in zip(A,A[1:]+A[:1]) for c,d in zip(B,B[1:]+B[:1])):return 0.
++ return min([point_seg(p,np.asarray(a),np.asarray(b)) for P,Q in ((A,B),(B,A)) for p in P for a,b in zip(Q,Q[1:]+Q[:1])])
++
++def test_batch_static_bounds_and_minimum_do_not_overstate_independent_geometry():
++ a,_=planner();rng=np.random.default_rng(1706)
++ for scene_index in range(24):
++  poses=np.column_stack((rng.uniform(-3,3,(8,2)),rng.uniform(-math.pi,math.pi,8)))
++  times=np.arange(8)*.13
++  obs=[]
++  for i in range(67): # crosses the hard-check chunk boundary
++   o=obstacle(*rng.uniform(-8,8,2),length=float(rng.uniform(.05,2)),width=float(rng.uniform(.05,2)),kind='block',id_=i)
++   o.shape_heading=0. if i%2 else float(rng.uniform(-math.pi,math.pi));obs.append(o)
++  bounds=a.cc.temporal_gaps_many(poses,times,obs)
++  L,W,_=a.cc._rect_dims();hb=a.cc._rect_hb()
++  for i,pose in enumerate(poses):
++   x,y,th=pose;A=corners(x+hb*math.cos(th),y+hb*math.sin(th),th,L,W)
++   for j,o in enumerate(obs):
++    exact=polygon_distance(A,corners(o.x,o.y,o.shape_heading,o.length,o.width))
++    assert bounds[i,j]<=exact+1e-10
++  assert math.isclose(a.cc.min_temporal_gap(poses,times,obs),float(np.min(bounds)),abs_tol=1e-10)
++
++def test_unknown_source_age_growth_is_retained_once_when_future_time_is_rebased():
++ c=core();f=TrackManager(ObstaclePredictor(dt=.1),max_speed=1.5)
++ initial=f.update_measurements([(10,0,'unknown',.3,.3,0,0,1,0)],now=100,stamp=100)[0]
++ current=f.snapshot(100.3)[0]
++ assert current.velocity_unknown and math.isclose(current.observation_age,.3)
++ assert current.radius>=initial.radius+1.5*.3
++ rebased=c._obstacles_after_delay([current],3)[0]
++ assert math.isclose(rebased.radius,current.radius+1.5*3,abs_tol=1e-10)
++ assert math.isclose(f.snapshot(100.3)[0].radius,current.radius,abs_tol=1e-10)
++ poses=np.array([[0.,0.,0.],[0.,0.,0.]])
++ original=c.planner.cc.temporal_gaps(poses,[3.,3.5],current,uncertainty_rate=.05)
++ shifted=c.planner.cc.temporal_gaps(poses,[0.,.5],rebased,uncertainty_rate=.05)
++ np.testing.assert_allclose(original,shifted,atol=1e-10)
++
++def test_unknown_is_unsafe_during_three_second_mode_wait():
++ c=core();o=obstacle(3,0,speed=0,kind='pedestrian')
++ o.velocity_unknown=True;o.max_unknown_speed=1.5
++ assert not c._spin_safe(math.pi/2,[o])
++ assert c._spin_safe(math.pi/2,[]) # the test does not fail because every spin is disabled
++
++def test_production_stopped_feedback_ready_loss_keeps_zero_and_mode_four():
++ p=TrajTrackerParams();p.spin_require_stopped_feedback=True;c=TrajTrackerCore(p)
++ c.set_traj_mode(1);c.set_pose(0,0)
++ traj=[(i*.02,0) for i in range(60)];now=0
++ for _ in range(16):
++  now+=.02;c.set_mode_ready(0,now);c.set_speed_feedback(0,now,stop_speed=0)
++  out=c.step(0,0,0,traj,math.pi/2,now,.02,1)
++ assert c.mode==c.MODE_SPIN and out['speed']==0 and out['turnmode']==4
++ request_time=c._mode_since
++ first_nonzero=None
++ while now-request_time<3.01:
++  now+=.02;c.set_mode_ready(4,now)
++  out=c.step(0,0,0,traj,math.pi/2,now,.02,1)
++  if now-request_time<3.-1e-9:
++   assert out['speed']==0
++  if out['speed']!=0 and first_nonzero is None:first_nonzero=now
++ assert first_nonzero is not None and first_nonzero-request_time>=3.-1e-9
++ now=request_time+3.02;c.set_mode_ready(4,now)
++ out=c.step(0,0,0,traj,math.pi/2,now,.02,1)
++ assert out['speed']>0 and out['turnmode']==4
++ now+=.02;c.set_mode_ready(-1,now)
++ out=c.step(0,0,0,traj,math.pi/2,now,.02,1)
++ assert out['speed']==0 and out['turnmode']==4 and c.mode==c.MODE_FAULT
+--- /dev/null
++++ b/tests/test_research_final_safety.py
+@@ -0,0 +1,119 @@
++"""Final recovery safety audit: functional probes only, no performance runs."""
++from pathlib import Path
++import sys,math
++from unittest.mock import patch
++import numpy as np
++ROOT=Path(__file__).resolve().parents[1]
++sys.path[:0]=[str(ROOT/'tests'),str(ROOT/'rda_dwa'),str(ROOT/'rda_dwa_real')]
++from test_planner_safety import core,fresh,obstacle
++from rda_dwa_real.traj_tracker_core import TrajTrackerCore,TrajTrackerParams
++
++def recovery(phase='RETREAT'):
++ c=core();c.set_goal(6.,0.);c._activate_trap(c.robot,[],c._goal)
++ c.trap.update(recovery_phase=phase,sub_goal=(-3.,0.),escape_heading=math.pi,
++               rear_heading=0.,phase_spin_started=False,phase_spin_result=None)
++ c._arbit='ACK';c._abort_once=False
++ return c
++
++def test_unknown_and_dynamic_yield_do_not_consume_recovery_budget():
++ for kind in ('unknown','moving'):
++  c=recovery();o=obstacle(8,5,kind='pedestrian',speed=.2 if kind=='moving' else 0.)
++  o.velocity_unknown=kind=='unknown';o.max_unknown_speed=1.5
++  before=c._trap_elapsed
++  c._update_trap([o],.2)
++  assert c._trap_elapsed==before
++  assert c.trap['active'] and c.trap['recovery_phase']=='RETREAT'
++
++def test_repeated_planner_deadlines_do_not_become_trap_timeout():
++ c=recovery();c.cfg.trap_max_duration=.15
++ c.planner.last_failure_reason='deadline'
++ c.planner.last_has_motion=False
++ observations=[(5.,5.,'block',.3,.3,0.,0.,1)]
++ with patch.object(c,'_update_static_detour',return_value=None), \
++      patch.object(c.planner,'plan',return_value=(False,0.,0.)):
++  for i in range(1,5):
++   now=i*.1;fresh(c,now,observations)
++   info=c.step(now=now)
++   assert info['reason']=='planner_budget_timeout'
++   assert info['v_cmd']==0 and info['w_cmd']==0
++   assert c.trap['active'] and not c._episode_failed
++ assert c._trap_elapsed==0.
++
++def test_faulted_source_data_cannot_start_retreat_or_consume_budget():
++ c=recovery();fresh(c,0,[(5.,5.,'block',.3,.3,0.,0.,1)])
++ before=c._trap_elapsed
++ info=c.step(now=1.)
++ assert info['v_cmd']==0 and info['w_cmd']==0
++ assert info['reason'] in ('localization_timeout','obstacle_timeout')
++ assert c._trap_elapsed==before and c._spin_attempts==0
++
++def test_rejoin_uses_effective_global_candidate_target_in_actual_planner():
++ c=recovery('REJOIN');c.robot.x=.6;c.trap['sub_goal']=(.6,0.)
++ c._t_now=2.;c._update_trap([],0.1)
++ fresh(c,2.1,x=.6)
++ with patch.object(c.planner,'build_dynamic_window',wraps=c.planner.build_dynamic_window) as samples:
++  info=c.step(now=2.1)
++ assert samples.call_args.args[3]==c._goal
++ assert info['v_cmd']>0 and info['trap_rejoin_active']
++
++def test_mode_transition_requires_all_wheels_stop_even_in_recovery_request():
++ p=TrajTrackerParams();p.spin_require_stopped_feedback=True
++ c=TrajTrackerCore(p);c.set_traj_mode(1)
++ for i in range(1,30):
++  now=i*.02;c.set_mode_ready(0,now);c.set_speed_feedback(.025,now,stop_speed=.1)
++  out=c.step(0.,0.,0.,[(0.,0.,0.)]*60,math.pi/2,now,.02,1)
++  assert out['speed']==0 and out['turnmode']==0 and c.mode=='ACK'
++
++def test_hard_node_deadline_rolls_back_phase_preserving_request_attempt_budget():
++ c=recovery();c.trap['sub_goal']=(0.,0.)
++ original=dict(c.trap);c._checkpoint_trap_tick()
++ c._update_trap([],.1)
++ assert c.trap['recovery_phase']=='ALIGN'
++ c._start_spin_session(c.trap['escape_heading'])
++ assert c._spin_attempts==1
++ info=c._stop_info({},'planning_deadline_or_input_age')
++ assert info['v_cmd']==0 and info['w_cmd']==0 and info['traj_mode']==-1
++ # A request conservatively consumes an attempt even when the deadline
++ # prevents publishing; never renew the finite request budget on computation faults.
++ assert c.trap==original and c._spin_attempts==1 and c._trap_elapsed==0.
++
++def test_exhausted_phase_spin_budget_does_not_start_a_third_request():
++ c=recovery('ALIGN');c._spin_attempts=2;c._t_now=2.;c.set_wheel_feedback([0.]*4,2.)
++ c.robot.v=0.;c._update_trap([],0.1)
++ assert c._arbit=='ACK' and c._spin_attempts==2
++ assert c.trap['recovery_phase']=='ALIGN'
++
++def test_invalid_controller_state_fails_closed_retaining_current_wheel_mode():
++ c=TrajTrackerCore();c.mode='CORRUPT';c._wire_mode=4;c.set_traj_mode(0)
++ out=c.step(0.,0.,0.,[(0.,0.,0.)]*60,0.,1.,.02,1)
++ assert out['turnmode']==4 and out['speed']==0 and c.mode=='FAULT'
++ assert c._failure_reason=='unknown_state'
++
++def test_stationary_pose_noise_with_fresh_zero_wheels_does_not_start_moving_recovery():
++ c=core();c.cfg.moving_recovery_enable=True;c.set_goal(4.,0.);activated=False
++ scene=[obstacle(1.8,0,length=.4,width=2.,kind='block'),
++        obstacle(.8,1.,length=4.,width=.2,kind='block',id_=2),
++        obstacle(.8,-1.,length=4.,width=.2,kind='block',id_=3)]
++ assert c._goal_relative_confinement(c.robot,scene,4.,0.)
++ for i in range(75):
++  now=i*.1;x=.65+(.01 if i%2 else 0.)
++  c._t_now=now;fresh(c,now,x=x,speed=0.)
++  activated|=c._moving_local_minimum(c.robot,scene,4.,0.)
++ assert not activated and not c.trap['active']
++ assert not c._moving_minimum_observed
++ assert c._spin_attempts==0
++
++def test_missing_wheel_feedback_does_not_make_pose_noise_moving_evidence():
++ c=core();c.cfg.moving_recovery_enable=True;c.set_goal(4.,0.);activated=False
++ scene=[obstacle(1.8,0,length=.4,width=2.,kind='block'),
++        obstacle(.8,1.,length=4.,width=.2,kind='block',id_=2),
++        obstacle(.8,-1.,length=4.,width=.2,kind='block',id_=3)]
++ assert c._goal_relative_confinement(c.robot,scene,4.,0.)
++ for i in range(75):
++  now=i*.1;x=.65+(.01 if i%2 else 0.)
++  c._t_now=now;c.set_localization(x,0.,0.,stamp=100.+now,arrival=now)
++  c.set_mode_ready(0,arrival=now)
++  activated|=c._moving_local_minimum(c.robot,scene,4.,0.)
++ assert not activated and not c.trap['active']
++ assert not c._moving_minimum_observed
++ assert c._spin_attempts==0
+--- /dev/null
++++ b/tests/test_research_mode_switch.cpp
+@@ -0,0 +1,18 @@
++#include "../control/car_ctr/src/mode_switch_guard.hpp"
++#include <cassert>
++int main() {
++    ModeSwitchGuard g;
++    assert(!g.request(1,0.0)); // unverified crab must not reach hardware
++    assert(!g.request(2,0.0));
++    assert(g.command_mode(3)==-1);
++    assert(g.request(4,0.0));
++    g.mark_sent(0.0);
++    g.observe(0,3.5);assert(g.should_retry(3.5));g.mark_sent(3.5);
++    g.observe(0,7.0);assert(g.should_retry(7.0));g.mark_sent(7.0);
++    g.observe(0,10.5);assert(!g.should_retry(10.5)); // bounded: initial + two retries
++    g.observe(4,10.5);assert(g.ready(10.5)); // eventual genuine feedback remains useful
++    assert(g.request(0,10.5));assert(g.send_count==0);
++    g.mark_sent(10.5);g.observe(0,13.49);assert(!g.ready(13.49));
++    g.observe(0,13.5);assert(g.ready(13.5));
++    return 0;
++}
+--- /dev/null
++++ b/tests/test_research_perception.py
+@@ -0,0 +1,118 @@
++"""Motion-consistency regressions use source-stamped synthetic detections."""
++from pathlib import Path
++import sys
++import math
++import unittest
++import numpy as np
++ROOT=Path(__file__).resolve().parents[1]
++sys.path[:0]=[str(ROOT/'rda_dwa'),str(ROOT/'rda_dwa_real')]
++from rda_dwa_real.kf_tracker import GlobalKFTracker,HungarianMatcher
++from rda_dwa_real.obstacle_fusion import TrackManager,WorldObstacleRepresenter,Clusterer
++from rda_dwa.predictor import ObstaclePredictor
++
++def det(x,y=2):return (x,y,'pedestrian',.3,.3)
++def fusion_det(state):
++ tid,x,y,speed,heading,kind,L,W=state
++ return x,y,kind,L,W,heading,speed,tid,0.0
++
++class MotionGuardTests(unittest.TestCase):
++ def test_impossible_second_displacement_stays_unknown_not_clipped_known(self):
++  t=GlobalKFTracker(dt=.05)
++  t.step([det(2)],stamp=100)
++  out=t.step([det(2.25)],stamp=100.05)[0]
++  self.assertEqual(out[0],1)
++  self.assertEqual(out[5],'unknown')
++  self.assertEqual(out[3],0)
++  self.assertAlmostEqual(out[1],2.25)
++  self.assertEqual(t.tracks[1].motion_status,'speed_bound')
++ def test_gate_rejection_keeps_old_hold_and_new_detection(self):
++  t=GlobalKFTracker(dt=.05,lost_ttl_seconds=.5)
++  t.step([det(2)],stamp=100)
++  out=t.step([det(2.8)],stamp=100.05)
++  self.assertEqual(len(out),2)
++  self.assertEqual(t.last_detection_ids,{0:2})
++  self.assertTrue(all(o[5]=='unknown' for o in out))
++  self.assertTrue(any(abs(o[1]-2.8)<1e-8 for o in out))
++  self.assertEqual(len(t.step([det(2.8)],stamp=100.6)),1)
++ def test_valid_constant_velocity_and_irregular_real_dt_are_preserved(self):
++  t=GlobalKFTracker(dt=.05)
++  t.step([det(2)],stamp=100)
++  for elapsed in (.1,.18,.3,.39,.5):
++   out=t.step([det(2-elapsed)],stamp=100+elapsed)[0]
++   self.assertEqual(out[0],1)
++   self.assertEqual(out[5],'pedestrian')
++   self.assertAlmostEqual(out[3],1,delta=.05)
++   self.assertAlmostEqual(abs(out[4]),math.pi,delta=.01)
++ def test_abrupt_reversal_resets_unknown_then_reconfirms(self):
++  t=GlobalKFTracker(dt=.1)
++  for i in range(8):out=t.step([det(2+i*.1)],stamp=100+i*.1)[0]
++  self.assertAlmostEqual(out[3],1,delta=.02)
++  out=t.step([det(2.6)],stamp=100.8)[0]
++  self.assertEqual(out[5],'unknown')
++  self.assertEqual(out[3],0)
++  self.assertFalse(t.tracks[1].static_confirmed)
++  for i in range(1,4):out=t.step([det(2.6-i*.1)],stamp=100.8+i*.1)[0]
++  self.assertEqual(out[5],'pedestrian')
++  self.assertAlmostEqual(abs(out[4]),math.pi,delta=.01)
++ def test_unknown_motion_survives_fusion_and_duplicate_source(self):
++  t=GlobalKFTracker(dt=.05)
++  f=TrackManager(ObstaclePredictor(dt=.1),max_speed=1.5)
++  first=t.step([det(2)],stamp=100)[0]
++  f.update_measurements([fusion_det(first)],now=10,stamp=100)
++  bad=t.step([det(2.25)],stamp=100.05)[0]
++  got=f.update_measurements([fusion_det(bad)],now=10.05,stamp=100.05)[0]
++  self.assertTrue(got.velocity_unknown)
++  before=t.tracks[1].x.copy()
++  t.step([det(1)],stamp=100.05)
++  np.testing.assert_array_equal(before,t.tracks[1].x)
++  aged=f.snapshot(10.25)[0]
++  self.assertGreaterEqual(aged.radius,got.radius+1.5*.2)
++ def test_tiled_reversal_inherits_unknown_parent(self):
++  r=WorldObstacleRepresenter()
++  for i in range(8):
++   raw=[(2+i*.1+j*.05,2) for j in range(80)]
++   out=r.step(Clusterer().cluster(raw),100+i*.1)
++  self.assertTrue(all(o[5]=='pedestrian' for o in out))
++  raw=[(2.6+j*.05,2) for j in range(80)]
++  out=r.step(Clusterer().cluster(raw),100.8)
++  self.assertTrue(all(o[5]=='unknown' and o[3]==0 for o in out))
++  for x,y in raw:
++   self.assertTrue(any(abs(x-o[1])<=o[6]/2+1e-8 and abs(y-o[2])<=o[7]/2+1e-8 for o in out))
++ def test_motion_guard_disable_provides_algorithm_ablation(self):
++  t=GlobalKFTracker(dt=.05,motion_guard_enable=False)
++  t.step([det(2)],stamp=100)
++  out=t.step([det(2.25)],stamp=100.05)[0]
++  self.assertEqual(out[5],'pedestrian')
++  self.assertAlmostEqual(out[3],1.5)
++ def test_late_single_measurement_does_not_complete_reconfirmation(self):
++  t=GlobalKFTracker(dt=.05,lost_ttl_seconds=.6)
++  t.step([det(2)],stamp=100)
++  t.step([det(2.25)],stamp=100.05)
++  t.step([det(2.25)],stamp=100.1)
++  out=t.step([det(2.25)],stamp=100.5)[0]
++  self.assertEqual(out[5],'unknown')
++  self.assertFalse(t.tracks[1].velocity_trusted)
++ def test_high_rate_centroid_noise_does_not_stay_unknown_forever(self):
++  t=GlobalKFTracker(dt=.05)
++  rng=np.random.default_rng(20261106)
++  kinds=[]
++  for i in range(100):
++   out=t.step([det(2+rng.normal(0,.04),2+rng.normal(0,.04))],stamp=100+i*.05)[0]
++   kinds.append(out[5])
++  self.assertLess(kinds.count('unknown'),20)
++  self.assertEqual(kinds[-1],'block')
++ def test_mask_applies_in_hungarian_and_greedy_fallback(self):
++  import rda_dwa_real.kf_tracker as module
++  original=module._HAS_SCIPY
++  try:
++   for fast in (True,False):
++    module._HAS_SCIPY=fast and module.linear_sum_assignment is not None
++    matched,unmatched=HungarianMatcher(1).match([(0,0)],[(.1,0)],allowed=np.array([[False]]))
++    self.assertEqual(matched,[]);self.assertEqual(unmatched,[0])
++  finally:module._HAS_SCIPY=original
++ def test_bad_operating_bound_parameters_rejected(self):
++  for kwargs in ({'max_speed':float('nan')},{'measurement_position_slack':-1},
++                 {'velocity_innovation_limit':0},{'velocity_reconfirm_time':-1}):
++   with self.assertRaises(ValueError):GlobalKFTracker(**kwargs)
++
++if __name__=='__main__':unittest.main()
+--- /dev/null
++++ b/tests/test_research_planner.py
+@@ -0,0 +1,156 @@
++"""Non-oracle planner geometry equivalence, deadlines, guidance and mode schedules."""
++import math
++import time
++from unittest.mock import patch
++import numpy as np
++from test_planner_safety import planner, obstacle
++from rda_dwa.robot_model import RobotState
++from rda_dwa.local_guide import LocalStaticGuide
++from rda_dwa.hybrid_primitives import evaluate_maneuver,DEFAULT_PROTOCOLS,ModeProtocol
++
++
++def test_batch_temporal_matches_scalar_for_static_dynamic_unknown_and_obb():
++    a,_=planner();rng=np.random.default_rng(20261106)
++    for _ in range(40):
++        n=int(rng.integers(2,90))
++        traj=np.column_stack((rng.uniform(-3,3,(20,2)),rng.uniform(-math.pi,math.pi,20)))
++        ts=np.arange(20)*.05
++        obs=[]
++        for i in range(n):
++            o=obstacle(*rng.uniform(-6,6,2),heading=float(rng.uniform(-math.pi,math.pi)),
++                       speed=float(rng.uniform(0,1.5)) if i%3==0 else 0.,
++                       length=float(rng.uniform(.05,2.)),width=float(rng.uniform(.05,2.)),
++                       kind='pedestrian' if i%3==0 else 'block',id_=i)
++            o.shape_heading=0. if i%4 else float(rng.uniform(-math.pi,math.pi))
++            if i%7==0:o.velocity_unknown=True;o.max_unknown_speed=1.5
++            obs.append(o)
++        scalar=np.column_stack([a.cc.temporal_gaps(traj,ts,o,uncertainty_rate=.05) for o in obs])
++        batch=a.cc.temporal_gaps_many(traj,ts,obs,uncertainty_rate=.05)
++        np.testing.assert_allclose(batch,scalar,rtol=1e-12,atol=1e-12)
++        assert math.isclose(a.cc.min_temporal_gap(traj,ts,obs,.05),float(scalar.min()),rel_tol=1e-12,abs_tol=1e-12)
++
++
++def test_whole_horizon_rejection_never_changes_collision_decision():
++    a,_=planner();rng=np.random.default_rng(812)
++    for _ in range(120):
++        r=RobotState(x=float(rng.uniform(-2,2)),y=float(rng.uniform(-2,2)),theta=float(rng.uniform(-math.pi,math.pi)),v=float(rng.uniform(-.3,.4)))
++        a.current_delta=float(rng.uniform(-.5,.5))
++        v=float(rng.uniform(-.3,.4));w=float(v*rng.uniform(-.8,.8))
++        traj,ts=a.reference_trajectory(v,w,r)
++        obs=[]
++        for i in range(15):
++            o=obstacle(*rng.uniform(-8,8,2),speed=float(rng.uniform(0,1.5)) if i%3==0 else 0.,
++                       heading=float(rng.uniform(-math.pi,math.pi)),kind='pedestrian' if i%3==0 else 'block',
++                       length=float(rng.uniform(.05,2.)),width=float(rng.uniform(.05,2.)),id_=i)
++            o.shape_heading=0. if i%4 else float(rng.uniform(-math.pi,math.pi))
++            if i%7==0:o.velocity_unknown=True;o.max_unknown_speed=1.5
++            obs.append(o)
++        a.cc.batch_temporal_enabled=False
++        scalar=a.cc.time_collision_free(traj,ts,obs,.2,.05)
++        a.cc.batch_temporal_enabled=True
++        assert a.cc.time_collision_free(traj,ts,obs,.2,.05)==scalar
++
++
++def test_batch_invalid_values_fail_closed_without_exception():
++    a,_=planner()
++    for name,value in [('speed',float('inf')),('heading',float('inf')),('x',float('nan')),('length',-.1),('max_unknown_speed',-.1)]:
++        o=obstacle(3,0);setattr(o,name,value)
++        assert not a.cc.time_collision_free([[0,0,0]],[0.],[o],.2,.05)
++
++
++def test_nominal_reuse_and_scalar_ablation_select_same_verified_command():
++    rng=np.random.default_rng(22)
++    for _ in range(8):
++        obs=[obstacle(float(rng.uniform(2.,6.)),float(rng.uniform(-3.,3.)),kind='block',id_=i) for i in range(12)]
++        r=RobotState(v=.2)
++        outputs=[]
++        for batch,reuse in [(False,False),(True,False),(True,True)]:
++            a,_=planner();a.params.batch_temporal_enable=batch;a.params.reuse_nominal_rollouts=reuse
++            outputs.append(a.plan(r,(6.,0.),obs))
++        assert outputs[0]==outputs[1]==outputs[2]
++
++
++def test_deadline_discards_candidate_and_preserves_unknown_total_counts():
++    a,_=planner();assert a.last_candidate_count is None
++    a.params.planning_budget_s=.000001
++    assert a.plan(RobotState(v=.2),(6,0),[])==(False,0.,0.)
++    assert a.last_failure_reason=='deadline'
++    assert not a.last_has_motion
++    assert a.last_candidate_count is None and a.last_feasible_count is None
++    assert a.cc.deadline_check is None and a.cc._scene_obstacles is None
++    a.params.planning_budget_s=0.
++    assert a.plan(RobotState(v=.2),(6,0),[])[0]
++    assert a.last_checked_count==a.last_candidate_count
++    assert a.last_feasible_count==a.last_candidate_count
++
++
++def test_snapshot_scope_never_survives_new_obstacle_update():
++    a,_=planner();r=RobotState(v=.2);obs=[obstacle(8,8,kind='block')]
++    assert a.plan(r,(6,0),obs)[0]
++    obs[0].x=0;obs[0].y=0
++    assert not a.plan(r,(6,0),obs)[0]
++    assert a.cc._scene_obstacles is None
++
++
++def test_static_counterfactual_does_not_override_actual_plan_diagnostics():
++    a,_=planner();r=RobotState();a.plan(r,(6,0),[])
++    before=(a.last_failure_reason,a.last_has_motion,a.last_candidate_count,a.last_feasible_count,a.last_checked_count)
++    assert a.has_safe_motion(r,[],.02) is True
++    wall=[obstacle(1.15,0,kind='block',length=.4,width=4),obstacle(-1.15,0,kind='block',length=.4,width=4)]
++    assert a.has_safe_motion(r,wall,.1) is False
++    assert a.has_safe_motion(r,wall,0.) is None
++    assert before==(a.last_failure_reason,a.last_has_motion,a.last_candidate_count,a.last_feasible_count,a.last_checked_count)
++
++
++def test_local_search_has_persistent_topology_and_supports_reverse_u_exit():
++    a,_=planner();r=RobotState();guide=LocalStaticGuide(a.cc,budget_s=.2,max_expansions=1000)
++    obs=[obstacle(2.5,0,kind='block',length=.6,width=.6)]
++    first=guide.update(r,(6,0),obs,0.)
++    assert guide.status=='path' and first is not None and abs(first[1])>.1
++    assert guide.update(r,(6,0),obs,.1)==first
++    guide.reset()
++    obs=[obstacle(1.5,0,kind='block',length=.3,width=3),obstacle(0,1.5,kind='block',length=3,width=.3),obstacle(0,-1.5,kind='block',length=3,width=.3)]
++    reverse=guide.update(r,(-3,0),obs,.2)
++    assert guide.status=='path' and reverse[0]<0
++
++
++def test_local_search_timeout_unknown_and_new_goal_failures_are_explicit():
++    a,_=planner();r=RobotState();guide=LocalStaticGuide(a.cc,budget_s=0.)
++    obs=[obstacle(2.5,0,kind='block',length=.6,width=.6)]
++    assert guide.update(r,(6,0),obs,0.) is None and guide.status=='timeout'
++    obs[0].velocity_unknown=True
++    assert guide.update(r,(6,0),obs,.1) is None and guide.status=='no_static_evidence'
++    guide.path=[(1,1,0)];guide._goal=(6,0)
++    assert guide.update(r,(-3,0),obs,.2) is None and not guide.path
++
++
++def test_unknown_mode_protocol_is_disabled_for_production_but_simulatable():
++    a,_=planner();r=RobotState()
++    for mode in ('CRAB','TRANSLATE'):
++        blocked=evaluate_maneuver(a.cc,r,[],mode=mode)
++        assert blocked.status=='protocol_unverified' and not blocked.safe
++        sim=evaluate_maneuver(a.cc,r,[],mode=mode,simulation=True)
++        assert sim.safe and not sim.protocol_verified
++        assert 'WAIT_READY' in sim.phases and 'RECOVERY_WAIT' in sim.phases
++        assert sim.trajectory[-1,1]>.2
++
++
++def test_mode_waits_real_ready_and_checks_approaching_dynamic_object():
++    a,_=planner();r=RobotState()
++    o=obstacle(0,3,heading=-math.pi/2,speed=1.)
++    result=evaluate_maneuver(a.cc,r,[o],mode='SPIN',yaw_change=math.pi/2)
++    assert not result.safe and result.status.startswith('unsafe')
++    phase=result.phases.index('ACTION_SPIN')
++    assert result.times[phase]>=3.0
++    timeout=evaluate_maneuver(a.cc,r,[],mode='SPIN',yaw_change=math.pi/2,ready_at_s=None)
++    assert timeout.status=='ready_timeout' and not timeout.safe
++    assert not any(x.startswith('ACTION') for x in timeout.phases)
++
++
++def test_reverse_and_ready_loss_brake_have_checked_footprints():
++    a,_=planner();r=RobotState(v=.2)
++    rear=obstacle(-1.,0.,kind='block')
++    assert not evaluate_maneuver(a.cc,r,[rear],mode='ACK',speed=-.2).safe
++    result=evaluate_maneuver(a.cc,RobotState(),[],mode='SPIN',yaw_change=1.5,ready_lost_at_s=.5)
++    assert result.status=='ready_lost' and 'BRAKE' in result.phases
++    assert result.safe
+--- /dev/null
++++ b/tests/test_research_protocol_constraints.py
+@@ -0,0 +1,26 @@
++"""User-confirmed partial mode semantics must not enable unverified hardware."""
++import math
++from test_planner_safety import planner
++from rda_dwa.robot_model import RobotState
++from rda_dwa.hybrid_primitives import DEFAULT_PROTOCOLS, evaluate_maneuver
++
++
++def test_crab_45_degree_limit_applies_to_both_simulation_directions():
++    model, _ = planner()
++    for direction in (-1, 1):
++        allowed = evaluate_maneuver(model.cc, RobotState(), [], mode='CRAB',
++            translation_angle=direction*math.radians(45), simulation=True)
++        rejected = evaluate_maneuver(model.cc, RobotState(), [], mode='CRAB',
++            translation_angle=direction*math.radians(46), simulation=True)
++        assert allowed.safe and not allowed.protocol_verified
++        assert rejected.status == 'angle_limit' and not rejected.safe
++
++
++def test_partial_speed_angle_confirmation_does_not_invent_ready_ids():
++    for mode in ('CRAB', 'TRANSLATE'):
++        protocol = DEFAULT_PROTOCOLS[mode]
++        assert protocol.speed_unit == 'm/s'
++        assert protocol.command_mode is None and protocol.feedback_mode is None
++        assert not protocol.verified and not protocol.enabled
++    assert DEFAULT_PROTOCOLS['CRAB'].angle_unit == 'degree'
++    assert DEFAULT_PROTOCOLS['TRANSLATE'].angle_unit == 'unused'

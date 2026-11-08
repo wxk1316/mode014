@@ -1,0 +1,72 @@
+# Local environments and generated build/cache files
+.DS_Store
+**/.DS_Store
+**/.git/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/build/
+**/install/
+**/log/
+**/*.egg-info/
+*.pyc
+*.pyo
+*.so
+*.dylib
+*Zone.Identifier*
+*.Identifier
+
+# User-supplied vehicle recordings: kept locally, never published
+/record_data/
+**/record_data/
+**/raw_bag/
+**/rosbag2_*/
+*.bag
+*.mcap
+*.db3
+*.db3-wal
+*.db3-shm
+**/messages_*.jsonl
+**/snapshots*.jsonl
+**/tracker_replay*.json
+**/core_*replay*.json
+**/track_history*.json
+**/matched_frames*.json
+**/diagnostic_rows*.json
+
+# Real-recording diagnostic outputs (source and Markdown reports remain)
+/diagnostics/**/*.json
+/diagnostics/**/*.jsonl
+/diagnostics/**/*.npz
+/diagnostics/**/*.npy
+/diagnostics/**/*.pcd
+/diagnostics/**/*.png
+/diagnostics/**/*.jpg
+/diagnostics/**/*.jpeg
+/diagnostics/**/*.mp4
+
+# Generated simulation suites and their reports/data are part of the project
+!/diagnostics/multimode_20261108/**/*.json
+!/diagnostics/multimode_20261108/**/*.jsonl
+!/diagnostics/multimode_20261108/**/*.png
+!/diagnostics/road_school_suite_20261108/**/*.json
+!/diagnostics/road_school_suite_20261108/**/*.jsonl
+!/diagnostics/road_school_suite_20261108/**/*.npz
+!/diagnostics/road_school_suite_20261108/**/*.png
+
+# Temporary clones, downloaded wheels, and duplicate distribution archives
+/diagnostics/github_campus_perception_20261108/repo/
+/diagnostics/campus_perception_20261108/wheels/
+*.zip
+*.whl
+*.tar
+*.tar.gz
+*.tgz
+/diagnostics/multimode_20261108/driver_policy_test
+/diagnostics/multimode_20261108/transition_matrix_test
+
+# Machine-local credentials/configuration
+.env
+.env.*
+!.env.example

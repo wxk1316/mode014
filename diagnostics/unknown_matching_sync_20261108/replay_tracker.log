@@ -1,0 +1,25 @@
+{
+  "note": "Recorded detections only, identical input for both trackers. No raw clouds, no object identity/velocity ground truth. SciPy absent: greedy branch. Motion counts are estimates, not evidence of actual moving objects.",
+  "frames": 1683,
+  "goal_active_frames": 1091,
+  "before": {
+    "unknown_p50": 5.0,
+    "unknown_mean": 5.7580201649862515,
+    "moving_mean": 0.6122823098075161,
+    "track_count_mean": 34.55087076076994,
+    "missed_dynamic_frames": 111,
+    "created_tracks": 1505,
+    "runtime_p50_s": 0.0008445419953204691,
+    "runtime_p99_s": 0.001093685122905299
+  },
+  "after": {
+    "unknown_p50": 5.0,
+    "unknown_mean": 5.867094408799267,
+    "moving_mean": 0.6012832263978002,
+    "track_count_mean": 34.5820348304308,
+    "missed_dynamic_frames": 108,
+    "created_tracks": 1527,
+    "runtime_p50_s": 0.0008413329778704792,
+    "runtime_p99_s": 0.0010918660566676408
+  }
+}

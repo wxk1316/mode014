@@ -1,0 +1,45 @@
+[
+  {
+    "name": "single_cone_2p5m",
+    "group": "static",
+    "seed": 19,
+    "noise": true,
+    "warm_kf": false,
+    "plant_lag": true,
+    "boundary_model": "tiled",
+    "input_mode": "detection_boxes",
+    "outcome": "reached",
+    "duration_s": 14.4,
+    "reached": true,
+    "goal_distance_m": 0.15377854785636705,
+    "min_obstacle_gap_m": 0.29546080303972816,
+    "min_road_gap_m": 0.6038163504981933,
+    "collision_at_s": null,
+    "exit_at_s": null,
+    "spin_requests": 0,
+    "max_yaw_change_deg": 35.2035173831093,
+    "first_dynamic_at_s": null,
+    "final_reason": "reached",
+    "reason_counts": {
+      "no_goal": 2,
+      "planning_pending": 3,
+      "motion": 139,
+      "reached": 1
+    },
+    "tracking_counts": {
+      "SAFETY_STOP": 25,
+      "LQR": 695,
+      "NO_REF": 1
+    },
+    "max_speed_m_s": 0.7882698664103471,
+    "command_acc_max": 0.7000000000000006,
+    "command_jerk_max": 2.0000000000001266,
+    "command_steer_rate_max_deg_s": 30.000000000000025,
+    "command_steer_accel_max_deg_s2": 100.00000000000675,
+    "steering_sign_changes": 1,
+    "motion_starts": 1,
+    "max_lateral_error_m": 0.014081230064186035,
+    "planner_duration_p95_s": 0.006217458339233417,
+    "wall_duration_s": 1.4447740830073599
+  }
+]

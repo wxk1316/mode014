@@ -1,0 +1,491 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.26.2 by Michael Rose
+  Copyright 2013-2024 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+
+<html lang="en-US" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>| Ze’s Personal Page</title>
+<meta name="description" content="Ze’s Personal Page based on Jekyll and Minimal Mistakes">
+
+
+  <meta name="author" content="Ze Zhang">
+  
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Ze's Personal Page">
+<meta property="og:title" content="">
+<meta property="og:url" content="https://woodenonez.github.io//">
+
+
+  <meta property="og:description" content="Ze’s Personal Page based on Jekyll and Minimal Mistakes">
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://woodenonez.github.io//">
+
+
+
+
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+    "name": "Ze Zhang",
+    "url": "https://woodenonez.github.io//"
+}
+</script>
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Ze's Personal Page Feed">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  window.enable_copy_code_button = true;
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--home wide" dir="ltr">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/logo_grayscale.svg" alt="Ze's Personal Page"></a>
+        
+        <a class="site-title" href="/">
+          Ze's Personal Page
+          <span class="site-subtitle">👨‍💻 - 🤖 - 🧗‍♂️- 🎧 - 🧳</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a
+                href="/about/"
+                
+                
+              >About</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/projects/"
+                
+                
+              >Projects</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/publications/"
+                
+                
+              >Publications</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="https://github.com/Woodenonez"
+                
+                
+              >Show Me The Code</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="https://woodenonez.github.io//">
+        <img src="/assets/images/selfie_2023_winter.jpg" alt="Ze Zhang" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="https://woodenonez.github.io//" itemprop="url">Ze Zhang</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>Still a traveller…</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">GOT, Sweden</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/Woodenonez" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://scholar.google.com/citations?user=zsUc-gkAAAAJ&hl=en" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-google-scholar" aria-hidden="true"></i><span class="label">Google Scholar</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/zhze17819/" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title"> </h1>
+    
+    <h2 id="greetings">Greetings!</h2>
+
+<p>Welcome to my personal page. I finished my PhD at the <a href="https://www.chalmers.se/en/">Chalmers University of Technology</a>, and I’m currently working on robot foundation models (VLA, WAM). My PhD research interests were in the area of robotics and machine learning, particularly in the development of integrated algorithms for predictive dynamic obstacle avoidance based on multimodal motion prediction. Feel free to contact me or raise an issue on the corresponding GitHub repository.</p>
+
+<!-- The latest official update of the application related to my research project: [Volvo Group](https://www.youtube.com/watch?v=DA7lKiCdkCc&t=132s&ab_channel=VolvoGroup) -->
+
+<p>I successfully defended my thesis, <a href="https://research.chalmers.se/en/publication/545958"><strong>“Future-Oriented Navigation for Autonomous Mobile Robots”</strong></a>, on <strong>May 15, 2025</strong>.</p>
+
+<h3 id="active-work">Active Work</h3>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\C20260227_cover.png" alt="C20260227" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Dynamic Nonconvex Obstacle Avoidance: One-shot Motion Prediction (EBM) and Control (On-Manifold CBF)</h3>
+    <p class="compact-authors">Yifan Xue*, <b class="compact-myname"><i>Ze Zhang*</i></b>, et al. (*equal contribution)</p>
+    <p><i><a href="https://ieeexplore.ieee.org/document/11417391">RA-L 2026</a> (with GRASP lab, Univerisity of Pennsylvania)</i>
+      <a href="https://github.com/yifanxueseas/mmp_mcbf_control/">[Code]</a> 
+      <a href="https://arxiv.org/abs/2601.10233">[Paper (arXiv)]</a>
+      <a href="https://youtu.be/heagLEwfcVc">[Video-Demo]</a>
+    </p>
+    <p class="compact-post-description">Proactive Local-Minima-Free Robot Navigation: Blending Motion Prediction with Safe Control
+</p>
+  </div>
+</div>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\J20250521_cover.png" alt="J20250521" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Dynamic Obstacle Avoidance: One-shot Motion Prediction (EBM) and Control (MPC)</h3>
+    <p class="compact-authors"><b class="compact-myname"><i>Ze Zhang</i></b>, ..., et al.</p>
+    <p><i><a href="https://ieeexplore.ieee.org/document/11021381">RA-L 2025</a></i>
+      <a href="https://github.com/Woodenonez/DyObAv-MPCnEBM-Warehouse">[Code]</a> 
+      <a href="https://github.com/Woodenonez/DyObAv-MPCnEBM-Warehouse-ROS2">[ROS 2]</a> 
+      <a href="\assets\papers\RAL2025_Ze_EBM_MPC_ROS.pdf">[Paper]</a>
+      <a href="https://youtu.be/j4n2mt0KdMY">[Video-Demo]</a>
+    </p>
+    <p class="compact-post-description">Future-Oriented Navigation: Dynamic Obstacle Avoidance with One-Shot Energy-Based Multimodal Motion Prediction | Autonomous Mobile Robot | Energy-Based Multimodal Motion Prediction</p>
+  </div>
+</div>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\C20241014_cover.png" alt="C20241014" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Efficient Obstacle Avoidance and Multi-Agent Coordination: DDPG-Boosted MPC for Collision-Free Navigation</h3>
+    <p class="compact-authors">Kristian Ceder*, <b class="compact-myname"><i>Ze Zhang*</i></b>, et al. (*equal contribution)</p>
+    <p><i><a href="https://ieeexplore.ieee.org/document/10801434">IROS 2024</a> (Abu Dhabi, UAE)</i> 
+      <a href="https://github.com/kristianceder/DRL-Traj-Planner">[Code]</a>  
+      <a href="\assets\papers\IROS2024_Co_DDPG_MPC_MultiAgent.pdf">[Paper]</a>
+      <a href="https://youtu.be/x0JXqocSIhQ">[Video-Demo]</a>
+    </p>
+    <p class="compact-post-description">Bird’s-Eye-View Trajectory Planning of Multiple Robots using Continuous Deep Reinforcement Learning and Model Predictive Control | Deep Reinforcement Learning | Multi-Agent Coordination</p>
+  </div>
+</div>
+
+<h3 id="more-work">More Work</h3>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\C20251127_cover.png" alt="C20251127" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Complex Obstacle Avoidance and Fleet Collision Avoidance: Sampling-based Trajectory Planning (DWA) Inspired by Gradient Field (GPDF)</h3>
+    <p class="compact-authors"><b class="compact-myname"><i>Ze Zhang</i></b>, Yifan Xue, et al.</p>
+    <p><i><a href="https://ieeexplore.ieee.org/document/11246091">IROS 2025</a> - Hangzhou, CN</i> 
+      <a href="https://github.com/Woodenonez/CollisionAvoidance-GPDF-DWA/">[Code]</a> 
+      <a href="https://arxiv.org/abs/2504.03260">[Paper (arXiv)]</a>
+      <a href="https://youtu.be/Et4C5oGHlF0">[Video-Demo]</a>
+    </p>
+    <p class="compact-post-description">Gradient Field-Based Dynamic Window Approach for Collision Avoidance in Complex Environments | Non-convex obstacle avoidance | Multi-robot collision avoidance</p>
+  </div>
+</div>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\J20230717_cover.png" alt="J20230717" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Dynamic Obstacle Avoidance: Iterative Motion Prediction (SWTA) and Control (MPC)</h3>
+    <p class="compact-authors"><b class="compact-myname"><i>Ze Zhang</i></b>, Hadi Hajieghrary, et al.</p>
+    <p><i><a href="https://ieeexplore.ieee.org/document/10185133"> RA-L 2023</a> - Yokohama, JPN (ICRA 2024)</i> 
+      <a href="https://github.com/Woodenonez/DyObAv-MPCnWTA-Warehouse">[Code]</a> 
+      <a href="\assets\papers\RAL2023_Ze_MPC_WTA.pdf">[Paper]</a>
+      <!-- <a href="https://ieeexplore.ieee.org/document/10185133">[Paper]</a> -->
+      <a href="https://youtu.be/XM6Ya11B81Q">[Video-Demo]</a>
+    </p>
+    <p class="compact-post-description">[Deprecation soon] Prescient Collision-Free Navigation of Mobile Robots With Iterative Multimodal Motion Prediction of Dynamic Obstacles | Autonomous Mobile Robot | Multimodal Motion Prediction</p>
+  </div>
+</div>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\C20230826_cover.png" alt="C20230826" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Efficient Obstacle Avoidance: DQN-Boosted MPC for Collision-Free Navigation</h3>
+    <p class="compact-authors"><b class="compact-myname"><i>Ze Zhang</i></b>, Yao Cai, et al.</p>
+    <p><i><a href="https://ieeexplore.ieee.org/document/10260515">CASE 2023</a> - Auckland, NZ</i> 
+      <a href="https://github.com/Woodenonez/TrajTrack-MPCnDQN-RLBoost">[Code]</a> 
+      <a href="\assets\papers\CASE2023_Ze_DQN_MPC.pdf">[Paper]</a>
+      <!-- <a href="https://ieeexplore.ieee.org/document/10260515">[Paper]</a> -->
+    </p>
+    <p class="compact-post-description">Collision-Free Trajectory Planning of Mobile Robots by Integrating Deep Reinforcement Learning and Model Predictive Control | Deep Reinforcement Learning</p>
+  </div>
+</div>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\C20220820_cover.png" alt="C20220820" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Multimodal Motion Prediction: Adaptive and Swarm WTA Loss</h3>
+    <p class="compact-authors"><b class="compact-myname"><i>Ze Zhang</i></b>, Emmanuel Dean, et al.</p>
+    <p><i>CASE 2022 - Mexico City, MEX</i> 
+      <a href="https://github.com/Woodenonez/M3P-SWTA-Pytorch">[Code]</a> 
+      <a href="\assets\papers\CASE2022_Ze_SwarmLoss.pdf">[Paper]</a>
+      <!-- <a href="https://ieeexplore.ieee.org/document/9926544">[Paper]</a> -->
+    </p>
+    <p class="compact-post-description">Multimodal Motion Prediction Based on Adaptive and Swarm Sampling Loss Functions for Reactive Mobile Robots | Multiple Choice Learning</p>
+  </div>
+</div>
+
+<div class="compact-post">
+  <div class="compact-post-image">
+    <img src="\assets\images\C20210823_cover.png" alt="C20210823" />  
+  </div>
+  <div class="compact-post-details">
+    <h3 class="compact-post-title">Dynamic Obstacle Avoidance: MDN Predictor and MPC</h3>
+    <p class="compact-authors"><b class="compact-myname"><i>Ze Zhang</i></b>, Emmanuel Dean, et al.</p>
+    <p><i>CASE 2021 (Virtual/Lyon, FR)</i> 
+      <a href="https://github.com/Woodenonez/M3P-MDN-CASE2021">[Code]</a> 
+      <a href="\assets\papers\CASE2021_Ze_MDN_NMPC_Ref.pdf">[Paper]</a>
+      <!-- <a href="https://ieeexplore.ieee.org/document/9551463">[Paper]</a> -->
+      <a href="https://youtu.be/vZI3-TnQZ1c">[Video-Demo]</a>
+    </p>
+    <p class="compact-post-description">Motion Prediction Based on Multiple Futures for Dynamic Obstacle Avoidance of Mobile Robots | Mixture Density Network</p>
+  </div>
+</div>
+
+
+<h3 class="archive__subtitle">Recent posts</h3>
+
+
+
+
+<div class="entries-list">
+  
+</div>
+
+
+
+
+  </div>
+</div>
+
+      
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+          <li><a href="https://github.com/Woodenonez" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://www.linkedin.com/in/zhze17819/" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn</a></li>
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 <a href="https://woodenonez.github.io/">Ze's Personal Page</a>. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/jekyll-themes/minimal-mistakes/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

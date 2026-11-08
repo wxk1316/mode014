@@ -1,0 +1,10 @@
+{
+  "suite": "production_planning",
+  "tests": 44,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_s": 0.48353433300508186,
+  "passed": true,
+  "geometry": "1.2x0.8; centre reference; parameterized rear distance .345",
+  "scope": "pure Python; no ROS2, DDS, vehicle or UDP execution"
+}

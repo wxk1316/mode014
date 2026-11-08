@@ -1,0 +1,46 @@
+{
+  "multi_blocks": {
+    "t": 24.0,
+    "pose": [
+      0.6471999969615294,
+      3.8669903690549806e-05,
+      0.00010639126496646448
+    ],
+    "normal_negative_free": true,
+    "normal_positive_free": true,
+    "locally_confined": false
+  },
+  "u_shape": {
+    "t": 12.5,
+    "pose": [
+      0.2656000000000003,
+      0.0,
+      0.0
+    ],
+    "normal_negative_free": false,
+    "normal_positive_free": false,
+    "locally_confined": true
+  },
+  "thick_u": {
+    "t": 14.0,
+    "pose": [
+      0.7935874845527434,
+      0.003019844674616443,
+      0.008355766719039962
+    ],
+    "normal_negative_free": false,
+    "normal_positive_free": false,
+    "locally_confined": true
+  },
+  "narrow_u": {
+    "t": 13.3,
+    "pose": [
+      0.6594000000000005,
+      0.0,
+      0.0
+    ],
+    "normal_negative_free": false,
+    "normal_positive_free": false,
+    "locally_confined": true
+  }
+}

@@ -1,0 +1,1020 @@
+[
+  {
+    "name": "single_cone_2p5m",
+    "raw_points": 6681,
+    "physical_object_count": 1,
+    "detection_count": 1,
+    "detections": [
+      [
+        2.5,
+        0.0,
+        "pedestrian",
+        0.2098040535778192,
+        0.20980405357781962,
+        -1.529225710850676
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6681,
+      "roi_points": 6567,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.003448417002800852,
+      "ground_removed_points": 6447,
+      "filtered_points": 120,
+      "cluster_input_points": 37,
+      "occupied_voxels": 16,
+      "voxel_duration_s": 0.00014366599498316646,
+      "cluster_count": 1,
+      "component_edges": 120,
+      "component_duration_s": 0.0005131249781697989,
+      "box_duration_s": 4.308400093577802e-05,
+      "processing_duration_s": 0.004531541984761134,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.7908290156307425,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "two_cones_centre_open",
+    "raw_points": 6801,
+    "physical_object_count": 2,
+    "detection_count": 2,
+    "detections": [
+      [
+        2.4999999999999996,
+        -0.7999999999999999,
+        "pedestrian",
+        0.2145088154916306,
+        0.2145088154916306,
+        1.5045205606465597
+      ],
+      [
+        2.5,
+        0.8,
+        "pedestrian",
+        0.20243822820952684,
+        0.20243822820952673,
+        1.5666297565748286
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6801,
+      "roi_points": 6687,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005158340209163725,
+      "ground_removed_points": 6447,
+      "filtered_points": 240,
+      "cluster_input_points": 74,
+      "occupied_voxels": 32,
+      "voxel_duration_s": 9.308301378041506e-05,
+      "cluster_count": 2,
+      "component_edges": 240,
+      "component_duration_s": 0.00047804199857637286,
+      "box_duration_s": 5.241698818281293e-05,
+      "processing_duration_s": 0.001444249995984137,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        },
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        }
+      ],
+      "detection_count": 2,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.8226435193136898,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "two_cones_centre_closed",
+    "raw_points": 6801,
+    "physical_object_count": 2,
+    "detection_count": 2,
+    "detections": [
+      [
+        2.4999999999999996,
+        -0.55,
+        "pedestrian",
+        0.2145088154916306,
+        0.2145088154916306,
+        1.5045205606465597
+      ],
+      [
+        2.5,
+        0.55,
+        "pedestrian",
+        0.20493062237406068,
+        0.20493062237406123,
+        -1.554135828855773
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6801,
+      "roi_points": 6687,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0004984580154996365,
+      "ground_removed_points": 6447,
+      "filtered_points": 240,
+      "cluster_input_points": 70,
+      "occupied_voxels": 24,
+      "voxel_duration_s": 8.633302059024572e-05,
+      "cluster_count": 2,
+      "component_edges": 132,
+      "component_duration_s": 0.00042058300459757447,
+      "box_duration_s": 4.720801371149719e-05,
+      "processing_duration_s": 0.0013387080107349902,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        },
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        }
+      ],
+      "detection_count": 2,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.7985083547919076,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "two_cones_staggered",
+    "raw_points": 6801,
+    "physical_object_count": 2,
+    "detection_count": 2,
+    "detections": [
+      [
+        1.9999999999999998,
+        0.5,
+        "pedestrian",
+        0.21296067309415712,
+        0.21296067309415723,
+        -0.058070813439995116
+      ],
+      [
+        3.2499999999999996,
+        -0.5,
+        "pedestrian",
+        0.20493062237406057,
+        0.20493062237406034,
+        -1.554135828855773
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6801,
+      "roi_points": 6687,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0006127909873612225,
+      "ground_removed_points": 6447,
+      "filtered_points": 240,
+      "cluster_input_points": 72,
+      "occupied_voxels": 28,
+      "voxel_duration_s": 0.00011729099787771702,
+      "cluster_count": 2,
+      "component_edges": 186,
+      "component_duration_s": 0.000524125003721565,
+      "box_duration_s": 5.933298962190747e-05,
+      "processing_duration_s": 0.0016376669809687883,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        },
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        }
+      ],
+      "detection_count": 2,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.287519225484334,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_gate_pillars",
+    "raw_points": 6881,
+    "physical_object_count": 2,
+    "detection_count": 2,
+    "detections": [
+      [
+        2.5,
+        -1.2500000000000002,
+        "bicycle",
+        0.40238244028746806,
+        0.40238244028746784,
+        -0.005973980420243732
+      ],
+      [
+        2.5,
+        1.2500000000000002,
+        "bicycle",
+        0.4029301264372034,
+        0.40293012643720294,
+        0.007352411188925716
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6881,
+      "roi_points": 6767,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005005830025766045,
+      "ground_removed_points": 6447,
+      "filtered_points": 320,
+      "cluster_input_points": 72,
+      "occupied_voxels": 36,
+      "voxel_duration_s": 0.00010204201680608094,
+      "cluster_count": 2,
+      "component_edges": 140,
+      "component_duration_s": 0.00047491700388491154,
+      "box_duration_s": 5.1875016652047634e-05,
+      "processing_duration_s": 0.001410958997439593,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 160,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        },
+        {
+          "points": 160,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 2,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.8189994641475165,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_bollards_narrow",
+    "raw_points": 6961,
+    "physical_object_count": 4,
+    "detection_count": 4,
+    "detections": [
+      [
+        2.5,
+        -1.35,
+        "pedestrian",
+        0.20000000000000018,
+        0.20000000000000018,
+        1.5707963267948966
+      ],
+      [
+        2.4999999999999996,
+        -0.65,
+        "pedestrian",
+        0.20057060526628634,
+        0.20057060526628623,
+        0.0028571117595985658
+      ],
+      [
+        2.4999999999999996,
+        0.6500000000000001,
+        "pedestrian",
+        0.2002498431647366,
+        0.20024984316473626,
+        -0.0012499973958430988
+      ],
+      [
+        2.4999999999999996,
+        1.35,
+        "pedestrian",
+        0.20198970282661444,
+        0.20198970282661444,
+        -1.5607976598083213
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6961,
+      "roi_points": 6847,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.000499125017086044,
+      "ground_removed_points": 6447,
+      "filtered_points": 400,
+      "cluster_input_points": 88,
+      "occupied_voxels": 40,
+      "voxel_duration_s": 0.00010695800301618874,
+      "cluster_count": 4,
+      "component_edges": 180,
+      "component_duration_s": 0.000384374987334013,
+      "box_duration_s": 0.00010008300887420774,
+      "processing_duration_s": 0.0013699590053875,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 100,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        },
+        {
+          "points": 100,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        },
+        {
+          "points": 100,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        },
+        {
+          "points": 100,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        }
+      ],
+      "detection_count": 4,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.8056698776450189,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_tree_and_cone",
+    "raw_points": 6841,
+    "physical_object_count": 2,
+    "detection_count": 2,
+    "detections": [
+      [
+        2.5,
+        0.39999999999999997,
+        "bicycle",
+        0.40254849076673205,
+        0.4025484907667318,
+        -0.00639169726500844
+      ],
+      [
+        3.6,
+        -0.49999999999999994,
+        "pedestrian",
+        0.20171996422197358,
+        0.20171996422197358,
+        -0.0005952378140411994
+      ]
+    ],
+    "metrics": {
+      "finite_points": 6841,
+      "roi_points": 6727,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005058329843450338,
+      "ground_removed_points": 6447,
+      "filtered_points": 280,
+      "cluster_input_points": 73,
+      "occupied_voxels": 34,
+      "voxel_duration_s": 0.00010762500460259616,
+      "cluster_count": 2,
+      "component_edges": 188,
+      "component_duration_s": 0.0004702500009443611,
+      "box_duration_s": 4.933401942253113e-05,
+      "processing_duration_s": 0.0014176249969750643,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 160,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        },
+        {
+          "points": 120,
+          "height_m": 0.5000000000000112,
+          "structural": false
+        }
+      ],
+      "detection_count": 2,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.6974433907267827,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_parked_vehicle",
+    "raw_points": 7051,
+    "physical_object_count": 1,
+    "detection_count": 1,
+    "detections": [
+      [
+        2.7,
+        0.6,
+        "vehicle",
+        1.7999999999999998,
+        0.9000000000000001,
+        0.0
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7051,
+      "roi_points": 6937,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005464169953484088,
+      "ground_removed_points": 6447,
+      "filtered_points": 490,
+      "cluster_input_points": 110,
+      "occupied_voxels": 54,
+      "voxel_duration_s": 0.00013175001367926598,
+      "cluster_count": 1,
+      "component_edges": 172,
+      "component_duration_s": 0.0004788750084117055,
+      "box_duration_s": 4.9458001740276814e-05,
+      "processing_duration_s": 0.001505374995758757,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 490,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.2000000000000002,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_building_corner",
+    "raw_points": 7291,
+    "physical_object_count": 2,
+    "detection_count": 1,
+    "detections": [
+      [
+        2.5853150214887446,
+        0.754805060098339,
+        "vehicle",
+        2.18388500606326,
+        1.706024657352419,
+        -0.1140829803049833
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7291,
+      "roi_points": 7177,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005074999935459346,
+      "ground_removed_points": 6447,
+      "filtered_points": 730,
+      "cluster_input_points": 157,
+      "occupied_voxels": 74,
+      "voxel_duration_s": 0.0001396249863319099,
+      "cluster_count": 1,
+      "component_edges": 453,
+      "component_duration_s": 0.0005343329976312816,
+      "box_duration_s": 5.299999611452222e-05,
+      "processing_duration_s": 0.001533249975182116,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 730,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 0.8033673541749963,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_bench_planter",
+    "raw_points": 7091,
+    "physical_object_count": 2,
+    "detection_count": 2,
+    "detections": [
+      [
+        2.3,
+        0.3,
+        "vehicle",
+        1.5,
+        0.45000000000000007,
+        6.292778005916894e-18
+      ],
+      [
+        3.7,
+        -0.9,
+        "bicycle",
+        0.4500000000000002,
+        0.44999999999999996,
+        0.0
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7091,
+      "roi_points": 6977,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005291670095175505,
+      "ground_removed_points": 6447,
+      "filtered_points": 530,
+      "cluster_input_points": 120,
+      "occupied_voxels": 60,
+      "voxel_duration_s": 0.0001226250024046749,
+      "cluster_count": 2,
+      "component_edges": 206,
+      "component_duration_s": 0.0004905840032733977,
+      "box_duration_s": 5.76250022277236e-05,
+      "processing_duration_s": 0.001486499997554347,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 350,
+          "height_m": 0.6000000000000112,
+          "structural": false
+        },
+        {
+          "points": 180,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        }
+      ],
+      "detection_count": 2,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 0.9499999999999998,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "school_road_blocked",
+    "raw_points": 7461,
+    "physical_object_count": 5,
+    "detection_count": 1,
+    "detections": [
+      [
+        2.5,
+        6.896375503161215e-17,
+        "static_large",
+        3.45,
+        0.4500000000000002,
+        1.5707963267948966
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7461,
+      "roi_points": 7347,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005147499905433506,
+      "ground_removed_points": 6447,
+      "filtered_points": 900,
+      "cluster_input_points": 196,
+      "occupied_voxels": 96,
+      "voxel_duration_s": 0.00016379100270569324,
+      "cluster_count": 1,
+      "component_edges": 380,
+      "component_duration_s": 0.0005476250080391765,
+      "box_duration_s": 5.5541982874274254e-05,
+      "processing_duration_s": 0.0015923749888315797,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 900,
+          "height_m": 0.8000000000000113,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": 1.6749999999999998,
+    "initial_false_occupied": false
+  },
+  {
+    "name": "u_depth2_front0.15",
+    "raw_points": 7701,
+    "physical_object_count": 3,
+    "detection_count": 1,
+    "detections": [
+      [
+        -0.1999999999999999,
+        -1.2246467991473527e-17,
+        "vehicle",
+        2.0,
+        2.1,
+        -1.5707963267948966
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7701,
+      "roi_points": 7587,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005144999886397272,
+      "ground_removed_points": 6447,
+      "filtered_points": 1140,
+      "cluster_input_points": 245,
+      "occupied_voxels": 122,
+      "voxel_duration_s": 0.0001916250039357692,
+      "cluster_count": 1,
+      "component_edges": 743,
+      "component_duration_s": 0.0005985409952700138,
+      "box_duration_s": 6.337501690723002e-05,
+      "processing_duration_s": 0.0016934579762164503,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 1140,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": -0.8,
+    "initial_false_occupied": true
+  },
+  {
+    "name": "u_depth2_front0.40",
+    "raw_points": 7701,
+    "physical_object_count": 3,
+    "detection_count": 1,
+    "detections": [
+      [
+        0.050000000000000044,
+        3.061616997868386e-18,
+        "vehicle",
+        2.0,
+        2.1,
+        -1.5707963267948966
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7701,
+      "roi_points": 7587,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005242500046733767,
+      "ground_removed_points": 6447,
+      "filtered_points": 1140,
+      "cluster_input_points": 251,
+      "occupied_voxels": 122,
+      "voxel_duration_s": 0.00018108301446773112,
+      "cluster_count": 1,
+      "component_edges": 752,
+      "component_duration_s": 0.0007636670197825879,
+      "box_duration_s": 7.283297600224614e-05,
+      "processing_duration_s": 0.0018801670230459422,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 1140,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": -0.8,
+    "initial_false_occupied": true
+  },
+  {
+    "name": "u_depth2_front0.70",
+    "raw_points": 7701,
+    "physical_object_count": 3,
+    "detection_count": 1,
+    "detections": [
+      [
+        0.3499999999999998,
+        -2.143131898507867e-17,
+        "vehicle",
+        2.0,
+        2.1,
+        1.5707963267948966
+      ]
+    ],
+    "metrics": {
+      "finite_points": 7701,
+      "roi_points": 7587,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005485829897224903,
+      "ground_removed_points": 6447,
+      "filtered_points": 1140,
+      "cluster_input_points": 245,
+      "occupied_voxels": 122,
+      "voxel_duration_s": 0.00018587498925626278,
+      "cluster_count": 1,
+      "component_edges": 730,
+      "component_duration_s": 0.00061645801179111,
+      "box_duration_s": 7.858299068175256e-05,
+      "processing_duration_s": 0.0017647909990046173,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 1140,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": -0.8,
+    "initial_false_occupied": true
+  },
+  {
+    "name": "u_depth3_front0.15",
+    "raw_points": 8021,
+    "physical_object_count": 3,
+    "detection_count": 1,
+    "detections": [
+      [
+        -0.7,
+        0.0,
+        "vehicle",
+        3.1,
+        2.0,
+        0.0
+      ]
+    ],
+    "metrics": {
+      "finite_points": 8021,
+      "roi_points": 7907,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.000520125002367422,
+      "ground_removed_points": 6447,
+      "filtered_points": 1460,
+      "cluster_input_points": 325,
+      "occupied_voxels": 162,
+      "voxel_duration_s": 0.00022233399795368314,
+      "cluster_count": 1,
+      "component_edges": 990,
+      "component_duration_s": 0.0006900829903315753,
+      "box_duration_s": 8.995801908895373e-05,
+      "processing_duration_s": 0.001845332997618243,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 1460,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": -0.8,
+    "initial_false_occupied": true
+  },
+  {
+    "name": "u_depth3_front0.40",
+    "raw_points": 8021,
+    "physical_object_count": 3,
+    "detection_count": 1,
+    "detections": [
+      [
+        -0.44999999999999996,
+        -1.3435239391648955e-17,
+        "vehicle",
+        3.1,
+        2.0,
+        2.985608753699768e-17
+      ]
+    ],
+    "metrics": {
+      "finite_points": 8021,
+      "roi_points": 7907,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0005206670030020177,
+      "ground_removed_points": 6447,
+      "filtered_points": 1460,
+      "cluster_input_points": 331,
+      "occupied_voxels": 162,
+      "voxel_duration_s": 0.00020908299484290183,
+      "cluster_count": 1,
+      "component_edges": 1012,
+      "component_duration_s": 0.0006704999832436442,
+      "box_duration_s": 7.516599725931883e-05,
+      "processing_duration_s": 0.0018098329892382026,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 1460,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": -0.8,
+    "initial_false_occupied": true
+  },
+  {
+    "name": "u_depth3_front0.70",
+    "raw_points": 8021,
+    "physical_object_count": 3,
+    "detection_count": 1,
+    "detections": [
+      [
+        -0.15000000000000013,
+        0.0,
+        "vehicle",
+        3.1,
+        2.0,
+        0.0
+      ]
+    ],
+    "metrics": {
+      "finite_points": 8021,
+      "roi_points": 7907,
+      "ground_plane": [
+        1.1215729810073306e-30,
+        2.646459074376892e-29,
+        -0.36000000000001126
+      ],
+      "ground_inliers": 2144,
+      "ground_residual_m": 1.1213252548714081e-14,
+      "ground_age_s": 0.0,
+      "ground_duration_s": 0.0007265000022016466,
+      "ground_removed_points": 6447,
+      "filtered_points": 1460,
+      "cluster_input_points": 321,
+      "occupied_voxels": 158,
+      "voxel_duration_s": 0.0002689999819267541,
+      "cluster_count": 1,
+      "component_edges": 956,
+      "component_duration_s": 0.0008984169980976731,
+      "box_duration_s": 9.941600728780031e-05,
+      "processing_duration_s": 0.0024549590016249567,
+      "weak_clusters_removed": 0,
+      "structural_tiles": 0,
+      "detection_support": [
+        {
+          "points": 1460,
+          "height_m": 1.8000000000000111,
+          "structural": false
+        }
+      ],
+      "detection_count": 1,
+      "valid": true,
+      "reason": "published"
+    },
+    "initial_reported_gap_m": -0.8,
+    "initial_false_occupied": true
+  }
+]

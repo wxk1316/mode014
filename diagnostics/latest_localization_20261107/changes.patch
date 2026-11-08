@@ -1,0 +1,355 @@
+--- a/src/rda_dwa_real/rda_dwa_real/localization_input.py
++++ b/src/rda_dwa_real/rda_dwa_real/localization_input.py
+@@ -1,11 +1,12 @@
+-"""Read the existing localization TF without changing its publishers.
++"""Use the latest received localization without changing its publishers.
+ 
+-The vehicle's /localization header can refer to an older fusion sample. TF's
+-map -> odom -> body chain has the current pose and its acquisition timestamp.
+-All consumers must select the same source; a failed TF lookup never falls back
+-to the cached topic pose. Core duplicate/jump checks remain in force.
++latest_topic caches the most recently received valid pose. Its ROS header is
++diagnostic data; a monotonic receipt time drives the disconnect watchdog and
++the core update clock. Re-reading the cache cannot renew that receipt time.
++The original source-time topic and TF modes remain explicit alternatives.
+ """
+ import math
++import time
+ 
+ from .frame_utils import quat_to_yaw
+ 
+@@ -13,19 +14,24 @@
+ class LocalizationInput:
+     def __init__(self, node):
+         self.node = node
+-        node.declare_parameter('localization_source', 'topic')
++        node.declare_parameter('localization_source', 'latest_topic')
+         node.declare_parameter('localization_parent_frame', 'map')
+         node.declare_parameter('localization_child_frame', 'body')
+         self.source = str(node.get_parameter('localization_source').value)
+         self.parent = str(node.get_parameter('localization_parent_frame').value)
+         self.child = str(node.get_parameter('localization_child_frame').value)
+-        if self.source not in ('topic', 'tf'):
+-            raise ValueError('localization_source must be topic or tf')
++        if self.source not in ('topic', 'tf', 'latest_topic'):
++            raise ValueError('localization_source must be topic, tf, or latest_topic')
+         if not self.parent or not self.child or self.parent == self.child:
+             raise ValueError('localization TF needs two different, nonempty frames')
+-        self.reason = 'topic' if self.source == 'topic' else 'tf_waiting'
++        self.reason = dict(topic='topic', tf='tf_waiting',
++                           latest_topic='latest_topic_waiting')[self.source]
+         self.stamp = None
+         self.age = None
++        self._pose = None
++        self._received_at = None
++        self.receive_age = None
++        self.effective_stamp = None
+         if self.source == 'tf':
+             from rclpy.time import Time
+             from tf2_ros import Buffer, TransformListener, TransformException
+@@ -40,13 +46,50 @@
+     def uses_tf(self):
+         return self.source == 'tf'
+ 
+-    def sample(self, max_age):
+-        """Return (body pose, source stamp, source age), or None.
++    @property
++    def uses_latest_topic(self):
++        return self.source == 'latest_topic'
+ 
+-        Time zero requests TF's latest common time. No blocking timeout is used
+-        in the control callbacks. Age remains tied to that source time, so
+-        repeatedly reading the same transform cannot keep the vehicle running.
++    def receive_topic(self, pose, header, received_at=None):
++        """Cache a valid body pose on message arrival, including old headers."""
++        if not self.uses_latest_topic:
++            return False
++        p, q = pose.position, pose.orientation
++        values = (p.x, p.y, p.z, q.x, q.y, q.z, q.w)
++        if not all(math.isfinite(v) for v in values) or math.hypot(q.x, q.y, q.z, q.w) < 1e-12:
++            self.reason = 'latest_topic_invalid'
++            return False
++        if header.frame_id not in ('', self.parent):
++            self.reason = 'latest_topic_frame_mismatch'
++            return False
++        now = time.monotonic() if received_at is None else received_at
++        if not math.isfinite(now) or (self._received_at is not None and now <= self._received_at):
++            return False
++        self._pose = (p.x, p.y, quat_to_yaw(q.x, q.y, q.z, q.w))
++        self._received_at = now
++        self.stamp = header.stamp.sec + header.stamp.nanosec * 1e-9
++        self.reason = 'latest_topic_valid'
++        return True
++
++    def sample(self, max_age, now=None):
++        """Return (body pose, effective update stamp, watchdog age), or None.
++
++        latest_topic uses receipt time, allowing delayed, duplicate, and
++        irregular ROS headers. TF mode still uses TF's latest common time.
+         """
++        if self.uses_latest_topic:
++            if self._received_at is None:
++                self.reason = 'latest_topic_waiting'
++                return None
++            now = time.monotonic() if now is None else now
++            self.receive_age = max(0., now-self._received_at)
++            self.age = self.node.get_clock().now().nanoseconds * 1e-9 - self.stamp
++            self.effective_stamp = self._received_at
++            if self.receive_age > max_age:
++                self.reason = 'latest_topic_disconnected'
++                return None
++            self.reason = 'latest_topic_valid'
++            return self._pose, self._received_at, self.receive_age
+         if not self.uses_tf:
+             return None
+         try:
+@@ -68,10 +111,14 @@
+             self.reason = 'tf_stale' if age >= 0 else 'tf_future'
+             return None
+         self.reason = 'tf_valid'
++        self.effective_stamp = stamp
+         pose = (tr.x, tr.y, quat_to_yaw(q.x, q.y, q.z, q.w))
+         return pose, stamp, max(0., age)
+ 
+     def diagnostic(self):
+         return dict(source=self.source, parent_frame=self.parent,
+                     child_frame=self.child, reason=self.reason,
+-                    source_stamp=self.stamp, source_age_s=self.age)
++                    source_stamp=self.stamp, source_age_s=self.age,
++                    receive_age_s=self.receive_age,
++                    effective_pose_stamp=self.effective_stamp,
++                    pose_stamp_clock='monotonic_receive' if self.uses_latest_topic else 'ros_source')
+--- a/src/rda_dwa_real/rda_dwa_real/bridge_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/bridge_node.py
+@@ -180,9 +180,10 @@
+         self.declare_parameter('gps_yaw_topic', '')           # 可选：std_msgs/Float32 航向(rad)
+         self.declare_parameter('gps_yaw_use_diff', True)      # 无航向话题时用 GPS 位移差分估航向
+ 
+-        for key,default in {'planning_budget_s':.08,'safety_margin':.12,'heading_weight':.3,'steer_weight':.12,'steer_change_weight':.08,'guide_extra':.08,'command_acc':.7,'command_steer_rate_deg':30.,'near_goal_spin_distance':4.,'near_goal_spin_angle_deg':65.,'blocked_spin_time':1.2,'spin_speed':.6,'cruise_velocity':1.,'lateral_acc_max':.6,'goal_replay_epsilon':.05,'motion_stall_time':3.,'recovery_subgoal_distance':1.8,'recovery_max_retries':2,'goal_max_spin_requests':4}.items():
++        for key,default in {'planning_budget_s':.25,'safety_margin':.12,'heading_weight':.3,'steer_weight':.12,'steer_change_weight':.08,'guide_extra':.08,'command_acc':.7,'command_steer_rate_deg':30.,'near_goal_spin_distance':4.,'near_goal_spin_angle_deg':65.,'blocked_spin_time':1.2,'spin_speed':.6,'cruise_velocity':1.,'lateral_acc_max':.6,'goal_replay_epsilon':.05,'motion_stall_time':3.,'recovery_subgoal_distance':1.8,'recovery_max_retries':2,'goal_max_spin_requests':4}.items():
+             self.declare_parameter(key,default)
+         self.declare_parameter('async_planning', True)
++        self.declare_parameter('planning_result_max_age_s', .8)
+         self.declare_parameter('velocity_horizon_targets',True)
+         cfg = BridgeConfig()
+         cfg.algorithm_frame = self.get_parameter('algorithm_frame').value
+@@ -297,7 +298,8 @@
+         for key in ['near_goal_spin_distance','near_goal_spin_angle_deg','blocked_spin_time','spin_speed','command_acc','command_steer_rate_deg','safety_margin','goal_replay_epsilon','motion_stall_time','recovery_subgoal_distance','recovery_max_retries','goal_max_spin_requests']:
+             setattr(cfg,key,self.get_parameter(key).value)
+         pp.command_steer_rate=math.radians(float(self.get_parameter('command_steer_rate_deg').value))
+-        self._async_planner = AsyncPlanner(planner) if bool(self.get_parameter('async_planning').value) else None
++        result_max_age = float(self.get_parameter('planning_result_max_age_s').value)
++        self._async_planner = AsyncPlanner(planner, max_age=result_max_age) if bool(self.get_parameter('async_planning').value) else None
+         if self._async_planner is not None: planner=self._async_planner
+         self.planner = planner
+ 
+@@ -473,6 +475,9 @@
+         if self._localization_input.uses_tf:
+             return
+         p = msg.pose.pose
++        if self._localization_input.uses_latest_topic:
++            self._localization_input.receive_topic(p, msg.header)
++            return
+         x_body = p.position.x
+         y_body = p.position.y
+         yaw_body = quat_to_yaw(p.orientation.x, p.orientation.y,
+@@ -492,6 +497,9 @@
+         if self._localization_input.uses_tf:
+             return
+         p = msg.pose.pose
++        if self._localization_input.uses_latest_topic:
++            self._localization_input.receive_topic(p, msg.header)
++            return
+         x_body = p.position.x
+         y_body = p.position.y
+         yaw_body = quat_to_yaw(p.orientation.x, p.orientation.y,
+@@ -603,7 +611,7 @@
+         # 算法 dt 同步为真实周期（M1 窗口/预测时域同源）
+         self.planner.params.dt = dt_real
+ 
+-        sample = self._localization_input.sample(cfg.localization_timeout)
++        sample = self._localization_input.sample(cfg.localization_timeout, now=now)
+         if sample is not None:
+             pose, stamp, age = sample
+             x, y, yaw = body_pose_to_base_link(*pose, self._body_to_base_x)
+--- a/src/rda_dwa_real/rda_dwa_real/lidar_track_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/lidar_track_node.py
+@@ -196,6 +196,9 @@
+         if self._localization_input.uses_tf:
+             return
+         p = msg.pose.pose
++        if self._localization_input.uses_latest_topic:
++            self._localization_input.receive_topic(p, msg.header)
++            return
+         x_body = p.position.x
+         y_body = p.position.y
+         yaw_body = quat_to_yaw(p.orientation.x, p.orientation.y,
+@@ -209,7 +212,7 @@
+ 
+     def _cb_cloud(self,msg:PointCloud2):
+         begin=time.monotonic();self._perception_seq+=1
+-        sample = self._localization_input.sample(self._loc_timeout)
++        sample = self._localization_input.sample(self._loc_timeout, now=begin)
+         if sample is not None:
+             pose, stamp, _ = sample
+             self._loc = body_pose_to_base_link(*pose, self._body_to_base_x)
+@@ -217,6 +220,12 @@
+         stamp=msg.header.stamp.sec+msg.header.stamp.nanosec*1e-9
+         self._perception_metrics=dict(schema_version=1,sequence=self._perception_seq,source_stamp=stamp,source_frame=msg.header.frame_id,source_age_s=self.get_clock().now().nanoseconds*1e-9-stamp,raw_points=msg.width*msg.height,raw_bytes=len(msg.data),location_pose_used=self._loc,location_source_stamp=self._loc_t,location_age_s=self.get_clock().now().nanoseconds*1e-9-self._loc_t)
+         self._perception_metrics['localization_input'] = self._localization_input.diagnostic()
++        if self._localization_input.uses_latest_topic:
++            self._perception_metrics.update(
++                location_source_stamp=self._localization_input.stamp,
++                location_effective_stamp=self._loc_t,
++                location_age_s=begin-self._loc_t,
++                location_age_clock='monotonic_receive')
+         try:self._perception_metrics['reason']=self._process_cloud(msg)
+         except Exception as exc:
+             self._perception_metrics['reason']='exception';self._perception_metrics['exception']=type(exc).__name__;raise
+@@ -235,7 +244,8 @@
+         self._last_cloud_source=stamp;self._cloud_source_stamp=msg.header.stamp
+         if self._loc is None:
+             return 'no_localization'  # 尚无定位，不发布（bridge 定位超时急停）
+-        now = self.get_clock().now().nanoseconds * 1e-9
++        now = (time.monotonic() if self._localization_input.uses_latest_topic
++               else self.get_clock().now().nanoseconds * 1e-9)
+         if now - self._loc_t > self._loc_timeout:
+             return 'localization_stale'  # 定位超时，保持上一帧障碍（bridge obstacle_timeout 兜底清空）
+         if self._pub_obs is None:
+--- a/src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
+@@ -177,6 +177,9 @@
+         if self._localization_input.uses_tf:
+             return
+         p = msg.pose.pose
++        if self._localization_input.uses_latest_topic:
++            self._localization_input.receive_topic(p, msg.header, received_at=self._now())
++            return
+         x_body = float(p.position.x)
+         y_body = float(p.position.y)
+         yaw_body = quat_to_yaw(p.orientation.x, p.orientation.y,
+@@ -232,7 +235,7 @@
+     def _control_tick(self):
+         begin=time.monotonic();now=self._now();raw_dt=.02 if self._last_tick is None else now-self._last_tick;dt=max(.001,min(.1,raw_dt));self._last_tick=now
+         reason=''
+-        sample = self._localization_input.sample(self.core.p.localization_timeout)
++        sample = self._localization_input.sample(self.core.p.localization_timeout, now=now)
+         if sample is not None:
+             pose, stamp, age = sample
+             x, y, yaw = body_pose_to_base_link(*pose, self._body_to_base_x)
+--- a/src/rda_dwa_real/config/real_vehicle.yaml
++++ b/src/rda_dwa_real/config/real_vehicle.yaml
+@@ -3,7 +3,7 @@
+ # Safety margin is separate from physical dimensions. Parameters validated offline; see docs/implementation/20261107.
+ rda_dwa_real_bridge:
+   ros__parameters:
+-    localization_source: tf
++    localization_source: latest_topic
+     localization_parent_frame: map
+     localization_child_frame: body
+     algorithm_frame: map
+@@ -42,7 +42,7 @@
+     gps_topic: ''
+     gps_yaw_topic: ''
+     gps_yaw_use_diff: false
+-    localization_timeout: 0.35
++    localization_timeout: 2.0
+     obstacle_timeout: 0.4
+     emergency_stop: true
+     enable_trap: true
+@@ -104,7 +104,8 @@
+     ack_a_max: 0.7
+     ack_dec_max: 1.2
+     async_planning: true
+-    planning_budget_s: 0.08
++    planning_budget_s: 0.25
++    planning_result_max_age_s: 0.8
+     safety_margin: 0.12
+     heading_weight: 0.3
+     steer_weight: 0.4
+@@ -144,7 +145,7 @@
+     bridge_state_topic: /car_bridge_state
+ traj_tracker_node:
+   ros__parameters:
+-    localization_source: tf
++    localization_source: latest_topic
+     localization_parent_frame: map
+     localization_child_frame: body
+     wheelbase: 0.69
+@@ -218,7 +219,7 @@
+     spin_wait_timeout: 7.0
+     spin_stop_speed: 0.035
+     yaw_stop_rate: 0.06
+-    localization_timeout: 0.35
++    localization_timeout: 2.0
+     obstacle_timeout: 0.4
+     safety_margin: 0.12
+     use_atomic_plan: true
+@@ -227,7 +228,7 @@
+     stop_window_s: 1.0
+ lidar_track_node:
+   ros__parameters:
+-    localization_source: tf
++    localization_source: latest_topic
+     localization_parent_frame: map
+     localization_child_frame: body
+     vehicle_length: 1.2
+@@ -258,4 +259,4 @@
+     static_speed_thr: 0.15
+     static_hold_frames: 10
+     static_small_thr: 0.6
+-    loc_timeout: 0.5
++    loc_timeout: 2.0
+--- a/src/rda_dwa_real/rda_dwa_real/async_planner.py
++++ b/src/rda_dwa_real/rda_dwa_real/async_planner.py
+@@ -6,16 +6,18 @@
+     while True:
+         item=input_queue.get()
+         if item is None:return
+-        seq,stamp,robot,goal,obs,trap,steer,age=item
++        seq,stamp,robot,goal,obs,trap,steer,age,plan_dt=item
+         try:
+             started=time.monotonic();planner.current_steer=steer;planner.obstacle_age=age
++            planner.params.dt=plan_dt
+             result=planner.plan(robot,goal,obs,trap)
+-            packet=(seq,stamp,robot,goal,result,planner.reference,dict(planner.telemetry,worker_duration_s=time.monotonic()-started,sampled_pose=[robot.x,robot.y,robot.theta],sampled_velocity=robot.v,sampled_steer=steer,sampled_obstacle_age_s=age))
++            packet=(seq,stamp,robot,goal,result,planner.reference,dict(planner.telemetry,worker_duration_s=time.monotonic()-started,worker_queue_delay_s=max(0.,started-stamp),sampled_control_dt_s=plan_dt,sampled_pose=[robot.x,robot.y,robot.theta],sampled_velocity=robot.v,sampled_steer=steer,sampled_obstacle_age_s=age))
+         except Exception as exc:packet=(seq,stamp,robot,goal,(False,0.,0.),[],{'reason':'planning_exception','error':type(exc).__name__})
+         output_queue.put(('result',packet))
+ 
+ class AsyncPlanner:
+-    def __init__(self,planner,max_age=.3):
++    def __init__(self,planner,max_age=.8):
++        if not math.isfinite(max_age) or max_age<=0:raise ValueError('planning result max age must be positive')
+         self.base=planner;self.max_age=max_age;self.reference=[];self.telemetry={}
+         self.current_steer=0.;self.obstacle_age=0.;self._pending=False;self._ready=False;self._seq=0;self._result=None
+         ctx=multiprocessing.get_context('spawn');self._input=ctx.Queue(1);self._output=ctx.Queue(2)
+@@ -29,7 +31,7 @@
+             if kind=='ready':self._ready=True
+             else:self._pending=False;self._result=payload
+         if self._ready and not self._pending and self._process.is_alive():
+-            self._seq+=1;item=(self._seq,now,copy.copy(robot),tuple(goal),copy.deepcopy(obs),copy.deepcopy(trap),self.current_steer,self.obstacle_age)
++            self._seq+=1;item=(self._seq,now,copy.copy(robot),tuple(goal),copy.deepcopy(obs),copy.deepcopy(trap),self.current_steer,self.obstacle_age,self.params.dt)
+             try:self._input.put_nowait(item);self._pending=True
+             except queue.Full:pass
+         self.reference=[]
+@@ -38,9 +40,16 @@
+         seq,stamp,pose,old_goal,result,reference,telemetry=self._result
+         err=(robot.theta-pose.theta+math.pi)%(2*math.pi)-math.pi
+         age=now-stamp
+-        if old_goal!=tuple(goal) or age>self.max_age+1e-6 or math.hypot(robot.x-pose.x,robot.y-pose.y)>.18 or abs(err)>math.radians(12):
+-            self.telemetry=dict(telemetry,reason='planning_result_stale',result_age_s=age,sequence=seq,goal_changed=old_goal!=tuple(goal),pose_displacement_m=math.hypot(robot.x-pose.x,robot.y-pose.y),yaw_change_rad=err,pending=self._pending);return False,0.,0.
+-        self.reference=reference;self.telemetry=dict(telemetry,result_age_s=age,sequence=seq)
++        displacement=math.hypot(robot.x-pose.x,robot.y-pose.y)
++        stale_causes=[]
++        if old_goal!=tuple(goal):stale_causes.append('goal_changed')
++        if age>self.max_age+1e-6:stale_causes.append('result_age')
++        if displacement>.18:stale_causes.append('pose_displacement')
++        if abs(err)>math.radians(12):stale_causes.append('yaw_change')
++        details=dict(telemetry,worker_reason=telemetry.get('reason'),result_age_s=age,max_result_age_s=self.max_age,sequence=seq,goal_changed=old_goal!=tuple(goal),pose_displacement_m=displacement,yaw_change_rad=err,pending=self._pending,stale_causes=stale_causes)
++        if stale_causes:
++            self.telemetry=dict(details,reason='planning_result_stale');return False,0.,0.
++        self.reference=reference;self.telemetry=details
+         return result
+     def close(self):
+         if self._process.is_alive():

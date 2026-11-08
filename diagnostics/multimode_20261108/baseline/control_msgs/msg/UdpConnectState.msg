@@ -1,0 +1,1 @@
+bool[6] connect_state

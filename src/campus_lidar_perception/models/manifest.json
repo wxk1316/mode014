@@ -1,0 +1,111 @@
+{
+  "centerpoint_revision": "494c8171def40bd36cc2feb323e0a5acbfab132b",
+  "harp_weight_revision": "c2cd3ce5940be23bfbc2d1cf22131fd2fd3dc149",
+  "harp_code_revision": "69c52ddc54e1fefaa7e64ac8e3fffea33e814eda",
+  "files": [
+    {
+      "path": "models/centerpoint_base/pts_voxel_encoder.onnx",
+      "url": "https://huggingface.co/AutowareFoundation/lidar_centerpoint/resolve/494c8171def40bd36cc2feb323e0a5acbfab132b/base/pts_voxel_encoder.onnx",
+      "bytes": 7429,
+      "sha256": "dc1a876580d86ee7a341d543f8ade2ede7f43bd032dc5b44155b1f0175405764",
+      "import_adaptation": false
+    },
+    {
+      "path": "models/centerpoint_base/pts_backbone_neck_head.onnx",
+      "url": "https://huggingface.co/AutowareFoundation/lidar_centerpoint/resolve/494c8171def40bd36cc2feb323e0a5acbfab132b/base/pts_backbone_neck_head.onnx",
+      "bytes": 20140082,
+      "sha256": "3fe7e128955646740c41a25be0c8f141d5a94594fe79d7405fe2a859e391542e",
+      "import_adaptation": false
+    },
+    {
+      "path": "models/centerpoint_base/ml_package.param.yaml",
+      "url": "https://huggingface.co/AutowareFoundation/lidar_centerpoint/resolve/494c8171def40bd36cc2feb323e0a5acbfab132b/base/ml_package.param.yaml",
+      "bytes": 1595,
+      "sha256": "76f737ae242416fa59035b84cfbae966d1ef2a8c47556d7dea97e6fa8cdae444",
+      "import_adaptation": false
+    },
+    {
+      "path": "models/centerpoint_base/detection_class_remapper.param.yaml",
+      "url": "https://huggingface.co/AutowareFoundation/lidar_centerpoint/resolve/494c8171def40bd36cc2feb323e0a5acbfab132b/base/detection_class_remapper.param.yaml",
+      "bytes": 2667,
+      "sha256": "c711f8875ece9b527dfe31ffc75f8c0de2e77945ef67860a959a4e04c36772d5",
+      "import_adaptation": false
+    },
+    {
+      "path": "models/harpnext_nuscenes/ckpt_best.pth",
+      "url": "https://huggingface.co/samir-abh/HARP-NeXt/resolve/c2cd3ce5940be23bfbc2d1cf22131fd2fd3dc149/harpnext-nuscenes-32x480/ckpt_best.pth",
+      "bytes": 64865210,
+      "sha256": "6f7fc5a1c03e9123541458358b1c703babf37ffc0b8b4ea6beac6c9f8478a147",
+      "import_adaptation": false
+    },
+    {
+      "path": "models/harpnext_nuscenes/net.yaml",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/configs/net/harpnext-nuscenes.yaml",
+      "bytes": 1927,
+      "sha256": "431f7d91379dd9360494ced78258fe54277a292f1a6a513340f620fdb609a8b5",
+      "import_adaptation": false
+    },
+    {
+      "path": "models/harpnext_nuscenes/classes.yaml",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/datasets/nuscenes/nuscenes.yaml",
+      "bytes": 11183,
+      "sha256": "5d9da3335a26840b255acd5d4a2b56f323d2ea54572a61a19d02d4eb74d2a978",
+      "import_adaptation": false
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/core/network.py",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/core/network.py",
+      "bytes": 2855,
+      "sha256": "a9f1c736096efb7546050f661b312343209d84b1eb9c46d2b216e45d97c0a5b2",
+      "import_adaptation": true
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/core/harpnext_core/encoder/features_encoder.py",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/core/harpnext_core/encoder/features_encoder.py",
+      "bytes": 4618,
+      "sha256": "28f3581e4e31010580178fc50e1a4fb04a9b40d46b078fdd26f57f4110084358",
+      "import_adaptation": true
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/core/harpnext_core/backbone/harpnext_backbone.py",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/core/harpnext_core/backbone/harpnext_backbone.py",
+      "bytes": 15286,
+      "sha256": "4a9788e7a46ed01f8886fc4817f75f139c8b7f5a32252027079b3d9914ea86dd",
+      "import_adaptation": true
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/core/harpnext_core/decode_heads/harpnext_head.py",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/core/harpnext_core/decode_heads/harpnext_head.py",
+      "bytes": 3381,
+      "sha256": "063d1d2178238f3fd3ffb0791e135c6cb9def479654cde0e0a45aff31f6788bb",
+      "import_adaptation": true
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/core/harpnext_core/decode_heads/aux_head.py",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/core/harpnext_core/decode_heads/aux_head.py",
+      "bytes": 2915,
+      "sha256": "fa5dd895db790e9e80684065f0701d9b09f01f66afbe979bdefc6cd2e110ce24",
+      "import_adaptation": true
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/core/harpnext_core/segmentor/harpnext.py",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/core/harpnext_core/segmentor/harpnext.py",
+      "bytes": 4314,
+      "sha256": "f3bdeeab3812c4af5fea011369733a94d0399d2ea31b8d3813ee92a491bf801e",
+      "import_adaptation": true
+    },
+    {
+      "path": "campus_lidar_perception/vendor/harpnext/LICENSE",
+      "url": "https://raw.githubusercontent.com/SamirAbouHaidar/HARP-NeXt/69c52ddc54e1fefaa7e64ac8e3fffea33e814eda/LICENSE",
+      "bytes": 10773,
+      "sha256": "53e47abe78f77e45b9ee13527e953608208109115df71e2ced3c161c9a1e4c5c",
+      "import_adaptation": false
+    }
+  ],
+  "normalized_harp_weights": {
+    "tensor_count": 293,
+    "parameters_unchanged": true,
+    "bytes": 21671976,
+    "sha256": "eddc36aeb45e53d3fdf2b71670f10f199da1364f3faf775de9e29937b3a35647"
+  }
+}

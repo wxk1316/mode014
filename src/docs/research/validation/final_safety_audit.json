@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-06",
+  "scope": "Functional read-only cross-module audit and coordinated C fixes; no ROS/UDP/performance tests",
+  "test_file": "tests/test_research_final_safety.py",
+  "tests": 10,
+  "passed": 10,
+  "original_failures": [
+    "unknown/dynamic lawful wait consumed trap budget",
+    "repeated planner deadline consumed recovery ACK budget",
+    "zero/missing wheel feedback failed to distinguish pose noise movement evidence"
+  ],
+  "resolved_by": "control agent, coordinated by root",
+  "attempt_count_semantics": "conservatively consumed requests; rollback does not renew attempts",
+  "sha256": {
+    "rda_dwa_real/rda_dwa_real/vehicle_bridge.py": "d6a103654b3b6d6e82c578a9eb8b96ecd5d953491a13c3701546d5841365c1b6",
+    "rda_dwa_real/rda_dwa_real/traj_tracker_core.py": "e64ba3bd94868c47cc073194c37c7379e9af338a719b4ec869252f2eb7924422",
+    "rda_dwa/rda_dwa/hybrid_primitives.py": "c180d037ccd8e96b0593bf4593b514c2953a6d97e73bb3f106c2ea670ce33dfa",
+    "tests/test_research_final_safety.py": "7feef80ffe736785bb34b05e18e2e362d5a4aa1c408c38be194a1eaa5cad3970",
+    "docs/research/cross_final_safety_review.md": "b59868ae43c1f1e9c30dd8917b7618b6fa4ee0daf191c188a0a2dac3322bd89d"
+  }
+}

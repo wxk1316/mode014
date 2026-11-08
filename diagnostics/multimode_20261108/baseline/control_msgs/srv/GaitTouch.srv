@@ -1,0 +1,3 @@
+bool gait_touch_switch
+---
+string feedback

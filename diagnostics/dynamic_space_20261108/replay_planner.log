@@ -1,0 +1,15 @@
+{
+  "note": "497 formerly yielding snapshots; recorded obstacles matched approximately to planner request receipt time; initial acceleration/rate unavailable and set to zero in both comparisons. Greedy/Hungarian tracking is not rerun. Frozen poses do not demonstrate closed-loop vehicle movement.",
+  "frames": 497,
+  "before_reasons": {
+    "dynamic_yield": 494,
+    "motion": 3
+  },
+  "after_reasons": {
+    "motion": 433,
+    "dynamic_yield": 64
+  },
+  "before_positive": 3,
+  "after_positive": 433,
+  "after_speed_p50": 1.0
+}

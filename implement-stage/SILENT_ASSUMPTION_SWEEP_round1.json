@@ -1,0 +1,84 @@
+{
+  "actual_model_identity": "unknown",
+  "scope_note": "Audit of the inspected source version. Findings do not treat unfinished scenario experiments or parameter selection as final. Subsequent fixes require the second sweep.",
+  "undeclared": [
+    {
+      "site": "diagnostics/multimode_20261108/campaign.py:24-46,102-120,164; src/rda_dwa_real/config/real_vehicle.yaml:112-114",
+      "decision": "The campaign constructs a synchronous planner despite async_planning=true, and simulated time remains fixed while core.step() computes. Reported duration_s excludes computation latency; plan_p95_ms and plan_max_ms are separate wall-clock measurements.",
+      "why_it_matters": "A-002 and A-011 do not declare this execution model. Campaign completion time and collision outcomes cannot directly validate production asynchronous planning, result expiration, or motion during worker latency. This concerns the meaning of future results, not their unfinished values.",
+      "class": "semantic"
+    },
+    {
+      "site": "diagnostics/multimode_20261108/campaign.py:135-144; src/control/car_ctr/src/car_ctr.cpp:145-155,203-205",
+      "decision": "The simulator supplies ground-truth v and omega for the driver's stopped predicate, while production derives that predicate from the localization velocity estimate. Only the estimator's valid flag is shared with the simulator.",
+      "why_it_matters": "The noisy campaign therefore gives the driver a stronger stop oracle than production. Its transition and robustness results do not establish that the production stop estimate behaves the same way under the injected localization noise.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/rda_dwa_real/rda_dwa_real/async_planner.py:27; src/rda_dwa_real/rda_dwa_real/multimode_supervisor.py:52-53,71; src/rda_dwa/rda_dwa/multimode_planner.py:52-68",
+      "decision": "AsyncPlanner delegates switch_candidate as a method bound to its base planner, although the supervisor writes current_steer, obstacle_age, current_acc and current_steer_rate onto the wrapper.",
+      "why_it_matters": "Mode-switch validation silently uses different state from the submitted worker plan. A read-only reproduction set wrapper steering to 0.8 rad and obstacle age to 0.12 s; the delegated method still saw base steering 0 and age 0. Consequently its stationary waiting and collision prediction do not use the current actuator and observation state.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:31-40,99-105; src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py:217-222",
+      "decision": "An accepted v2 plan with an empty reference retains the previous reference unless its reason is reached, crab_hold or mode_switch_wait. In particular, dynamic_wait is considered healthy but does not clear or replace the old motion.",
+      "why_it_matters": "The supposedly authoritative atomic plan can request waiting while the tracker continues the preceding trajectory until its timeout. Reproduction: after a reference requesting 0.5 m/s, an empty dynamic_wait plan left two reference points active and the next LQR step increased output from 0.3 to 0.3008 m/s.",
+      "class": "interface"
+    },
+    {
+      "site": "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:93-98 in the inspected version; src/rda_dwa_real/rda_dwa_real/traj_tracker_core.py:174-176",
+      "decision": "SPIN v2 reports reached from one qualifying pose-estimator check inside the angular tolerance, without applying configured spin_stop_hold and without requiring the outgoing spin command to be zero.",
+      "why_it_matters": "This changes the completion result relative to the preserved baseline's pending/brake/hold sequence. Reproduction with a 0.01 rad target error, valid stationary pose history and residual _spin_w=0.2 produced result=reached and bridge_state=3 while commanding speed=0.184. A supervisor may consume completion before the requested braking hold has occurred.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py:48-58,90-92; src/rda_dwa_real/rda_dwa_real/multimode_supervisor.py:12-13,35-43",
+      "decision": "Replacing a goal during SPIN resets _arbit to ACK but preserves _mm_desired=4 and the old spin target. The next multimode step continues publishing the old SPIN intent.",
+      "why_it_matters": "The goal/session replacement behavior is undeclared and internally inconsistent: matching spin completion is accepted only when _arbit is SPIN_REQUEST. Reproduction after a new goal returned reason=spin_active, motion_mode=SPIN, the old target 3.14, and arbit=ACK; matching reached feedback was ignored.",
+      "class": "interface"
+    },
+    {
+      "site": "diagnostics/multimode_20261108/campaign.py:144,161",
+      "decision": "The trace field ready records active, which is only last['turnmode']==mode, rather than driver.ready or completion of the mechanical waiting phase.",
+      "why_it_matters": "After a zero-speed command in the echoed target mode is delivered, trace ready can become true during WAIT_MECHANICAL. A reader using this field to verify readiness or measure the three-second transition would receive a different meaning from production /car_driver/mode_state.ready.",
+      "class": "semantic"
+    }
+  ],
+  "stale_rows": [
+    {
+      "row": "A-009",
+      "site": "src/control/car_ctr/src/mode_transaction.hpp:24-32; src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:56-74",
+      "stated": "A valid full-plane localization velocity window and continuous standstill are required before switching; invalid data cannot count as stationary.",
+      "actual": "The driver's early return for invalid body data or stale feedback preserves stopped_at. The tracker likewise preserves _v2_stop_at across its safety and stale-driver early returns.",
+      "why_it_matters": "An invalid interval contributes elapsed time to the required stop hold. Using the existing compiled driver policy, valid/stopped at t=0, invalid body data at t=0.08 and 0.24, then valid/stopped at t=0.40 immediately entered RESET. It did not acquire another continuous valid stop interval.",
+      "class": "interface"
+    },
+    {
+      "row": "A-013",
+      "site": "src/rda_dwa/rda_dwa/multimode_planner.py:100-110",
+      "stated": "Reverse ACK avoidance is added when the three-second switch cannot finish in time and forward ACK has no safe complete action.",
+      "actual": "Any confirmed approaching obstacle can trigger reverse_candidate before forward ACK is evaluated. Neither stated fallback condition is checked.",
+      "why_it_matters": "This is a different avoidance policy from the ledger. Reproduction with a pedestrian at (7,0), vx=-0.2 yielded a feasible forward ACK command of 1.0 m/s, while MultiModePlanner selected reverse at -0.8 m/s.",
+      "class": "interface"
+    },
+    {
+      "row": "A-013",
+      "site": "src/rda_dwa/rda_dwa/multimode_planner.py:80,98; src/rda_dwa_real/rda_dwa_real/multimode_tracking.py:37,101-105 in the inspected version",
+      "stated": "Reverse execution remains mode 0 and is checked using the independent signed model.",
+      "actual": "Direction is inferred only from reference[0][3] < 0. A reverse schedule's braking segment emits -0.0 targets while its forecast still contains backward motion; -0.0 < 0 is false, so that reference enters forward LQR and its forward collision guard.",
+      "why_it_matters": "The stopping segment of a real reverse schedule loses its signed-model execution check. A read-only reproduction using backward reference positions and -0.0 speeds selected branch=LQR with reverse_ref=false.",
+      "class": "interface"
+    },
+    {
+      "row": "A-011",
+      "site": "diagnostics/multimode_20261108/tune.py:5-10",
+      "stated": "Specified scenes form the tuning set; additional campus geometries and noise seeds form the validation set.",
+      "actual": "campus_planter is explicitly included among the six tuning cases.",
+      "why_it_matters": "The current split declaration is inaccurate. Any later claim about held-out campus validation must identify campus_planter as tuning data and distinguish the remaining validation cases. This finding makes no assumption about unfinished validation outputs.",
+      "class": "semantic"
+    }
+  ],
+  "semantic_undeclared": 5,
+  "verdict": "gaps"
+}

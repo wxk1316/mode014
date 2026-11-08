@@ -1,0 +1,35 @@
+{
+  "primary_runs": 127,
+  "noise_cold_runs": 69,
+  "clean_cold_runs": 23,
+  "noise_warm_runs": 18,
+  "cluster_snapshot_runs": 17,
+  "boundary_representation_comparison_runs": 110,
+  "noise_outcomes": {
+    "collision": 18,
+    "not_reached": 17,
+    "reached": 13,
+    "not_exited_u": 8,
+    "exited_u": 10,
+    "safe_blocked": 3
+  },
+  "warm_dynamic_outcomes": {
+    "collision": 18
+  },
+  "clean_outcomes": {
+    "collision": 6,
+    "reached": 6,
+    "not_reached": 4,
+    "exited_u": 4,
+    "not_exited_u": 2,
+    "safe_blocked": 1
+  },
+  "cluster_snapshot_outcomes": {
+    "not_exited_u": 6,
+    "reached": 6,
+    "not_reached": 2,
+    "safe_blocked": 1,
+    "clearance_below_12cm": 2
+  },
+  "current_production_code_modified": false
+}

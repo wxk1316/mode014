@@ -1,0 +1,48 @@
+{
+  "case": "staggered_barriers",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 45.92,
+  "goal_distance_m": 0.18656088052686584,
+  "min_gap_m": 0.16118811326507526,
+  "collision": false,
+  "switches": [
+    {
+      "t": 12.8,
+      "mode": 4
+    },
+    {
+      "t": 18.8,
+      "mode": 0
+    },
+    {
+      "t": 28.6,
+      "mode": 4
+    },
+    {
+      "t": 36.32,
+      "mode": 0
+    }
+  ],
+  "spin_count": 2,
+  "crab_count": 0,
+  "trap_ticks": 150,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.7441429399883559,
+  "reasons": {
+    "motion": 200,
+    "blocked": 3,
+    "execution_collision_guard": 43,
+    "spin_requested": 2,
+    "spin_active": 149,
+    "spin_reached": 2,
+    "mode_return_wait": 60,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 2.9107148831826635,
+  "plan_max_ms": 3.5616249951999635,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

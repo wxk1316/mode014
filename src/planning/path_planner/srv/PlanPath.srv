@@ -1,0 +1,6 @@
+geometry_msgs/Pose start_pose
+geometry_msgs/Pose goal_pose
+---
+bool success
+string message
+nav_msgs/Path[] segments

@@ -1,0 +1,12 @@
+# 主agent补充来源核查
+
+截止2026-11-06（Asia/Shanghai）；实际联网搜索+原文/作者仓库读取。原始网页摘要/代码元数据在validation/source_root与exact_readme，禁止把搜索标题当已部署事实。下面来源支持系统路线比较，不引入新依赖。
+
+|ID/类别|作者/题目/年份/刊物|稳定原文|官方实现/许可/权重|实验与适用边界|影响力证据/本车对应|
+|---|---|---|---|---|---|
+|R26-EX/规划性能、多模式|Chen Peng, Zhikang Ge, Wenwu Lu, Haiming Gao, Stavros Vougioukas, Peng Wei. EXACT-MPPI: Exact Signed-Distance Navigation for Arbitrary-Footprint Robots from Point Clouds via Path Integral Control. 2026，arXiv预印本v2；未核实会议发表|[arXiv/DOI](https://doi.org/10.48550/arXiv.2605.29663)，[原文v1](https://arxiv.org/html/2605.29663v1)|[作者仓库](https://github.com/caseypen/EXACT-mppi)，Readme.md确认JAX CPU/CUDA12、Ubuntu22.04/Python3.10、Humble/Gazebo/Docker；无需训练权重，根LICENSE未找到/APIlicense null，许可待确认|多底盘2D足迹/低速运动学；SecIV-D批量距离，IV-F分模式+切换惩罚/冷却；V-F动态只重规划当前点云，无显式未来运动预测|2026-11-06作者仓库API98stars（短期关注证据，非持续影响证明）。本车采用独立NumPy批量时序撞检思想与模式成本比较，保留未来障碍、3秒/ready条件；不移植MPPI实现或定理|
+|R25-DRA/动态避障|Elia Trevisan, Khaled A. Mustafa, Godert Notten, Xinwei Wang, Javier Alonso-Mora. Dynamic Risk-Aware MPPI for Mobile Robots in Crowds via Efficient Monte Carlo Approximations. 2025，arXivv2作者注明IROS2025 Accepted Version|[原文](https://arxiv.org/html/2506.21205v2)，[DOI](https://doi.org/10.48550/arXiv.2506.21205)|本轮原文仅核实pedsim实验链接，未找到作者算法官方代码/权重/许可；不当部署候选|人群随机未来轨迹的MonteCarlo联合碰撞概率，实车与仿真比较S-MPC/Frenet/MPPI；概率可信度需要预测分布|IROS2025接受是评审状态证据，引用量未查。作为概率风险路线比较；当前CV/unknown可达包络缺统计校准，不能输出论文意义CP|
+|E-MPPI/官方工程|Nav2 MPPI Controller，滚动官方文档与README（2026访问），非单独论文条目|[Jazzy官方配置](https://docs.nav2.org/jazzy/configuration_and_development/configuration_guide/controller_plugins/mppi_controller/configuring_mppic/)|[官方实现](https://github.com/ros-navigation/navigation2/tree/main/nav2_mppi_controller)，license需按子包检查（整个repo API Other不足判断）|支持DiffDrive/Omni/Ackermann；batch与rollout/critic、最小曲率约束；不能用文档示例时间证明本机预算|Nav2发布实现提供可核实采用；本轮比较完整优化替换成本与依赖，不直接覆盖既有模式ready/反馈链|
+|E-SMAC/官方工程|Nav2 Smac Hybrid-A* Planner，滚动官方文档（2026访问）|[官方配置](https://docs.nav2.org/rolling/configuration_and_development/configuration_guide/planners_plugins/smac/smac_hybrid/configuring_smac_hybrid/)|[官方实现](https://github.com/ros-navigation/navigation2/tree/main/nav2_smac_planner)；许可需子包核对，无模型权重|SE2非完整约束、倒车/转弯半径/解析连接代价与最大长度；离散地图/全局规划输入要求不同|官方生产实现可核实；本轮轻量有界局部SE2引导独立实现，后续DWA保持动态时序与制动检查，无完备性声称|
+
+专业理论和本车推导：DWA/SE2/混合模式的共同状态可写z=(x,y,yaw,v,delta,m,phase,t_wait)。ACK用后轴bicycle再转换中心，SPIN中心yaw变化；未知模式满足protocol_confirmed才可用。候选可行条件不是仅J小，而是每时刻足迹与障碍可达集合分离，换轮等待与返回换轮也在H内。deadline要求未完整验证的结果丢弃；安全停车仍依赖反应/制动/速度上界/感知覆盖的配置假设。此推导属于本车工程适配，不是以上来源直接给出的本车安全证明。

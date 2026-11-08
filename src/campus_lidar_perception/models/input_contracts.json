@@ -1,0 +1,99 @@
+{
+  "pts_voxel_encoder.onnx": {
+    "inputs": [
+      {
+        "name": "input_features",
+        "shape": [
+          "num_voxels",
+          "num_max_points",
+          9
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "pillar_features",
+        "shape": [
+          "num_voxels",
+          1,
+          32
+        ]
+      }
+    ]
+  },
+  "pts_backbone_neck_head.onnx": {
+    "inputs": [
+      {
+        "name": "spatial_features",
+        "shape": [
+          "batch_size",
+          32,
+          "H",
+          "W"
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "heatmap",
+        "shape": [
+          "batch_size",
+          5,
+          "H",
+          "W"
+        ]
+      },
+      {
+        "name": "reg",
+        "shape": [
+          "batch_size",
+          2,
+          "H",
+          "W"
+        ]
+      },
+      {
+        "name": "height",
+        "shape": [
+          "batch_size",
+          1,
+          "H",
+          "W"
+        ]
+      },
+      {
+        "name": "dim",
+        "shape": [
+          "batch_size",
+          3,
+          "H",
+          "W"
+        ]
+      },
+      {
+        "name": "rot",
+        "shape": [
+          "batch_size",
+          2,
+          "H",
+          "W"
+        ]
+      },
+      {
+        "name": "vel",
+        "shape": [
+          "batch_size",
+          2,
+          "H",
+          "W"
+        ]
+      }
+    ]
+  },
+  "harpnext": {
+    "tensor_count": 293,
+    "parameters_unchanged": true,
+    "bytes": 21671976,
+    "sha256": "eddc36aeb45e53d3fdf2b71670f10f199da1364f3faf775de9e29937b3a35647"
+  }
+}

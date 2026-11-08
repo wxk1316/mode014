@@ -1,0 +1,10 @@
+int8 enable
+int8 mode
+int8 wrn
+float32 fdb_speed
+float32 giv_speed
+float32 fdb_pos
+float32 giv_pos
+float32 current
+float32 voltage
+int32 heartbeat

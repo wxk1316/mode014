@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-06",
+  "checks": {
+    "centre_compensation_zero": true,
+    "footprint_centre_zero": true,
+    "footprint_geometry": true,
+    "wheelbase_shared": true,
+    "rear_reference_shared": true,
+    "speed_limits_shared": true,
+    "accel_brake_shared": true,
+    "steer_shared": true,
+    "physical_switch_minimum": true,
+    "physical_stop_timeout_shared": true,
+    "physical_stop_gates_enabled": true,
+    "reaction_covers_watchdog": true,
+    "planning_budget_within_period": true,
+    "tracking_correction_unenabled": true,
+    "protected_localization_byte_identical": true
+  },
+  "protected_files_checked": 40,
+  "failure_files": [],
+  "centre_to_rear_status": "symmetric-wheelbase assumption, not independently measured",
+  "vehicle_limit_status": "configured motion bounds, not a calibration certificate",
+  "steering_measurement_available": false,
+  "scope": "read-only YAML and SHA256; no ROS, DDS or vehicle"
+}

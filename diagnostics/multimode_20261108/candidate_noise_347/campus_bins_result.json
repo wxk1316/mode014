@@ -1,0 +1,51 @@
+{
+  "case": "campus_bins",
+  "baseline": false,
+  "noise": true,
+  "seed": 347,
+  "reached": true,
+  "duration_s": 51.62,
+  "goal_distance_m": 0.15191083554574736,
+  "min_gap_m": 0.13835424727559598,
+  "collision": false,
+  "switches": [
+    {
+      "t": 5.6000000000000005,
+      "mode": 4
+    },
+    {
+      "t": 14.52,
+      "mode": 0
+    },
+    {
+      "t": 19.8,
+      "mode": 1
+    }
+  ],
+  "spin_count": 1,
+  "crab_count": 1,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.5424039305091823,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "mode_switch_wait": 93,
+    "planning_pending": 3,
+    "motion": 15,
+    "spin_requested": 1,
+    "spin_active": 112,
+    "spin_reached": 1,
+    "planning_result_stale": 6,
+    "crab_requested": 1,
+    "crab_motion": 282,
+    "goal_braking": 1,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 10.814158036373556,
+  "plan_max_ms": 31.668208015616983,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

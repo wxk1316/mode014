@@ -1,0 +1,30 @@
+{
+  "case": "staggered_tight",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 90.0,
+  "goal_distance_m": 5.0,
+  "min_gap_m": 1.1,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "planning_pending": 2,
+    "mode_switch_wait": 1,
+    "bounded_static_no_route": 1,
+    "recovery_exhausted": 896
+  },
+  "final_reason": "recovery_exhausted",
+  "plan_p95_ms": 0.0059999903896823525,
+  "plan_max_ms": 77.30545802041888,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

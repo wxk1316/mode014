@@ -1,0 +1,54 @@
+{
+  "case": "campus_full_block",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 90.0,
+  "goal_distance_m": 3.488747158780654,
+  "min_gap_m": 0.3204898491802233,
+  "collision": false,
+  "switches": [
+    {
+      "t": 2.12,
+      "mode": 4
+    },
+    {
+      "t": 12.8,
+      "mode": 0
+    },
+    {
+      "t": 28.12,
+      "mode": 4
+    },
+    {
+      "t": 38.72,
+      "mode": 0
+    }
+  ],
+  "spin_count": 2,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 3.041763079823016,
+  "reasons": {
+    "planning_pending": 3,
+    "orientation_stall": 28,
+    "spin_requested": 2,
+    "spin_active": 217,
+    "spin_reached": 2,
+    "mode_return_wait": 60,
+    "planning_result_stale": 6,
+    "motion": 237,
+    "goal_braking": 27,
+    "blocked": 14,
+    "recovery_exhausted": 304
+  },
+  "final_reason": "recovery_exhausted",
+  "plan_p95_ms": 3.321974683785811,
+  "plan_max_ms": 3.891874977853149,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "legacy modeled 3s with truth stop gate",
+  "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+}

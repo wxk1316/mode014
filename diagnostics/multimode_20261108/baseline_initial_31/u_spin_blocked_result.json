@@ -1,0 +1,24 @@
+{
+  "case": "u_spin_blocked",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 60.0,
+  "goal_distance_m": 2.0,
+  "min_gap_m": 0.2499999999999999,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "orientation_stall": 600
+  },
+  "final_reason": "orientation_stall",
+  "plan_p95_ms": 3.463796153664589,
+  "plan_max_ms": 7.07733299350366,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

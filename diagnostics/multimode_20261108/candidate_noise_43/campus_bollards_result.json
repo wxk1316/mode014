@@ -1,0 +1,37 @@
+{
+  "case": "campus_bollards",
+  "baseline": false,
+  "noise": true,
+  "seed": 43,
+  "reached": true,
+  "duration_s": 16.42,
+  "goal_distance_m": 0.07117674221613053,
+  "min_gap_m": 0.17351184348363613,
+  "collision": false,
+  "switches": [
+    {
+      "t": 1.32,
+      "mode": 1
+    }
+  ],
+  "spin_count": 0,
+  "crab_count": 1,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "crab_requested": 1,
+    "mode_switch_wait": 43,
+    "planning_result_stale": 3,
+    "crab_motion": 116,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 7.977033196948454,
+  "plan_max_ms": 13.256542006274685,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

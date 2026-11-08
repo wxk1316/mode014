@@ -1,0 +1,206 @@
+{
+  "u_shape": {
+    "first_naive_window_without_goal_progress": {
+      "end_t": 12.5,
+      "path_m": 0.41920000000000013,
+      "best_goal_progress_m": 0.027800000000000047
+    },
+    "flagged_windows": 151,
+    "checks": [
+      {
+        "t": 10.0,
+        "pose": [
+          0.5156000000000005,
+          0.0,
+          0.0
+        ],
+        "safe_spin_target_rad": -2.8797932657906435,
+        "spin_eval_ms": 4.324333000113256,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 122
+      },
+      {
+        "t": 20.0,
+        "pose": [
+          -0.9674000000000007,
+          0.0,
+          0.0
+        ],
+        "safe_spin_target_rad": -2.356194490192345,
+        "spin_eval_ms": 4.2389579975861125,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 123
+      },
+      {
+        "t": 30.0,
+        "pose": [
+          -0.3182939591348102,
+          0.027587388567865193,
+          0.08403144956537287
+        ],
+        "safe_spin_target_rad": 2.7020253275568678,
+        "spin_eval_ms": 4.267459000402596,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 125
+      }
+    ]
+  },
+  "thick_u": {
+    "first_naive_window_without_goal_progress": {
+      "end_t": 16.7,
+      "path_m": 0.10171895913482842,
+      "best_goal_progress_m": 0.018999908477042915
+    },
+    "flagged_windows": 160,
+    "checks": [
+      {
+        "t": 10.0,
+        "pose": [
+          0.7679972204564258,
+          0.0013810029990643164,
+          0.00399540098357303
+        ],
+        "safe_spin_target_rad": 2.883788666774217,
+        "spin_eval_ms": 4.081791004864499,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 125
+      },
+      {
+        "t": 20.0,
+        "pose": [
+          0.7682930553871548,
+          0.008464769529035904,
+          0.0250747573499219
+        ],
+        "safe_spin_target_rad": 2.9048680231405655,
+        "spin_eval_ms": 4.032124998047948,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 124
+      },
+      {
+        "t": 30.0,
+        "pose": [
+          0.7625094221455576,
+          0.013876401502257442,
+          0.04164234308336026
+        ],
+        "safe_spin_target_rad": 2.9214356088740043,
+        "spin_eval_ms": 4.147125000599772,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 114
+      }
+    ]
+  },
+  "narrow_u": {
+    "first_naive_window_without_goal_progress": {
+      "end_t": 13.3,
+      "path_m": 0.2654000000000001,
+      "best_goal_progress_m": 0.027800000000000047
+    },
+    "flagged_windows": 139,
+    "checks": [
+      {
+        "t": 10.0,
+        "pose": [
+          0.8180000000000006,
+          0.0,
+          0.0
+        ],
+        "safe_spin_target_rad": null,
+        "spin_eval_ms": 2.0786669992958196,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 118
+      },
+      {
+        "t": 20.0,
+        "pose": [
+          -0.21740000000000026,
+          0.0,
+          0.0
+        ],
+        "safe_spin_target_rad": null,
+        "spin_eval_ms": 2.129667002009228,
+        "guide_50ms_status": "timeout",
+        "guide_waypoint": null,
+        "guide_expansions": 113
+      },
+      {
+        "t": 30.0,
+        "pose": [
+          0.4364000000000113,
+          0.0,
+          0.0
+        ],
+        "safe_spin_target_rad": null,
+        "spin_eval_ms": 2.1104999977978878,
+        "guide_50ms_status": "path",
+        "guide_waypoint": [
+          -0.4635999999999888,
+          0.0
+        ],
+        "guide_expansions": 93
+      }
+    ]
+  },
+  "multi_blocks": {
+    "first_naive_window_without_goal_progress": null,
+    "flagged_windows": 0,
+    "checks": [
+      {
+        "t": 10.0,
+        "pose": [
+          0.4932000000000018,
+          0.0,
+          0.0
+        ],
+        "safe_spin_target_rad": -1.0471975511965974,
+        "spin_eval_ms": 3.789458001847379,
+        "guide_50ms_status": "path",
+        "guide_waypoint": [
+          -0.4067999999999983,
+          0.0
+        ],
+        "guide_expansions": 27
+      },
+      {
+        "t": 20.0,
+        "pose": [
+          0.6419999028097189,
+          0.0002574278377640415,
+          0.0007524247132515199
+        ],
+        "safe_spin_target_rad": -1.3082445142824957,
+        "spin_eval_ms": 3.667750002932735,
+        "guide_50ms_status": "path",
+        "guide_waypoint": [
+          -0.25799984242596613,
+          -0.00041975434026535674
+        ],
+        "guide_expansions": 33
+      },
+      {
+        "t": 30.0,
+        "pose": [
+          0.641199862421095,
+          0.00030704668827245883,
+          0.0008891995217665447
+        ],
+        "safe_spin_target_rad": -1.3081077394739806,
+        "spin_eval_ms": 3.723499998159241,
+        "guide_50ms_status": "path",
+        "guide_waypoint": [
+          -0.2587997817748231,
+          -0.0004932327758571885
+        ],
+        "guide_expansions": 33
+      }
+    ]
+  }
+}

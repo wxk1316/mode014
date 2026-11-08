@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-06",
+  "inputs": "synthetic source-stamped detections; no real vehicle logs",
+  "baseline_kf_sha256": "e39a2c0414935c0242f089199e019841b9181d0341a8a6a07bdb9347cbe67ada",
+  "sha256": {
+    "rda_dwa_real/rda_dwa_real/kf_tracker.py": "849faf116afc1548a8758b954e4ee7d3c2bac508debca9f5901f51a049f3c988",
+    "rda_dwa_real/rda_dwa_real/lidar_track_node.py": "0dbd79eec4a90363504d040be8963a686f578489a0f8f92b357f2156c82e6a48",
+    "rda_dwa_real/rda_dwa_real/obstacle_fusion.py": "c7dc2c59d9b2dc00fe2531072728f52c813dc5ff8a2a43c4ff89179997489658",
+    "rda_dwa_real/rda_dwa_real/frame_utils.py": "fdd2239dd0861e771e1a5d0fe30d0e6a6a5da6581322adbd8f2c043d896ea896",
+    "tests/test_research_perception.py": "52207703bea6e49ceaae6de5cee942601d63eb604a730987ff680c3d79013e4c",
+    "tests/test_research_cross_module.py": "9344ff13a9e67628aa6962f2e310a96f1df1ec9ee871ee724e1bc10717c3e461",
+    "docs/research/perception_comparison.json": "267d89a0ae28e78ce7e060a982e75ff5d8006e83ca663274d1c23f54843452b4",
+    "docs/research/perception_noise_sweep.json": "afa77a46d10d8f4e5edb7022067bfc3dcf6c3c8afa10c5edaff90b20de519264"
+  }
+}

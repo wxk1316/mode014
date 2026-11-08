@@ -1,0 +1,277 @@
+--- a/src/rda_dwa_real/rda_dwa_real/bridge_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/bridge_node.py
+@@ -55,6 +55,7 @@
+ from .frame_utils import quat_to_yaw, is_body_frame, body_pose_to_base_link
+ from .dqn_infer import DQNPolicy
+ from .telemetry_recording import safe_data
++from .localization_input import LocalizationInput
+ # 2026-11-06 重构：/rda/traj 改为"前方 2.5m 路基"（里程域积分，见 vehicle_bridge._build_road_base），
+ # 不再使用 predict_reference_traj / traj_point_count（定时域预测）与 traj_cache（时序缓存，已下移跟踪层）。
+ 
+@@ -70,6 +71,7 @@
+ 
+     def __init__(self):
+         super().__init__('rda_dwa_real_bridge')
++        self._localization_input = LocalizationInput(self)
+ 
+         # ---------------- 参数 ----------------
+         self.declare_parameter('algorithm_frame', 'map')
+@@ -468,6 +470,8 @@
+         /localization 给的是 body 在 map 下的位姿；算法消费 base_link 位姿，
+         需在此处做 body→base_link 2D 偏移补偿。
+         """
++        if self._localization_input.uses_tf:
++            return
+         p = msg.pose.pose
+         x_body = p.position.x
+         y_body = p.position.y
+@@ -485,6 +489,8 @@
+ 
+         与 _cb_odom 同理：amcl 位姿为 body 系，需补偿为 base_link。
+         """
++        if self._localization_input.uses_tf:
++            return
+         p = msg.pose.pose
+         x_body = p.position.x
+         y_body = p.position.y
+@@ -596,6 +602,12 @@
+         self._last_cycle_t = now
+         # 算法 dt 同步为真实周期（M1 窗口/预测时域同源）
+         self.planner.params.dt = dt_real
++
++        sample = self._localization_input.sample(cfg.localization_timeout)
++        if sample is not None:
++            pose, stamp, age = sample
++            x, y, yaw = body_pose_to_base_link(*pose, self._body_to_base_x)
++            self.core.set_localization(x, y, yaw, stamp, arrival=now-age)
+ 
+         t0 = time.monotonic()
+         info = self.core.step(dt=dt_real, now=now)
+@@ -757,6 +769,7 @@
+         diag = {
+             't': float(self.core._t_now),
+             'reason': info.get('reason',''),
++            'localization_input': self._localization_input.diagnostic(),
+             'timing':info.get('timing'),
+             'pose':dict(centre=self.core.centre(),rear=[self.core.robot.x,self.core.robot.y,self.core.robot.theta],source_stamp=self.core._pose_source,arrival_age_s=self.core._t_now-self.core._t_loc,v_estimate=self.core._v_meas),
+             'goal':self.core._goal,
+--- a/src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py
+@@ -27,6 +27,7 @@
+ from .telemetry_recording import safe_data
+ from .traj_tracker_core import TrajTrackerCore, TrajTrackerParams, wrap_angle
+ from .frame_utils import quat_to_yaw, body_pose_to_base_link
++from .localization_input import LocalizationInput
+ from rda_dwa.motion_safety import TrackedObstacle
+ from rda_dwa_real_msgs.msg import ObstacleArray
+ from control_msgs.msg import CarState
+@@ -41,6 +42,7 @@
+ 
+     def __init__(self):
+         super().__init__('traj_tracker_node')
++        self._localization_input = LocalizationInput(self)
+         pp = TrajTrackerParams()
+ 
+         # ---------------- 数值参数 ----------------
+@@ -172,6 +174,8 @@
+ 
+     def _cb_loc(self, msg: Odometry):
+         """/localization（body 位姿）→ base_link 补偿（与 bridge_node 同一口径）。"""
++        if self._localization_input.uses_tf:
++            return
+         p = msg.pose.pose
+         x_body = float(p.position.x)
+         y_body = float(p.position.y)
+@@ -228,6 +232,12 @@
+     def _control_tick(self):
+         begin=time.monotonic();now=self._now();raw_dt=.02 if self._last_tick is None else now-self._last_tick;dt=max(.001,min(.1,raw_dt));self._last_tick=now
+         reason=''
++        sample = self._localization_input.sample(self.core.p.localization_timeout)
++        if sample is not None:
++            pose, stamp, age = sample
++            x, y, yaw = body_pose_to_base_link(*pose, self._body_to_base_x)
++            self.core.set_pose(x, y, yaw, stamp=stamp, arrival=now-age)
++            self._loc = (x, y, yaw)
+         if now-self._last_cmd_ts>self.core.p.cmd_timeout:reason='plan_timeout'
+         elif now-self.core._pose_at>self.core.p.localization_timeout:reason='localization_timeout'
+         elif now-self.core._obstacle_at>self.core.p.obstacle_timeout:reason='obstacle_timeout'
+@@ -238,6 +248,7 @@
+         self._publish(cmd)
+         self._control_seq+=1
+         packet=dict(schema_version=1,producer_monotonic_ns=time.monotonic_ns(),producer_ros_ns=self.get_clock().now().nanoseconds,sequence=self._control_seq,raw_dt_s=raw_dt,used_dt_s=dt,duration_s=time.monotonic()-begin,mode=self.core.mode,stage=self.core._spin_stage,session=self.core._session,result=self.core._spin_result,target_yaw_rad=self.core._spin_target,safety_reason=self.core._safety_reason,command=cmd,tracking=self.core.diag,measured_v_estimate=self.core._v_meas,yaw_rate_estimate=self.core._yaw_rate,centre=self.core._centre,rear_pose=[self.core._px,self.core._py,self.core._pyaw],pose_source_stamp=self.core._pose_stamp,pose_arrival_age_s=now-self.core._pose_at,obstacle_source_stamp=self.core._obstacle_source,obstacle_age_s=now-self.core._obstacle_at,wheel_max_cached=self.core._wheel_max,wheel_arrival_age_s=now-self.core._wheel_at,mode_echo=self.core._mode_echo,mode_echo_age_s=now-self.core._mode_echo_at,reference_seq=self.core._ref_seq,reference_age_s=now-self.core._last_traj_ts,reference_points=len(self.core._ref),steer_rate_rad_s=self.core._steer_rate,acceleration_state=self.core._acc,pid_integral=self.core._pid_i)
++        packet['localization_input'] = self._localization_input.diagnostic()
+         self._pub_control_diag.publish(String(data=json.dumps(safe_data(packet),allow_nan=False)))
+ 
+     # ==================================================================
+--- a/src/rda_dwa_real/rda_dwa_real/lidar_track_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/lidar_track_node.py
+@@ -54,6 +54,7 @@
+ from .obstacle_fusion import Clusterer, cluster_bounding_box, infer_type
+ from .frame_utils import body_to_world_2d, quat_to_yaw, body_pose_to_base_link
+ from .kf_tracker import GlobalKFTracker
++from .localization_input import LocalizationInput
+ 
+ 
+ class LidarTrackNode(Node):
+@@ -61,6 +62,7 @@
+ 
+     def __init__(self):
+         super().__init__('lidar_track_node')
++        self._localization_input = LocalizationInput(self)
+ 
+         # ---------------- 参数 ----------------
+         self.declare_parameter('points_topic', '/rslidar_points')
+@@ -191,6 +193,8 @@
+     # 回调
+     # ==================================================================
+     def _cb_odom(self, msg: Odometry):
++        if self._localization_input.uses_tf:
++            return
+         p = msg.pose.pose
+         x_body = p.position.x
+         y_body = p.position.y
+@@ -205,8 +209,14 @@
+ 
+     def _cb_cloud(self,msg:PointCloud2):
+         begin=time.monotonic();self._perception_seq+=1
++        sample = self._localization_input.sample(self._loc_timeout)
++        if sample is not None:
++            pose, stamp, _ = sample
++            self._loc = body_pose_to_base_link(*pose, self._body_to_base_x)
++            self._loc_t = stamp
+         stamp=msg.header.stamp.sec+msg.header.stamp.nanosec*1e-9
+         self._perception_metrics=dict(schema_version=1,sequence=self._perception_seq,source_stamp=stamp,source_frame=msg.header.frame_id,source_age_s=self.get_clock().now().nanoseconds*1e-9-stamp,raw_points=msg.width*msg.height,raw_bytes=len(msg.data),location_pose_used=self._loc,location_source_stamp=self._loc_t,location_age_s=self.get_clock().now().nanoseconds*1e-9-self._loc_t)
++        self._perception_metrics['localization_input'] = self._localization_input.diagnostic()
+         try:self._perception_metrics['reason']=self._process_cloud(msg)
+         except Exception as exc:
+             self._perception_metrics['reason']='exception';self._perception_metrics['exception']=type(exc).__name__;raise
+--- a/src/rda_dwa_real/config/real_vehicle.yaml
++++ b/src/rda_dwa_real/config/real_vehicle.yaml
+@@ -3,6 +3,9 @@
+ # Safety margin is separate from physical dimensions. Parameters validated offline; see docs/implementation/20261107.
+ rda_dwa_real_bridge:
+   ros__parameters:
++    localization_source: tf
++    localization_parent_frame: map
++    localization_child_frame: body
+     algorithm_frame: map
+     body_frames:
+     - base_link
+@@ -141,6 +144,9 @@
+     bridge_state_topic: /car_bridge_state
+ traj_tracker_node:
+   ros__parameters:
++    localization_source: tf
++    localization_parent_frame: map
++    localization_child_frame: body
+     wheelbase: 0.69
+     max_steer_deg: 30.0
+     v_max: 1.0
+@@ -221,6 +227,9 @@
+     stop_window_s: 1.0
+ lidar_track_node:
+   ros__parameters:
++    localization_source: tf
++    localization_parent_frame: map
++    localization_child_frame: body
+     vehicle_length: 1.2
+     vehicle_width: 0.8
+     points_topic: /rslidar_points
+--- a/src/rda_dwa_real/package.xml
++++ b/src/rda_dwa_real/package.xml
+@@ -9,6 +9,7 @@
+ 
+   <depend>rda_dwa</depend>
+   <depend>rclpy</depend>
++  <depend>tf2_ros</depend>
+   <depend>rcl_interfaces</depend>
+   <exec_depend>ros2bag</exec_depend>
+   <exec_depend>rosbag2_transport</exec_depend>
+@@ -25,6 +26,7 @@
+   <exec_depend>launch_ros</exec_depend>
+ 
+   <test_depend>python3-pytest</test_depend>
++  <test_depend>python3-yaml</test_depend>
+ 
+   <export>
+     <build_type>ament_python</build_type>
+--- /dev/null
++++ b/src/rda_dwa_real/rda_dwa_real/localization_input.py
+@@ -0,0 +1,77 @@
++"""Read the existing localization TF without changing its publishers.
++
++The vehicle's /localization header can refer to an older fusion sample. TF's
++map -> odom -> body chain has the current pose and its acquisition timestamp.
++All consumers must select the same source; a failed TF lookup never falls back
++to the cached topic pose. Core duplicate/jump checks remain in force.
++"""
++import math
++
++from .frame_utils import quat_to_yaw
++
++
++class LocalizationInput:
++    def __init__(self, node):
++        self.node = node
++        node.declare_parameter('localization_source', 'topic')
++        node.declare_parameter('localization_parent_frame', 'map')
++        node.declare_parameter('localization_child_frame', 'body')
++        self.source = str(node.get_parameter('localization_source').value)
++        self.parent = str(node.get_parameter('localization_parent_frame').value)
++        self.child = str(node.get_parameter('localization_child_frame').value)
++        if self.source not in ('topic', 'tf'):
++            raise ValueError('localization_source must be topic or tf')
++        if not self.parent or not self.child or self.parent == self.child:
++            raise ValueError('localization TF needs two different, nonempty frames')
++        self.reason = 'topic' if self.source == 'topic' else 'tf_waiting'
++        self.stamp = None
++        self.age = None
++        if self.source == 'tf':
++            from rclpy.time import Time
++            from tf2_ros import Buffer, TransformListener, TransformException
++            self._time = Time
++            self._exception = TransformException
++            self.buffer = Buffer(node=node)
++            self.listener = TransformListener(self.buffer, node)
++        node.get_logger().info(
++            f'localization_source={self.source} TF={self.parent}->{self.child}')
++
++    @property
++    def uses_tf(self):
++        return self.source == 'tf'
++
++    def sample(self, max_age):
++        """Return (body pose, source stamp, source age), or None.
++
++        Time zero requests TF's latest common time. No blocking timeout is used
++        in the control callbacks. Age remains tied to that source time, so
++        repeatedly reading the same transform cannot keep the vehicle running.
++        """
++        if not self.uses_tf:
++            return None
++        try:
++            transform = self.buffer.lookup_transform(
++                self.parent, self.child, self._time())
++        except self._exception:
++            self.reason = 'tf_unavailable'
++            return None
++        stamp = (transform.header.stamp.sec
++                 + transform.header.stamp.nanosec * 1e-9)
++        age = self.node.get_clock().now().nanoseconds * 1e-9 - stamp
++        self.stamp, self.age = stamp, age
++        tr, q = transform.transform.translation, transform.transform.rotation
++        values = (tr.x, tr.y, tr.z, q.x, q.y, q.z, q.w, stamp, age)
++        if not all(math.isfinite(v) for v in values) or math.hypot(q.x, q.y, q.z, q.w) < 1e-12:
++            self.reason = 'tf_invalid'
++            return None
++        if stamp <= 0 or age > max_age or age < -.05:
++            self.reason = 'tf_stale' if age >= 0 else 'tf_future'
++            return None
++        self.reason = 'tf_valid'
++        pose = (tr.x, tr.y, quat_to_yaw(q.x, q.y, q.z, q.w))
++        return pose, stamp, max(0., age)
++
++    def diagnostic(self):
++        return dict(source=self.source, parent_frame=self.parent,
++                    child_frame=self.child, reason=self.reason,
++                    source_stamp=self.stamp, source_age_s=self.age)

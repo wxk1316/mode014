@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-06",
+  "scope": "Single open-loop escape hypotheses; not DWA recursive safety or vehicle tests.\n\nIncludes .3s stop confirmation hypothesis plus >=3s wheel change and recovery.\nAll mode speeds/acceleration use the existing software bounds. CRAB negative\nspeed, lateral sign and ready IDs remain physically unverified. A safe scheduled\nprimitive does not guarantee a safe stop at every intermediate state or goal\narrival. This script constructs in-memory ROS doubles and sends no UDP.\n",
+  "rows": [
+    {
+      "initial_actor_range_m": 5.0,
+      "action": "ACK_turn",
+      "status": "complete",
+      "scheduled_model_safe": true,
+      "minimum_gap_m": 0.23773231788055899,
+      "schedule_time_s": 5.299999999999989,
+      "terminal_pose": [
+        0.9061327540690659,
+        1.507366558893892,
+        1.551211629939818
+      ],
+      "protocol_verified": true,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 5.0,
+      "action": "SPIN_only",
+      "status": "unsafe_complete",
+      "scheduled_model_safe": false,
+      "minimum_gap_m": -0.7385533905932729,
+      "schedule_time_s": 9.600000000000001,
+      "terminal_pose": [
+        0.0,
+        0.0,
+        1.59074276656308
+      ],
+      "protocol_verified": true,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 5.0,
+      "action": "CRAB_forward_45",
+      "status": "unsafe_complete",
+      "scheduled_model_safe": false,
+      "minimum_gap_m": -0.5075455623578279,
+      "schedule_time_s": 11.900000000000034,
+      "terminal_pose": [
+        1.339083466872024,
+        1.339083466872024,
+        0.0
+      ],
+      "protocol_verified": false,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 5.0,
+      "action": "CRAB_reverse_45",
+      "status": "unsafe_complete",
+      "scheduled_model_safe": false,
+      "minimum_gap_m": -0.3226816584917637,
+      "schedule_time_s": 14.800000000000075,
+      "terminal_pose": [
+        -1.654629867976519,
+        -1.654629867976519,
+        0.0
+      ],
+      "protocol_verified": false,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 5.0,
+      "action": "TRANSLATE",
+      "status": "unsafe_complete",
+      "scheduled_model_safe": false,
+      "minimum_gap_m": -0.089515324207739,
+      "schedule_time_s": 11.900000000000034,
+      "terminal_pose": [
+        1.1595874379426483e-16,
+        1.8937500000000014,
+        0.0
+      ],
+      "protocol_verified": false,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 7.0,
+      "action": "ACK_turn",
+      "status": "complete",
+      "scheduled_model_safe": true,
+      "minimum_gap_m": 1.5705472459170298,
+      "schedule_time_s": 5.299999999999989,
+      "terminal_pose": [
+        0.9061327540690659,
+        1.507366558893892,
+        1.551211629939818
+      ],
+      "protocol_verified": true,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 7.0,
+      "action": "SPIN_only",
+      "status": "unsafe_complete",
+      "scheduled_model_safe": false,
+      "minimum_gap_m": -0.8335533905932739,
+      "schedule_time_s": 9.600000000000001,
+      "terminal_pose": [
+        0.0,
+        0.0,
+        1.59074276656308
+      ],
+      "protocol_verified": true,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 7.0,
+      "action": "CRAB_forward_45",
+      "status": "unsafe_complete",
+      "scheduled_model_safe": false,
+      "minimum_gap_m": -0.04911191563504863,
+      "schedule_time_s": 11.900000000000034,
+      "terminal_pose": [
+        1.339083466872024,
+        1.339083466872024,
+        0.0
+      ],
+      "protocol_verified": false,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 7.0,
+      "action": "CRAB_reverse_45",
+      "status": "complete",
+      "scheduled_model_safe": true,
+      "minimum_gap_m": 0.23682691626454544,
+      "schedule_time_s": 14.800000000000075,
+      "terminal_pose": [
+        -1.654629867976519,
+        -1.654629867976519,
+        0.0
+      ],
+      "protocol_verified": false,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    },
+    {
+      "initial_actor_range_m": 7.0,
+      "action": "TRANSLATE",
+      "status": "complete",
+      "scheduled_model_safe": true,
+      "minimum_gap_m": 0.5935401477335741,
+      "schedule_time_s": 11.900000000000034,
+      "terminal_pose": [
+        1.1595874379426483e-16,
+        1.8937500000000014,
+        0.0
+      ],
+      "protocol_verified": false,
+      "navigation_success": null,
+      "recursive_safe_backup": null
+    }
+  ]
+}

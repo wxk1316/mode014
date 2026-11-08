@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-06",
+  "archive": "docs/research/delivery_20261106.zip",
+  "archive_bytes": 1400210,
+  "archive_sha256": "5d9f7f02855a7d97b3ef24a0e675ce75991ef045115abaef3128c1847f26e407",
+  "manifest_sha256": "50d416d5d95611ca82e6b06471b400f7e5c1d5e75aa8e412ab07e0fc27b644f6",
+  "members_verified": 298,
+  "changed_files_included": 27,
+  "all_hashes_and_crc_passed": true,
+  "python_scripts_parsed": 45,
+  "full_text_and_baseline_excluded": true,
+  "runtime_source_changes_during_packaging": false
+}

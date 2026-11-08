@@ -1,0 +1,85 @@
+RDA-DWA 本轮改动部署清单（2026-11-07）
+========================================
+
+一、覆盖到车上（3 个文件，路径相对 src_doubao/）
+--------------------------------------------------
+1. rda_dwa_real/rda_dwa_real/vehicle_bridge.py     <- src/vehicle_bridge.py
+2. rda_dwa_real/rda_dwa_real/traj_tracker_node.py  <- src/traj_tracker_node.py
+3. rda_dwa_real/config/real_vehicle.yaml           <- config/real_vehicle.yaml
+
+注：traj_tracker_core.py 本轮未改动，不要覆盖（避免与上一批 hotfix 冲突）。
+
+二、vehicle_bridge.py 改了 4 处（都带 2026-11-07 注释，可 grep 定位）
+------------------------------------------------------------------
+1. set_tracker_cmd_speed：abs(v) < thr  ->  <= thr + 0.025
+   （0.05 与底盘量化档位 0.05/0.10 重合，严格小于是 97% 帧清零）
+2. _curvature_infeasible() 重写：
+   |v|>0.1 走原曲率判据；|v|<=0.1 且 |w|<=0.1 且 road_arc<0.2 且未到目标 -> 不可行
+   （原判据在 (v≈0,ω≈0) 形态恒 False，该形态占 96.3% 规划帧，命中 0/1200）
+3. step()：新增 _last_road_arc（路基总弧长）+ info['road_arc']
+4. _arbitration_step()：guarded 门住计数（不只是请求）+ still 阈值 0.05->0.125
+   注意：**不要**再放宽成"有未达目标即算走不动"，S11 实测会退化成 SPIN 空转循环
+
+三、traj_tracker_node.py 改了 1 处
+------------------------------------
+_control_tick 急停门加 `self.core.mode == MODE_ACK and`
+（/cmd_vel 断流不再压死 SPIN；实车 SPIN#1 就是被 cmd_vel_age>2.0 吃掉 6.80s）
+
+四、real_vehicle.yaml（traj_tracker_node 段）
+----------------------------------------------
+spin_w_max        1.0  -> 0.55   （实车端到端 speed=1.0 -> 1.6rad/s，折算 0.88rad/s=50°/s）
+rotate_decel_deg  25.0 -> 45.0
+spin_wait_time    3.0  -> 4.0    （car_ctr 时序 0.26+3.0=3.26s + 余量）
+spin_timeout      6.0  -> 12.0   （转速降 45%，转 180° 需 ~6s）
+
+real_vehicle.yaml（rda_dwa_real_bridge 段）
+-------------------------------------------
+ack_guard_time    2.0  -> 3.0    （"阿克曼≥2s" + 1s 覆盖 car_ctr 起步空窗）
+
+五、编译与重启
+--------------
+
+  cd ~/Desktop/Wxk/car
+  colcon build --packages-select rda_dwa_real
+  source install/setup.bash
+  # car_ctr 未改，不必重建；若重建过，确认 install/.../car_ctr 里
+  # L274 `if (udp->rec_count == 0) return;` 已在使能重试之后
+
+六、上电自检（逐条看数值，不看有没有报错）
+----------------------------------------
+
+  ros2 param get /car_ctr run_enable          # 必须 True
+  ros2 param get /car_ctr remote_ip           # 192.168.15.15
+  ros2 topic hz /car_state                    # 有回帧（一问一答，非高频）
+  ros2 topic echo /rda/traj_mode --once       # 0=ACK 1=SPIN
+  ros2 topic echo /car_cmd --once             # 看 speed/turnmode
+
+七、实车复测要记的三个数（这轮的验证缺口）
+----------------------------------------
+
+1. 架空实测自转：给 speed=1.0，记底盘稳态 °/s
+   目标 50°/s 对应 speed=0.55；若实测不是 1.6rad/s，按 目标ω/实测ω 反算 spin_w_max
+2. 同一"近距离垂直目标"场景，记 goal -> 首个 SPIN_REQUEST 的秒数
+   （实车原值 19.98s，本轮判据理论上能命中，但缩短量只能实车证）
+3. 自转结束回 ACK 后 3s 内，记录 /car_cmd 的 speed 是否出现负值
+   （仿真曾出现 SPIN 的 -1.1 被 ACK 沿用导致倒车；本版 car_ctr 空窗期发
+    SteerModeCtrl 不会沿用，但要在实车确认）
+
+八、回滚
+--------
+
+  从 backup_20261107/ 覆盖同名文件：
+    vehicle_bridge.py -> rda_dwa_real/rda_dwa_real/
+    traj_tracker_node.py -> rda_dwa_real/rda_dwa_real/
+    real_vehicle.yaml -> rda_dwa_real/config/
+
+九、仿真复跑
+------------
+
+  python3 sim_loop.py --variant post \
+    --yaml <上面 yaml> --scenario S1_sparse --max-t 60 --out sim_out/B
+  python3 sim_loop.py --variant pre --pre-root <改前包> \
+    --yaml <backup yaml> --scenario S11_pedestrian --max-t 60 --out sim_out/C
+  python3 sim_summary.py sim_out/*
+
+  详见《闭环仿真测试报告_20261107.md》§9。

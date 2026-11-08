@@ -1,0 +1,15 @@
+{
+  "note": "497 snapshots originally yielding; approximate obstacle matching at request receipt time; missing initial acceleration/rate zero in both comparisons; budgets set 1 s to compare policy. Recorded obstacle boxes remain unchanged; raw-cloud detection/KF not rerun. Frozen poses do not prove vehicle movement.",
+  "frames": 497,
+  "before_reasons": {
+    "motion": 433,
+    "dynamic_yield": 64
+  },
+  "after_reasons": {
+    "motion": 439,
+    "dynamic_yield": 43,
+    "blocked": 15
+  },
+  "before_positive": 433,
+  "after_positive": 439
+}

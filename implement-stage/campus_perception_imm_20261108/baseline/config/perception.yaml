@@ -1,0 +1,43 @@
+campus_lidar_perception:
+  ros__parameters:
+    profile: centerpoint_harpnext
+    points_topic: /rslidar_points
+    odom_topic: /localization
+    obstacles_topic: /rda/obstacles
+    drivable_topic: /rda/drivable_area
+    localization_source: latest_available
+    localization_parent_frame: map
+    localization_child_frame: body
+    base_frame: base_link
+    sensor_frame: rslidar
+    # Follow the current planner's confirmed geometric body-centre reference.
+    body_to_base_link_x: 0.0
+    sensor_x: 0.0
+    sensor_y: 0.0
+    sensor_z: 0.45
+    sensor_roll: 0.0
+    sensor_pitch: 0.0
+    sensor_yaw: 0.0
+    loc_timeout: 0.35
+    max_source_age: 0.4
+    semantic_hz: 5.0
+    semantic_max_age: 0.35
+    semantic_confidence: 0.6
+    max_range: 30.0
+    # Reused recorded ground reference, in the raw LiDAR coordinate system.
+    # Check with actual mounting/PointCloud2 before driving.
+    ground_reference_z: -0.36
+    ground_tolerance: 0.12
+    ground_sensor_height: 0.36
+    obstacle_height: 0.06
+    dropoff_height: 0.06
+    vehicle_length: 1.2
+    vehicle_width: 0.8
+    past_frames: 1
+    intensity_scale: 1.0
+    score_thresholds: [0.35,0.35,0.35,0.35,0.35]
+    tracker_gate: 1.2
+    tracker_max_speed: 15.0
+    tracker_lost_time: 0.4
+    publish_planner: true
+    strict_single_publisher: true

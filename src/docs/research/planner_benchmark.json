@@ -1,0 +1,6482 @@
+{
+  "date": "2026-11-06",
+  "scope": "pure Python synthetic model snapshots; no ROS2/DDS/vehicle/real logs",
+  "quantile_limit": "12 repeated fixed snapshots per case by default; empirical p99 is not a calibrated tail bound",
+  "equal_commands_against_frozen_baseline": {
+    "batch_only": true,
+    "full": true
+  },
+  "results": [
+    {
+      "case": "straight",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 18.46335449954495,
+        "p95": 19.202898098228616,
+        "p99": 19.36347961636784,
+        "max": 19.403624995902646
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "curve",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 17.763312498573214,
+        "p95": 18.66896495084802,
+        "p99": 18.78239299003326,
+        "max": 18.810749999829568
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7497458536542535,
+      "selected_endpoint_heading_error_rad": 0.30958434439128624,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "multi_static",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 39.187332997244084,
+        "p95": 43.52010990260169,
+        "p99": 43.845288385637105,
+        "max": 43.92658300639596
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.8512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "long_wall",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 29.28743699885672,
+        "p95": 30.633087349997368,
+        "p99": 30.63598386797821,
+        "max": 30.636707997473422
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 1.0512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "u",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 16.392312001698883,
+        "p95": 17.204247554400354,
+        "p99": 17.228649514654535,
+        "max": 17.23475000471808
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.75125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "thick_u",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 16.911270504351705,
+        "p95": 17.625468747792183,
+        "p99": 17.630693745959434,
+        "max": 17.631999995501246
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.80125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "narrow_u",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 16.355167001165682,
+        "p95": 17.089466548350174,
+        "p99": 17.156126108311582,
+        "max": 17.172790998301934
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.325,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "narrow_corridor",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 2,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 17.908125002577435,
+        "p95": 18.14170434845437,
+        "p99": 18.190140870647156,
+        "max": 18.202250001195353
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.27499999999999997,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "crossing",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 28.552395498991245,
+        "p95": 29.259616851777537,
+        "p99": 29.263723372569075,
+        "max": 29.26475000276696
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.4676626683990482,
+      "selected_nominal_path_m": 0.6000000000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "headon",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.441271001298446,
+        "p95": 23.117922950405045,
+        "p99": 23.41285099500965,
+        "max": 23.4865830061608
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "rear_approach",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.03731249755947,
+        "p95": 23.25797094963491,
+        "p99": 23.309561393689364,
+        "max": 23.322459004702978
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "unknown_accel_or_reversal",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.804145501140738,
+        "p95": 24.35843940183986,
+        "p99": 24.444587883190252,
+        "max": 24.46612500352785
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "late_frame_compensated_snapshot",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.605208497931017,
+        "p95": 22.030108000035398,
+        "p99": 22.092588001978584,
+        "max": 22.10820800246438
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "rear_blocked",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 8.039437496336177,
+        "p95": 8.279508451596485,
+        "p99": 8.32306888893072,
+        "max": 8.33395899826428
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.3012215295539389,
+      "selected_nominal_path_m": 0.15394961146721486,
+      "selected_endpoint_heading_error_rad": 3.044323285681772,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "far_tiles_128",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 128,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 674.8980000011215,
+        "p95": 680.8346169993456,
+        "p99": 681.6578569995181,
+        "max": 681.8636669995612
+      },
+      "cycle_deadline_100ms_misses": 12,
+      "planner_budget_80ms_misses": 12,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "far_tiles_512",
+      "variant": "baseline",
+      "samples": 12,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 2680.770812501578,
+        "p95": 2721.452408298137,
+        "p99": 2725.068915257507,
+        "max": 2725.9730419973494
+      },
+      "cycle_deadline_100ms_misses": 12,
+      "planner_budget_80ms_misses": 12,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": null,
+        "feasible_count": null,
+        "checked_count": null
+      }
+    },
+    {
+      "case": "straight",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 17.013770499033853,
+        "p95": 17.477899998630164,
+        "p99": 17.567879998678112,
+        "max": 17.590374998690095
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "curve",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 18.482542000128888,
+        "p95": 18.962783000824857,
+        "p99": 18.963223000973812,
+        "max": 18.96333300101105
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7497458536542535,
+      "selected_endpoint_heading_error_rad": 0.30958434439128624,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 111,
+        "feasible_count": 111,
+        "checked_count": 111
+      }
+    },
+    {
+      "case": "multi_static",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 38.16304199790466,
+        "p95": 41.367524849192705,
+        "p99": 41.5304713693331,
+        "max": 41.5712079993682
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.8512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "long_wall",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 29.256104498927016,
+        "p95": 29.83204374540946,
+        "p99": 30.095108744426398,
+        "max": 30.16087499418063
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 1.0512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "u",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 15.419854000356281,
+        "p95": 16.11898489718442,
+        "p99": 16.14386337940232,
+        "max": 16.150082999956794
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.75125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "thick_u",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 15.332458500779467,
+        "p95": 15.457268754107645,
+        "p99": 15.508253751759185,
+        "max": 15.52100000117207
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.80125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "narrow_u",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 16.08820800174726,
+        "p95": 16.319339798064902,
+        "p99": 16.38913435628638,
+        "max": 16.406582995841745
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.325,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "narrow_corridor",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 2,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 18.281166998349363,
+        "p95": 18.665514102758607,
+        "p99": 18.68793562214705,
+        "max": 18.693541001994163
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.27499999999999997,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 26,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "crossing",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 26.644208002835512,
+        "p95": 27.40890840141219,
+        "p99": 27.48451448060223,
+        "max": 27.50341600039974
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.4676626683990482,
+      "selected_nominal_path_m": 0.6000000000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "headon",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.366000503097894,
+        "p95": 23.42656250038999,
+        "p99": 23.59871249864227,
+        "max": 23.64174999820534
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "rear_approach",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.923500000615604,
+        "p95": 23.914193600649014,
+        "p99": 24.09050512011163,
+        "max": 24.134582999977283
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "unknown_accel_or_reversal",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.844583501660964,
+        "p95": 22.260885901050642,
+        "p99": 22.34714438323863,
+        "max": 22.368709003785625
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "late_frame_compensated_snapshot",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 23.46456200029934,
+        "p95": 23.974585449832375,
+        "p99": 24.12948349105136,
+        "max": 24.168208001356106
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "rear_blocked",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 8.71258349798154,
+        "p95": 8.99161904999346,
+        "p99": 9.04209101026936,
+        "max": 9.054709000338335
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.3012215295539389,
+      "selected_nominal_path_m": 0.15394961146721486,
+      "selected_endpoint_heading_error_rad": 3.044323285681772,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 22,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "far_tiles_128",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 128,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 33.896353997988626,
+        "p95": 35.59313940277207,
+        "p99": 36.013027883454924,
+        "max": 36.11800000362564
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "far_tiles_512",
+      "variant": "batch_only",
+      "samples": 12,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 38.525041498360224,
+        "p95": 38.97014595058863,
+        "p99": 39.19729639324942,
+        "max": 39.25408400391461
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "straight",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 10.12250049825525,
+        "p95": 14.073452447701126,
+        "p99": 15.304590488303804,
+        "max": 15.61237499845447
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "curve",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 10.58452050347114,
+        "p95": 10.744502601664863,
+        "p99": 10.803334119773353,
+        "max": 10.818041999300476
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7497458536542535,
+      "selected_endpoint_heading_error_rad": 0.30958434439128624,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 111,
+        "feasible_count": 111,
+        "checked_count": 111
+      }
+    },
+    {
+      "case": "multi_static",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 30.74168750026729,
+        "p95": 32.2671125013585,
+        "p99": 32.26942250294087,
+        "max": 32.27000000333646
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.8512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "long_wall",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 21.189646002312656,
+        "p95": 21.74395350193663,
+        "p99": 21.770023498756927,
+        "max": 21.776540997962
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 1.0512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "u",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 13.256999500299571,
+        "p95": 13.489814399872555,
+        "p99": 13.605662880072487,
+        "max": 13.634625000122469
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.75125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "thick_u",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 12.72172899916768,
+        "p95": 13.086527598716202,
+        "p99": 13.091239114510245,
+        "max": 13.092416993458755
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.80125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "narrow_u",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 12.448041503375862,
+        "p95": 12.639706099798786,
+        "p99": 12.652007622164092,
+        "max": 12.655083002755418
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.325,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "narrow_corridor",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 2,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 16.302542000630638,
+        "p95": 17.967222550942097,
+        "p99": 18.139244511548895,
+        "max": 18.182250001700595
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.27499999999999997,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 26,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "crossing",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 20.219437003106577,
+        "p95": 20.45838910235034,
+        "p99": 20.465410622928175,
+        "max": 20.467166003072634
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.4676626683990482,
+      "selected_nominal_path_m": 0.6000000000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "headon",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.794895499624545,
+        "p95": 22.800437646583305,
+        "p99": 23.11962112558831,
+        "max": 23.19941699533956
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "rear_approach",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.37429150409298,
+        "p95": 24.589556103092036,
+        "p99": 24.917777623559232,
+        "max": 24.99983300367603
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "unknown_accel_or_reversal",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 23.11635399746592,
+        "p95": 25.058666699260357,
+        "p99": 25.140799737055204,
+        "max": 25.161332996503916
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "late_frame_compensated_snapshot",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.763437500339933,
+        "p95": 22.21406045027834,
+        "p99": 22.457178490949445,
+        "max": 22.517958001117222
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "rear_blocked",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 6.591395998839289,
+        "p95": 6.721283150545787,
+        "p99": 6.727956628601532,
+        "max": 6.729624998115469
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.3012215295539389,
+      "selected_nominal_path_m": 0.15394961146721486,
+      "selected_endpoint_heading_error_rad": 3.044323285681772,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 22,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "far_tiles_128",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 128,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 27.290167003229726,
+        "p95": 29.192954199606902,
+        "p99": 29.295657240363653,
+        "max": 29.32133300055284
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "far_tiles_512",
+      "variant": "full",
+      "samples": 12,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 29.438145997119136,
+        "p95": 31.80222150222107,
+        "p99": 32.96151150330843,
+        "max": 33.25133400358027
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "straight",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 10.181624998949701,
+        "p95": 10.549525148962857,
+        "p99": 10.597338626539567,
+        "max": 10.609291995933745
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "curve",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 0,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ],
+        [
+          true,
+          0.25,
+          0.038081244661476985
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 10.578333494777326,
+        "p95": 10.921799847710645,
+        "p99": 11.035026367026148,
+        "max": 11.063332996855024
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": 0.7497458536542535,
+      "selected_endpoint_heading_error_rad": 0.30958434439128624,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 111,
+        "feasible_count": 111,
+        "checked_count": 111
+      }
+    },
+    {
+      "case": "multi_static",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 31.7309585007024,
+        "p95": 32.414490251176176,
+        "p99": 32.581965249046334,
+        "max": 32.623833998513874
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.8512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "long_wall",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 21.90629200413241,
+        "p95": 22.17605230071058,
+        "p99": 22.251676861706073,
+        "max": 22.270583001954947
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 1.0512499999999998,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "u",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 12.982791999093024,
+        "p95": 13.232091699319426,
+        "p99": 13.233484740194399,
+        "max": 13.233833000413142
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.75125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "thick_u",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 12.726208500680514,
+        "p95": 12.765095651047886,
+        "p99": 12.767919128600624,
+        "max": 12.768624997988809
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.80125,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "narrow_u",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 3,
+      "outputs": [
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ],
+        [
+          true,
+          -0.05,
+          -0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 12.764583501848392,
+        "p95": 12.976153950512526,
+        "p99": 13.013664393001818,
+        "max": 13.023042003624141
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.325,
+      "selected_nominal_path_m": 0.1487500000000001,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 43,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "narrow_corridor",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 2,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 15.984458001184976,
+        "p95": 16.68114564890857,
+        "p99": 16.801229126140242,
+        "max": 16.83124999544816
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.27499999999999997,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 26,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "crossing",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ],
+        [
+          true,
+          0.2,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 19.55129150155699,
+        "p95": 20.18619740010763,
+        "p99": 20.205905878174235,
+        "max": 20.210832997690886
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.4676626683990482,
+      "selected_nominal_path_m": 0.6000000000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "headon",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.76439650429529,
+        "p95": 21.92836844624253,
+        "p99": 21.96490648580948,
+        "max": 21.974040995701216
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "rear_approach",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 22.17827049753396,
+        "p95": 23.13053109937755,
+        "p99": 23.218072618401493,
+        "max": 23.23995799815748
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "unknown_accel_or_reversal",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.99068749905564,
+        "p95": 22.695451750041684,
+        "p99": 22.822556751052616,
+        "max": 22.85433300130535
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "late_frame_compensated_snapshot",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ],
+        [
+          false,
+          0.0,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate",
+        "no_safe_candidate"
+      ],
+      "latency_ms": {
+        "p50": 21.653708005032968,
+        "p95": 21.961731397459516,
+        "p99": 22.023679880221607,
+        "max": 22.03916700091213
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": null,
+      "selected_nominal_path_m": null,
+      "selected_endpoint_heading_error_rad": null,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 0,
+        "checked_count": 212
+      }
+    },
+    {
+      "case": "rear_blocked",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 1,
+      "outputs": [
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ],
+        [
+          true,
+          0.05,
+          -0.04183697602823375
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 6.661916500888765,
+        "p95": 6.850870800553821,
+        "p99": 6.86300776025746,
+        "max": 6.86604200018337
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 0.3012215295539389,
+      "selected_nominal_path_m": 0.15394961146721486,
+      "selected_endpoint_heading_error_rad": 3.044323285681772,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 43,
+        "feasible_count": 22,
+        "checked_count": 43
+      }
+    },
+    {
+      "case": "far_tiles_128",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 128,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 27.709479505574564,
+        "p95": 28.529972248361446,
+        "p99": 28.567427251837216,
+        "max": 28.57679100270616
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    },
+    {
+      "case": "far_tiles_512",
+      "variant": "full_budget",
+      "samples": 12,
+      "input_obstacles": 512,
+      "outputs": [
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ],
+        [
+          true,
+          0.25,
+          0.0
+        ]
+      ],
+      "failure_reasons": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "latency_ms": {
+        "p50": 29.11760400093044,
+        "p95": 29.846049998741364,
+        "p99": 29.8555100003432,
+        "max": 29.85787500074366
+      },
+      "cycle_deadline_100ms_misses": 0,
+      "planner_budget_80ms_misses": 0,
+      "minimum_selected_nominal_model_gap_m": 2.4,
+      "selected_nominal_path_m": 0.7487500000000004,
+      "selected_endpoint_heading_error_rad": 0.0,
+      "model_first_margin_TTC_s": null,
+      "mode_switches": 0,
+      "trap_entries": 0,
+      "counts": {
+        "candidate_count": 106,
+        "feasible_count": 106,
+        "checked_count": 106
+      }
+    }
+  ],
+  "frozen_source_sha256": {
+    "rda_dwa/rda_dwa/enhanced_dwa.py": "c83a513b0077b3b295cb50cff9f37974aab98b104bd2e72392669ff1bc6f0d9c",
+    "rda_dwa/rda_dwa/collision_checker.py": "6b75c76311a6ce469a6debec70ac5a121281e4297deab60aed120337aa976181",
+    "rda_dwa/rda_dwa/params.py": "6c96b2fb0570d789164698674da9ba39dec14aad13a671450f56555692c5a8d3",
+    "rda_dwa/rda_dwa/local_guide.py": "da1f7d22c8875ac9a6c5459a9de469adb6ada6e522dce9c38a29373fc08238a7",
+    "rda_dwa/rda_dwa/hybrid_primitives.py": "cdbbcb369ecb16dc684117792913a4ac83c196e0f970633a8fdba4d24f9503f6"
+  }
+}

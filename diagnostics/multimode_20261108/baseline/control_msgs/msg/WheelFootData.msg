@@ -1,0 +1,16 @@
+float32[6] dof
+float32 fx
+float32 fy
+float32 fz
+float32[6] ax_p
+float32[6] ax_v
+float32[6] ax_f
+bool[7] active
+bool touchflag
+float32 wheelspeed
+float32 wheelcv
+float32 ds
+float32 trigger
+float32 f_error
+float32 p_edge
+float32 n_edge

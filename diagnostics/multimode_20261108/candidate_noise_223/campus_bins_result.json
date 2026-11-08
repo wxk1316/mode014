@@ -1,0 +1,59 @@
+{
+  "case": "campus_bins",
+  "baseline": false,
+  "noise": true,
+  "seed": 223,
+  "reached": true,
+  "duration_s": 65.72,
+  "goal_distance_m": 0.14734746385329475,
+  "min_gap_m": 0.14441098314079182,
+  "collision": false,
+  "switches": [
+    {
+      "t": 5.88,
+      "mode": 4
+    },
+    {
+      "t": 16.92,
+      "mode": 0
+    },
+    {
+      "t": 21.72,
+      "mode": 4
+    },
+    {
+      "t": 31.92,
+      "mode": 0
+    },
+    {
+      "t": 37.2,
+      "mode": 1
+    }
+  ],
+  "spin_count": 2,
+  "crab_count": 1,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 1.5576059632995325,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "mode_switch_wait": 139,
+    "planning_pending": 3,
+    "motion": 12,
+    "spin_requested": 2,
+    "spin_active": 239,
+    "spin_reached": 2,
+    "planning_result_stale": 9,
+    "crab_requested": 1,
+    "crab_motion": 246,
+    "goal_braking": 3,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 6.943341149599285,
+  "plan_max_ms": 32.39829099038616,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

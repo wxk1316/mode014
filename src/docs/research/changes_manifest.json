@@ -1,0 +1,205 @@
+{
+  "date": "2026-11-06",
+  "workspace": "/Users/bytedance/learn/src",
+  "git_repository": false,
+  "baseline_manifest_sha256": "5becbf9a79dd8f2a404a45ae4110069f984e8d91d143dad87851c22f6335cc25",
+  "baseline_archive_sha256": "4effb46d27f925223ad76240f39ae5942c1dc79ba9201853e85b091fbbb11e7c",
+  "patch_sha256": "31317be835fa042d52bbcb1722ea73453fd9d745863ca6068534243fd6d1d690",
+  "files": [
+    {
+      "path": "control/car_ctr/src/car_ctr.cpp",
+      "change": "modified",
+      "before_sha256": "a7651371689c71c70070e737f873862b4388dae615477c59a5cd2c19b457ee0a",
+      "after_sha256": "a30a785bd19a749979ad6621723be7cd10a4da080d180ca67932346c63a1b842",
+      "after_mode": 438
+    },
+    {
+      "path": "control/car_ctr/src/mode_switch_guard.hpp",
+      "change": "modified",
+      "before_sha256": "d45951e17faeafbc136b219d8437c31b980c7ad5ce800e09954bab1587c8c75d",
+      "after_sha256": "e0be037919cc4b4e9a0af09eb39993da518dade09f7b283f5447ee16a812b720",
+      "after_mode": 420
+    },
+    {
+      "path": "docs/validation/run_closed_loop.py",
+      "change": "modified",
+      "before_sha256": "ee051fe9b6d4167f8303769c3ecbd967eb6b124548fbfc9b89f4a0974e9408a0",
+      "after_sha256": "7e8987186889cb74345a22522cfe5bfa23fb6e4d19afa917ca4873514087345e",
+      "after_mode": 420
+    },
+    {
+      "path": "docs/validation/run_spin_session.py",
+      "change": "modified",
+      "before_sha256": "5500a300412e1f145ac602d4e009780b4c37bc22546bb9bae29f808fb712756e",
+      "after_sha256": "2b6305f4eeb4cde4890c42ee3fd1a435a57949f782f1fb234ad9ccf15a6b4e46",
+      "after_mode": 420
+    },
+    {
+      "path": "rda_dwa/rda_dwa/collision_checker.py",
+      "change": "modified",
+      "before_sha256": "658fce8f7d9947f418ddae6669dd6bd0c5f6638cb6d895320fb635d21e8452ac",
+      "after_sha256": "6b75c76311a6ce469a6debec70ac5a121281e4297deab60aed120337aa976181",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa/rda_dwa/enhanced_dwa.py",
+      "change": "modified",
+      "before_sha256": "29fc05433cd680f0830c1a68261fafb28e6b7dafcecaaa4cec9acf1f6b893530",
+      "after_sha256": "c83a513b0077b3b295cb50cff9f37974aab98b104bd2e72392669ff1bc6f0d9c",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa/rda_dwa/hybrid_primitives.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "c180d037ccd8e96b0593bf4593b514c2953a6d97e73bb3f106c2ea670ce33dfa",
+      "after_mode": 420
+    },
+    {
+      "path": "rda_dwa/rda_dwa/local_guide.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "da1f7d22c8875ac9a6c5459a9de469adb6ada6e522dce9c38a29373fc08238a7",
+      "after_mode": 420
+    },
+    {
+      "path": "rda_dwa/rda_dwa/params.py",
+      "change": "modified",
+      "before_sha256": "86c7c27e35353ce9efe4ad31a63177993e053de2c2b566db69672e9d7a94e615",
+      "after_sha256": "6c96b2fb0570d789164698674da9ba39dec14aad13a671450f56555692c5a8d3",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/config/real_vehicle.yaml",
+      "change": "modified",
+      "before_sha256": "f6360100a087eef2b6676603a5a411468b26472fbd9bdae61ca58383b647a3ed",
+      "after_sha256": "6b1a0f4a74966a850a434c3ab3ff4c99d4542bd35b8fea04dc4f099dcdf9006f",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/launch/rl_dwa_car.launch.py",
+      "change": "modified",
+      "before_sha256": "d63e387dbc65296b23b079a689db28e5ed64c2053d6d1235d98623adc65d4cbf",
+      "after_sha256": "16f5f378aeed376aef69d0d20f4be4a93a74f8951653733a930e73edf17cf9b9",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/bridge_node.py",
+      "change": "modified",
+      "before_sha256": "3afd22a3d2484eefaf17155b8052747fc1ea83cf40596d51c8022b63544be8da",
+      "after_sha256": "86ffac8e94ac8aeab93c383fe445ac2637c67e14492248e116c26da95b0d5e0a",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/kf_tracker.py",
+      "change": "modified",
+      "before_sha256": "e39a2c0414935c0242f089199e019841b9181d0341a8a6a07bdb9347cbe67ada",
+      "after_sha256": "849faf116afc1548a8758b954e4ee7d3c2bac508debca9f5901f51a049f3c988",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/lidar_track_node.py",
+      "change": "modified",
+      "before_sha256": "3d0008d02f6e87756fb935555cb14ab29c3bc43d3b2956eb62119f8d8404cc25",
+      "after_sha256": "0dbd79eec4a90363504d040be8963a686f578489a0f8f92b357f2156c82e6a48",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/obstacle_fusion.py",
+      "change": "modified",
+      "before_sha256": "9c362456de4878b830b6d9c3aadb3f358b300e0733a8b44085f99523d53a2df5",
+      "after_sha256": "c7dc2c59d9b2dc00fe2531072728f52c813dc5ff8a2a43c4ff89179997489658",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/traj_tracker_core.py",
+      "change": "modified",
+      "before_sha256": "a25ece9df43cab6d3172fa542d509b1477510d3227878b1eaa9388ff5b9f8517",
+      "after_sha256": "e64ba3bd94868c47cc073194c37c7379e9af338a719b4ec869252f2eb7924422",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/traj_tracker_node.py",
+      "change": "modified",
+      "before_sha256": "c405ea457b575088877c6a5b44d5305bb564e21c33bd5fb770d29b142615747c",
+      "after_sha256": "6998c8f20490e567974f270096901adcc18e5f69f3b7d52f83d2059bbefb428d",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real/rda_dwa_real/vehicle_bridge.py",
+      "change": "modified",
+      "before_sha256": "5ba465dcf3dff720f4df66f071a16dc63435b4c35c7a7fd4d67e67a5ae1ad0a5",
+      "after_sha256": "2b6fa0c79cc1073e7c3a9bd8654709528767bd4b618e31ee1cb4431d1e6af1fc",
+      "after_mode": 438
+    },
+    {
+      "path": "rda_dwa_real_msgs/msg/Obstacle.msg",
+      "change": "modified",
+      "before_sha256": "d4090da6b657aa2e62f723c8f7901f8555bdb480726658749e7fc9500fffc5f8",
+      "after_sha256": "3c52d461e13f66ffc2a41c6ba8a318f08fd2171b5f6eee711b443315616ee0f2",
+      "after_mode": 438
+    },
+    {
+      "path": "tests/test_planner_safety.py",
+      "change": "modified",
+      "before_sha256": "acf3a8d706404bfda3eb520c54baf2aa78083b6a79f3238c53488127143367e5",
+      "after_sha256": "a29ac8af3320ad9c6220bef7817d7df0ff42e838c7c9740d327e455cdd3e56d9",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_control.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "7c7511f57def68889d531ea5105e1e176fcf04c15782642f5e93a89207241b9a",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_cross_module.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "9344ff13a9e67628aa6962f2e310a96f1df1ec9ee871ee724e1bc10717c3e461",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_final_safety.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "417db9c5c881a7a46abf27fdc69de6f8f118819113645d52851543a386b6da18",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_mode_switch.cpp",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "8bed9129d1a7070105974b9da476a810a4501b50f489794c91f4048531ee8538",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_perception.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "52207703bea6e49ceaae6de5cee942601d63eb604a730987ff680c3d79013e4c",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_planner.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "2331830c24924d6a24708ec5fb680971f56eff4bc2591abafdb34472785e494b",
+      "after_mode": 420
+    },
+    {
+      "path": "tests/test_research_protocol_constraints.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "5be7e47e7369b360e873f018ea0ef6a87fb435af5ddb067a78f77d40a0b04b2a",
+      "after_mode": 420
+    }
+  ],
+  "exclusions": [
+    "pytest/bytecode caches",
+    "unmodified historical review/validation",
+    "research source-reading caches"
+  ],
+  "localization_preserved": true
+}

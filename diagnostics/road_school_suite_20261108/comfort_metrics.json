@@ -1,0 +1,7 @@
+{
+  "normal_acceleration_m_s2": 0.7000000000000006,
+  "normal_deceleration_m_s2": 0.8736749268358268,
+  "command_jerk_max": 2.000000000000196,
+  "command_steer_rate_max_deg_s": 30.00000000000016,
+  "command_steer_accel_max_deg_s2": 100.00000000002451
+}

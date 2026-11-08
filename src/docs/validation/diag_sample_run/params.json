@@ -1,0 +1,6 @@
+{
+  "schema_version": 2,
+  "synthetic": true,
+  "scope": "Synthetic file-format/mode-timeline smoke test, no ROS/DDS/vehicle",
+  "actual_steering_available": false
+}

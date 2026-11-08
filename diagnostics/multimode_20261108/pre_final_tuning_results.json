@@ -1,0 +1,1368 @@
+[
+  {
+    "config": {
+      "crab_v_max": 0.3,
+      "command_steer_rate_deg": 30.0,
+      "experiment_label": "tune_v0.3_r30.0"
+    },
+    "results": [
+      {
+        "case": "pedestrian_0.5",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 40.54,
+        "goal_distance_m": 0.09571026965854655,
+        "min_gap_m": 0.44869214462255913,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.120000000000001,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.7035696706468778,
+        "reasons": {
+          "motion": 52,
+          "mode_switch_wait": 61,
+          "crab_requested": 1,
+          "crab_motion": 291,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 8.158469005138613,
+        "plan_max_ms": 43.786333000753075,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "car_1.0",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": false,
+        "duration_s": 2.8,
+        "goal_distance_m": 5.0,
+        "min_gap_m": -2.220446049250313e-16,
+        "collision": true,
+        "switches": [],
+        "spin_count": 0,
+        "crab_count": 0,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "dynamic_yield": 27,
+          "mode_switch_wait": 1
+        },
+        "final_reason": "dynamic_yield",
+        "plan_p95_ms": 26.403166992531624,
+        "plan_max_ms": 26.529709022725,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "single_barrier",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 34.54,
+        "goal_distance_m": 0.09445357998196742,
+        "min_gap_m": 0.1815750670007895,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 284,
+          "goal_braking": 13,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.234218242345378,
+        "plan_max_ms": 16.760999977122992,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "staggered_barriers",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": false,
+        "duration_s": 60.0,
+        "goal_distance_m": 2.3561640189531103,
+        "min_gap_m": 0.14593173755846722,
+        "collision": false,
+        "switches": [
+          {
+            "t": 13.64,
+            "mode": 1
+          },
+          {
+            "t": 27.76,
+            "mode": 0
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.1680695740399466,
+        "reasons": {
+          "motion": 113,
+          "mode_switch_wait": 131,
+          "goal_braking": 7,
+          "crab_requested": 1,
+          "crab_motion": 59,
+          "blocked": 14,
+          "recovery_no_safe_heading": 1,
+          "recovery_exhausted": 274
+        },
+        "final_reason": "recovery_exhausted",
+        "plan_p95_ms": 4.342212491610544,
+        "plan_max_ms": 13.881958002457395,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "campus_planter",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 51.92,
+        "goal_distance_m": 0.092942672084297,
+        "min_gap_m": 0.17964891856541332,
+        "collision": false,
+        "switches": [
+          {
+            "t": 6.16,
+            "mode": 4
+          },
+          {
+            "t": 13.6,
+            "mode": 0
+          },
+          {
+            "t": 18.52,
+            "mode": 1
+          }
+        ],
+        "spin_count": 1,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.46899099250517406,
+        "reasons": {
+          "motion": 27,
+          "mode_switch_wait": 93,
+          "spin_requested": 1,
+          "spin_active": 95,
+          "spin_reached": 1,
+          "crab_requested": 1,
+          "crab_motion": 289,
+          "goal_braking": 10,
+          "crab_hold": 2,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.028768460557328,
+        "plan_max_ms": 17.87237499956973,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "lateral_goal",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 11.72,
+        "goal_distance_m": 0.09650083600546243,
+        "min_gap_m": 0.49650006722906315,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 69,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 2.6382625175756393,
+        "plan_max_ms": 5.8290000015404075,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      }
+    ]
+  },
+  {
+    "config": {
+      "crab_v_max": 0.5,
+      "command_steer_rate_deg": 30.0,
+      "experiment_label": "tune_v0.5_r30.0"
+    },
+    "results": [
+      {
+        "case": "pedestrian_0.5",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 31.42,
+        "goal_distance_m": 0.09603971788735557,
+        "min_gap_m": 0.44869214462255913,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.120000000000001,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.7035696706468778,
+        "reasons": {
+          "motion": 52,
+          "mode_switch_wait": 61,
+          "crab_requested": 1,
+          "crab_motion": 200,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 7.292432992835533,
+        "plan_max_ms": 14.490250003291294,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "car_1.0",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": false,
+        "duration_s": 2.8,
+        "goal_distance_m": 5.0,
+        "min_gap_m": -2.220446049250313e-16,
+        "collision": true,
+        "switches": [],
+        "spin_count": 0,
+        "crab_count": 0,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "dynamic_yield": 27,
+          "mode_switch_wait": 1
+        },
+        "final_reason": "dynamic_yield",
+        "plan_p95_ms": 26.507943216711283,
+        "plan_max_ms": 26.640625001164153,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "single_barrier",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 30.12,
+        "goal_distance_m": 0.09328675697350912,
+        "min_gap_m": 0.17485643352702046,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 245,
+          "goal_braking": 8,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.159789616824128,
+        "plan_max_ms": 17.083791986806318,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "staggered_barriers",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": false,
+        "duration_s": 60.0,
+        "goal_distance_m": 4.579576046312431,
+        "min_gap_m": 0.17156173550124204,
+        "collision": false,
+        "switches": [
+          {
+            "t": 18.04,
+            "mode": 4
+          },
+          {
+            "t": 29.6,
+            "mode": 0
+          },
+          {
+            "t": 41.68,
+            "mode": 4
+          },
+          {
+            "t": 51.0,
+            "mode": 0
+          },
+          {
+            "t": 56.0,
+            "mode": 1
+          }
+        ],
+        "spin_count": 2,
+        "crab_count": 1,
+        "trap_ticks": 225,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 4.471711453665586,
+        "reasons": {
+          "motion": 220,
+          "mode_switch_wait": 136,
+          "goal_braking": 3,
+          "blocked": 9,
+          "spin_requested": 2,
+          "spin_active": 219,
+          "spin_reached": 2,
+          "crab_requested": 1,
+          "crab_motion": 8
+        },
+        "final_reason": "crab_motion",
+        "plan_p95_ms": 5.768893753702286,
+        "plan_max_ms": 18.162708991440013,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "campus_planter",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 33.32,
+        "goal_distance_m": 0.09344959129910717,
+        "min_gap_m": 0.1834200347186768,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 276,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.677621152950438,
+        "plan_max_ms": 17.171666986541823,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "lateral_goal",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 11.42,
+        "goal_distance_m": 0.09720082945840361,
+        "min_gap_m": 0.4972000671864165,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 66,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 2.70056260342244,
+        "plan_max_ms": 5.125583993503824,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      }
+    ]
+  },
+  {
+    "config": {
+      "crab_v_max": 0.7,
+      "command_steer_rate_deg": 30.0,
+      "experiment_label": "tune_v0.7_r30.0"
+    },
+    "results": [
+      {
+        "case": "pedestrian_0.5",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 27.92,
+        "goal_distance_m": 0.09420103295729543,
+        "min_gap_m": 0.44869214462255913,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.120000000000001,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.7035696706468778,
+        "reasons": {
+          "motion": 52,
+          "mode_switch_wait": 61,
+          "crab_requested": 1,
+          "crab_motion": 165,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 6.2523649030481545,
+        "plan_max_ms": 14.357834006659687,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "car_1.0",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": false,
+        "duration_s": 2.8,
+        "goal_distance_m": 5.0,
+        "min_gap_m": -2.220446049250313e-16,
+        "collision": true,
+        "switches": [],
+        "spin_count": 0,
+        "crab_count": 0,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "dynamic_yield": 27,
+          "mode_switch_wait": 1
+        },
+        "final_reason": "dynamic_yield",
+        "plan_p95_ms": 26.464358548400924,
+        "plan_max_ms": 26.63379200384952,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "single_barrier",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 29.42,
+        "goal_distance_m": 0.09734511385721988,
+        "min_gap_m": 0.17202152842046453,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 237,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.248683011974209,
+        "plan_max_ms": 16.41733301221393,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "staggered_barriers",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": false,
+        "duration_s": 60.0,
+        "goal_distance_m": 4.579137884054244,
+        "min_gap_m": 0.17156173550124204,
+        "collision": false,
+        "switches": [
+          {
+            "t": 18.04,
+            "mode": 4
+          },
+          {
+            "t": 29.6,
+            "mode": 0
+          },
+          {
+            "t": 41.68,
+            "mode": 4
+          },
+          {
+            "t": 51.0,
+            "mode": 0
+          },
+          {
+            "t": 56.0,
+            "mode": 1
+          }
+        ],
+        "spin_count": 2,
+        "crab_count": 1,
+        "trap_ticks": 225,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 4.471711453665586,
+        "reasons": {
+          "motion": 220,
+          "mode_switch_wait": 136,
+          "goal_braking": 3,
+          "blocked": 9,
+          "spin_requested": 2,
+          "spin_active": 219,
+          "spin_reached": 2,
+          "crab_requested": 1,
+          "crab_motion": 8
+        },
+        "final_reason": "crab_motion",
+        "plan_p95_ms": 5.825658307003319,
+        "plan_max_ms": 18.375375017058104,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "campus_planter",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 32.72,
+        "goal_distance_m": 0.0941664605248343,
+        "min_gap_m": 0.18293189211978514,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 270,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.486789807560849,
+        "plan_max_ms": 16.94504200713709,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "lateral_goal",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 11.52,
+        "goal_distance_m": 0.09354086477339121,
+        "min_gap_m": 0.49354006740939815,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 67,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 2.660760743310675,
+        "plan_max_ms": 4.9584590015001595,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      }
+    ]
+  },
+  {
+    "config": {
+      "crab_v_max": 0.5,
+      "command_steer_rate_deg": 40.0,
+      "experiment_label": "tune_v0.5_r40.0"
+    },
+    "results": [
+      {
+        "case": "pedestrian_0.5",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 31.42,
+        "goal_distance_m": 0.0972682815535078,
+        "min_gap_m": 0.20802283982705158,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.44,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.7372893188515584,
+        "reasons": {
+          "motion": 55,
+          "mode_switch_wait": 61,
+          "crab_requested": 1,
+          "crab_motion": 197,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 7.184450002387169,
+        "plan_max_ms": 14.753458992345259,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "car_1.0",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 32.94,
+        "goal_distance_m": 0.097891760879511,
+        "min_gap_m": 0.29797000922022865,
+        "collision": false,
+        "switches": [
+          {
+            "t": 9.44,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.8285755793904498,
+        "reasons": {
+          "motion": 57,
+          "mode_switch_wait": 66,
+          "dynamic_wait": 3,
+          "crab_requested": 1,
+          "crab_motion": 202,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 7.408493595721671,
+        "plan_max_ms": 14.874250016873702,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "single_barrier",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 30.12,
+        "goal_distance_m": 0.09328675697350912,
+        "min_gap_m": 0.17485643352702046,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 245,
+          "goal_braking": 8,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.592937215056733,
+        "plan_max_ms": 17.446790996473283,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "staggered_barriers",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 41.12,
+        "goal_distance_m": 0.18984564802205298,
+        "min_gap_m": 0.17519909421903976,
+        "collision": false,
+        "switches": [
+          {
+            "t": 14.8,
+            "mode": 4
+          },
+          {
+            "t": 24.28,
+            "mode": 0
+          }
+        ],
+        "spin_count": 1,
+        "crab_count": 0,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 1.6269244333174402,
+        "reasons": {
+          "motion": 263,
+          "mode_switch_wait": 44,
+          "goal_braking": 3,
+          "spin_requested": 1,
+          "spin_active": 99,
+          "spin_reached": 1,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 5.715779039019252,
+        "plan_max_ms": 16.663625021465123,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "campus_planter",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 33.32,
+        "goal_distance_m": 0.09344959129910717,
+        "min_gap_m": 0.1834200347186768,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 276,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.652833007276055,
+        "plan_max_ms": 17.420625023078173,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "lateral_goal",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 11.42,
+        "goal_distance_m": 0.09720082945840361,
+        "min_gap_m": 0.4972000671864165,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 66,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 2.782370510976761,
+        "plan_max_ms": 6.055500009097159,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      }
+    ]
+  },
+  {
+    "config": {
+      "crab_v_max": 0.7,
+      "command_steer_rate_deg": 40.0,
+      "experiment_label": "tune_v0.7_r40.0"
+    },
+    "results": [
+      {
+        "case": "pedestrian_0.5",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 28.02,
+        "goal_distance_m": 0.09674014673697491,
+        "min_gap_m": 0.20802283982705158,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.44,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.7372893188515584,
+        "reasons": {
+          "motion": 55,
+          "mode_switch_wait": 61,
+          "crab_requested": 1,
+          "crab_motion": 163,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 6.49470800999552,
+        "plan_max_ms": 15.165874996455386,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "car_1.0",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 29.32,
+        "goal_distance_m": 0.09533597189683894,
+        "min_gap_m": 0.29797000922022865,
+        "collision": false,
+        "switches": [
+          {
+            "t": 9.44,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.8285755793904498,
+        "reasons": {
+          "motion": 57,
+          "mode_switch_wait": 66,
+          "dynamic_wait": 3,
+          "crab_requested": 1,
+          "crab_motion": 166,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 6.404810291132879,
+        "plan_max_ms": 14.826333004748449,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "single_barrier",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 29.42,
+        "goal_distance_m": 0.09734511385721988,
+        "min_gap_m": 0.17202152842046453,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 237,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.296366806374863,
+        "plan_max_ms": 16.716917016310617,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "staggered_barriers",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 41.12,
+        "goal_distance_m": 0.18984564802205298,
+        "min_gap_m": 0.17519909421903976,
+        "collision": false,
+        "switches": [
+          {
+            "t": 14.8,
+            "mode": 4
+          },
+          {
+            "t": 24.28,
+            "mode": 0
+          }
+        ],
+        "spin_count": 1,
+        "crab_count": 0,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 1.6269244333174402,
+        "reasons": {
+          "motion": 263,
+          "mode_switch_wait": 44,
+          "goal_braking": 3,
+          "spin_requested": 1,
+          "spin_active": 99,
+          "spin_reached": 1,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 5.828262353315949,
+        "plan_max_ms": 13.893541996367276,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "campus_planter",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 32.72,
+        "goal_distance_m": 0.0941664605248343,
+        "min_gap_m": 0.18293189211978514,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 270,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.454893844376776,
+        "plan_max_ms": 18.07612500851974,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "lateral_goal",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 11.52,
+        "goal_distance_m": 0.09354086477339121,
+        "min_gap_m": 0.49354006740939815,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 67,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 2.699541517358739,
+        "plan_max_ms": 4.9978749884758145,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      }
+    ]
+  },
+  {
+    "config": {
+      "crab_v_max": 0.7,
+      "command_steer_rate_deg": 45.0,
+      "experiment_label": "tune_v0.7_r45.0"
+    },
+    "results": [
+      {
+        "case": "pedestrian_0.5",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 28.02,
+        "goal_distance_m": 0.09475880857505216,
+        "min_gap_m": 0.24379580506099305,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.44,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.7991256959713063,
+        "reasons": {
+          "motion": 54,
+          "mode_switch_wait": 61,
+          "dynamic_wait": 1,
+          "crab_requested": 1,
+          "crab_motion": 163,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 6.369166017975658,
+        "plan_max_ms": 15.093458001501858,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "car_1.0",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 29.12,
+        "goal_distance_m": 0.09309967193217063,
+        "min_gap_m": 0.22701150458545072,
+        "collision": false,
+        "switches": [
+          {
+            "t": 8.96,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.8290458566566076,
+        "reasons": {
+          "motion": 49,
+          "mode_switch_wait": 61,
+          "dynamic_wait": 11,
+          "crab_requested": 1,
+          "crab_motion": 169,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 6.4112296473467705,
+        "plan_max_ms": 14.687333983602002,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "single_barrier",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 29.42,
+        "goal_distance_m": 0.09734511385721988,
+        "min_gap_m": 0.17202152842046453,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 237,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.278787496150472,
+        "plan_max_ms": 16.364417009754106,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "staggered_barriers",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 40.82,
+        "goal_distance_m": 0.19003341461666498,
+        "min_gap_m": 0.17536498743642379,
+        "collision": false,
+        "switches": [
+          {
+            "t": 14.8,
+            "mode": 4
+          },
+          {
+            "t": 24.28,
+            "mode": 0
+          }
+        ],
+        "spin_count": 1,
+        "crab_count": 0,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 1.6269513057310396,
+        "reasons": {
+          "motion": 260,
+          "mode_switch_wait": 44,
+          "goal_braking": 3,
+          "spin_requested": 1,
+          "spin_active": 99,
+          "spin_reached": 1,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 5.93554159859195,
+        "plan_max_ms": 13.974625006085262,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "campus_planter",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 32.72,
+        "goal_distance_m": 0.0941664605248343,
+        "min_gap_m": 0.18293189211978514,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 270,
+          "goal_braking": 9,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 4.558666895900385,
+        "plan_max_ms": 18.449583993060514,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      },
+      {
+        "case": "lateral_goal",
+        "baseline": false,
+        "noise": false,
+        "seed": 31,
+        "reached": true,
+        "duration_s": 11.52,
+        "goal_distance_m": 0.09354086477339121,
+        "min_gap_m": 0.49354006740939815,
+        "collision": false,
+        "switches": [
+          {
+            "t": 1.6,
+            "mode": 1
+          }
+        ],
+        "spin_count": 0,
+        "crab_count": 1,
+        "trap_ticks": 0,
+        "exit_at_s": null,
+        "max_abs_yaw_rad": 0.0,
+        "reasons": {
+          "mode_switch_wait": 47,
+          "crab_requested": 1,
+          "crab_motion": 67,
+          "reached": 1
+        },
+        "final_reason": "reached",
+        "plan_p95_ms": 2.713958492677193,
+        "plan_max_ms": 5.155582999577746,
+        "worker_delay_s": 0.0,
+        "time_model": "virtual time excluding synchronous solve wall time",
+        "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+      }
+    ]
+  }
+]

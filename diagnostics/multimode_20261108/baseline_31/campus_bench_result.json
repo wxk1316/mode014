@@ -1,0 +1,29 @@
+{
+  "case": "campus_bench",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 13.52,
+  "goal_distance_m": 0.16553287064538913,
+  "min_gap_m": 0.2475814044149631,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.3219230097882606,
+  "reasons": {
+    "planning_pending": 3,
+    "motion": 132,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 3.352896004798822,
+  "plan_max_ms": 3.643499978352338,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "legacy modeled 3s with truth stop gate",
+  "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+}

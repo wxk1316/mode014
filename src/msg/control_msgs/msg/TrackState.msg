@@ -1,0 +1,8 @@
+int64 timestamp
+string stop_reason
+int32 self_turn_ctr
+int32 turnmode_ctr
+float32 track_angle_err
+float32 track_dis_err
+float32 aim_range
+float32 steering_property

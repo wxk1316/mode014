@@ -1,0 +1,73 @@
+{
+  "scope": "closed-loop engineering simulation; no ROS/UDP/real vehicle",
+  "nominal_count": 21,
+  "nominal_reached": 17,
+  "nominal_collisions": 0,
+  "nominal_min_gap_m": 0.15871416375880498,
+  "required_core_pass": true,
+  "noise_count": 63,
+  "noise_collisions": 0,
+  "noise_margin_violations": [],
+  "noise_failures": [
+    {
+      "seed": 223,
+      "case": "u_window",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 223,
+      "case": "staggered_tight",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 223,
+      "case": "campus_chicane",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 223,
+      "case": "campus_full_block",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 347,
+      "case": "u_window",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 347,
+      "case": "staggered_tight",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 347,
+      "case": "campus_chicane",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 347,
+      "case": "campus_full_block",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 509,
+      "case": "u_window",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 509,
+      "case": "staggered_tight",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 509,
+      "case": "campus_chicane",
+      "reason": "recovery_exhausted"
+    },
+    {
+      "seed": 509,
+      "case": "campus_full_block",
+      "reason": "recovery_exhausted"
+    }
+  ]
+}

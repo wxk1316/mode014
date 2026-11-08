@@ -1,0 +1,816 @@
+ 
+ 
+ 
+ Gradient Field-Based Dynamic Window Approach for Collision Avoidance in Complex Environments 
+ 
+ 
+ 
+ 
+ 
+ // Restore the saved color scheme preference, or
+ // enact the browser preference if "automatic", 
+ // without expecting DOM load to have completed.
+ //
+ // Also restore any saved readingmode and ToC display preferences.
+ function initializeReadingPreferences() {
+ let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+ if (saved_theme === "automatic") {
+ if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+ saved_theme = "dark";
+ }
+ }
+ if (saved_theme == "dark") {
+ document.documentElement.setAttribute("data-theme", "dark");
+ } else {
+ document.documentElement.setAttribute("data-theme", "light");
+ }
+
+ const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+ if (tocDisplay) {
+ document.documentElement.setAttribute("data-toc-display", tocDisplay);
+ }
+ const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+ if (readingMode) {
+ document.documentElement.setAttribute("data-reading-mode", readingMode);
+ }
+ }
+ // Run as soon as JS starts, to minimize repainting
+ initializeReadingPreferences();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ /* Reading mode hides the chrome and the empty .arxiv-html-header marker: the pinned JS reads
+ the marker's display to know which way to toggle. The marker draws no box. */
+ .arxiv-html-header { display: contents; }
+ html[data-reading-mode="enabled"] :is(.arxiv-html-site-chrome, .arxiv-html-header, .ds-site-footer) { display: none; }
+ /* The paper controls' icons are blocks, so they sit centred (the pinned JS shows the theme
+ icon by making its span a block). */
+ .arxiv-html-site-chrome .ds-site-header-tools svg { display: block; width: 18px; height: 18px; flex-shrink: 0; fill: currentColor; }
+ /* ar5iv dims every image in dark mode and puts it on a white wash, for paper figures;
+ arXiv's own render as they are (the logo on the bar, the funder logos on their white
+ chips). Important: ar5iv's dark rules are unlayered, as specific as
+ :root:not([data-theme]) img:not(.ltx_no_dark_filter). */
+ :is(.ds-site-header, .ds-site-footer) img { filter: none !important; }
+ .ds-site-header img { background-color: transparent !important; }
+
+ /* Wide (the theme's 1280px): the theme lays the body out as a grid whose full-width top rows
+ were the band's and its sticky reader bar's. The band takes the first and scrolls away; the
+ header, the paper's bar (no site navigation, the paper's controls), takes the second and
+ stays in view, the one sticky bar, with the anchor clearance that requires (DESIGN-POLICIES).
+ The controls show their names. */
+ @media (min-width: 1280px) {
+ html { scroll-padding-top: 80px; }
+ .arxiv-html-site-chrome { display: contents; }
+ .arxiv-html-site-chrome > #ds-announcement { grid-area: announce; }
+ .arxiv-html-site-chrome > .ds-site-header { grid-area: header; position: sticky; top: 0; z-index: 3; }
+ .arxiv-html-site-chrome .tool-icon { display: none; }
+ }
+ /* Narrow: the header scrolls away, and the controls show icons (names kept for screen
+ readers; Why HTML? goes). The theme's contents panel is fixed below where its old sticky
+ bar was, and hidden only once the reader has closed it, so until then it is an invisible box
+ over the header and the paper: it shows only while open, under the chrome, in its place in
+ the page. The paper's footer (build logs, reporting instructions) keeps the text's side
+ inset; the theme gives it none, so it met the screen edges. */
+ @media (max-width: 1279px) {
+ .arxiv-html-site-chrome .tool-wide { display: none; }
+ .arxiv-html-site-chrome .tool-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+ html:not([data-toc-display="block"]) .ltx_page_navbar { display: none; }
+ .ltx_page_navbar { position: absolute; top: auto; }
+ .arxiv-html-footer { padding-inline: 1rem; }
+ }
+ 
+ 
+ Skip to main content 
+ 
+ 
+ 
+ Report GitHub Issue 
+ × 
+ 
+
+ 
+ Title: 
+ 
+
+ Content selection saved. Describe the issue below: 
+
+ Description: 
+ 
+ 
+
+ 
+ Submit without GitHub 
+ Submit in GitHub 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Why HTML? 
+ 
+ Report Issue 
+ 
+ Back to Abstract 
+ 
+ 
+ Download PDF 
+ 
+ Contents 
+ 
+ 
+ Reading mode 
+ 
+ 
+ Colour theme 
+ 
+ 
+ 
+ 
+ 
+ Abstract 
+ I INTRODUCTION 
+ II Preliminaries 
+ 
+ II-A Dynamic Window Approach 
+ II-B Gaussian Process Distance Field 
+ 
+ III Gradient-aware Sampling-based Motion Planning 
+ 
+ III-A Predictive Obstacle Avoidance based on Gradient Field 
+ III-B Gradient Field-based Dynamic Window Approach 
+ III-C Predictive Fleet Collision Avoidance 
+ 
+ IV Implementation 
+ V Evaluation 
+ 
+ V-A Static Obstacle Avoidance 
+ V-B Gradient information 
+ V-C Multi-robot collision avoidance 
+ 
+ VI Conclusion 
+ References 
+ 
+ 
+ 
+ 
+ 
+ License: arXiv.org perpetual non-exclusive license
+ 
+ 
+arXiv:2504.03260v2 [cs.RO] 08 Jul 2025 
+ 
+ 
+ Gradient Field-Based Dynamic Window Approach for Collision Avoidance in Complex Environments
+ 
+ 
+ 
+ Ze Zhang
+ 
+ Affiliation:  Ze Zhang and Knut Åkesson are with Chalmers University of Technology, 41296 Gothenburg, Sweden {zhze, knut}@chalmers.se 
+ 
+    
+ Yifan Xue
+ 
+ Affiliation:  Yifan Xue and Nadia Figueroa are with the University of Pennsylvania, Philadelphia, PA 19104 USA {yifanxue, nadiafig}@seas.upenn.edu 
+ 
+    
+ Nadia Figueroa
+ 
+ Affiliation:  Yifan Xue and Nadia Figueroa are with the University of Pennsylvania, Philadelphia, PA 19104 USA {yifanxue, nadiafig}@seas.upenn.edu 
+ 
+    
+ Knut Åkesson
+ † † thanks: *This paper has been accepted by IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) 2025, Hangzhou. 
+ Affiliation:  Ze Zhang and Knut Åkesson are with Chalmers University of Technology, 41296 Gothenburg, Sweden {zhze, knut}@chalmers.se 
+ 
+
+ Abstract 
+ 
+ For safe and flexible navigation in multi-robot systems, this paper presents an enhanced and predictive sampling-based trajectory planning approach in complex environments, the Gradient Field-based Dynamic Window Approach (GF-DWA).
+Building upon the dynamic window approach, the proposed method utilizes gradient information of obstacle distances as a new cost term to anticipate potential collisions. This enhancement enables the robot to improve awareness of obstacles, including those with non-convex shapes.
+The gradient field is derived from the Gaussian process distance field, which generates both the distance field and gradient field by leveraging Gaussian process regression to model the spatial structure of the environment.
+Through several obstacle avoidance and fleet collision avoidance scenarios, the proposed GF-DWA is shown to outperform other popular trajectory planning and control methods in terms of safety and flexibility, especially in complex environments with non-convex obstacles. 
+ 
+ 
+ 
+ I INTRODUCTION 
+
+ 
+ With the rise of autonomous mobile robots, there is a growing demand for advanced and flexible collision-free navigation algorithms that allow robots to operate autonomously in complex environments.
+In the context of local motion planning and control [ 1 ] , existing approaches can be broadly classified into optimization-based, sampling-based, and learning-based methods. Optimization-based methods, such as Model Predictive Control (MPC) [ 2 , 3 ] and control barrier functions [ 4 , 5 ] , generate optimal control inputs by formulating an optimization problem with a defined cost function and constraints. These methods are widely used due to their ability to ensure safety and stability in navigation tasks. Sampling-based methods, including the Dynamic Window Approach (DWA) [ 6 , 7 , 8 , 9 , 10 ] with consideration of kinematic constraint and rapidly-exploring randomized trees [ 11 , 12 ] , generate a set of control or state samples and select the most suitable one based on objective function evaluation and feasibility checks. Recently, learning-based methods, such as Deep Reinforcement Learning (DRL) [ 13 , 14 , 15 ] , have been explored for motion planning and control, which can learn the optimal policy from the interaction with the environment.
+While convex obstacles can be handled efficiently by most navigation algorithms, non-convex obstacles present significant challenges, particularly in local motion planning and control. When multiple robots operate in close proximity, non-convex obstacles may frequently emerge due to the spatial configuration of robots and static obstacles [ 13 , 5 ] .
+These obstacles are particularly difficult to avoid as they introduce local minima in the objective function, making it challenging for both optimization-based and sampling-based methods to find feasible solutions. Additionally, learning-based methods face difficulties in overcoming non-convex obstacles, as successful navigation in such environments requires an effective exploration strategy during training that incorporates sufficient randomness and a long-term reward structure to ensure adaptive decision-making. 
+ 
+ 
+ Fig. 1: Comparison of trajectory evaluation strategies between the regular DWA (left) and the proposed GF-DWA (right) when encountering the same non-convex obstacle. Black polygons represent static obstacles, while blue circles denote mobile robots, with arrows indicating their movement direction. For trajectory visualization: Gray trajectories are infeasible. Orange trajectories are feasible (with a color gradient: redder hues indicate lower cost, while yellower hues indicate higher cost). Purple trajectories represent the optimal selection. 
+ 
+ 
+ Escaping from a non-convex obstacle requires more than just instantaneous distance information; it is essential to determine whether the mobile robot is approaching the obstacle. A straightforward solution is to leverage the gradient of the distance to the obstacle, allowing the robot to take actions that guide it along the gradient direction, thereby avoiding potential collisions.
+The Euclidean Signed Distance Field (ESDF) [ 16 , 17 ] is a widely used method to model the environment, as it provides both distance and gradient information relative to the nearest occupied cell. However, to capture the overall shape of the obstacle, a robot needs to consider the distance and gradient information from all directions, which is crucial for non-convex obstacle avoidance.
+The Gaussian Process Distance Field (GPDF) [ 18 , 19 ] offers a probabilistic approach to modeling the environment, providing distance and gradient information from all detected obstacles. This enables a more comprehensive representation of non-convex structures, allowing for more effective motion planning and obstacle avoidance in complex environments. 
+ 
+ 
+ In this work, we propose the Gradient Field-based Dynamic Window Approach (GF-DWA), a simple yet effective extension of the traditional DWA, incorporating the gradient information from the GPDF in the objective function.
+By leveraging the unified distance and gradient fields from the GPDF, the GF-DWA provides a more accurate and comprehensive representation of the environment, allowing robots to avoid non-convex obstacles effectively. Furthermore, the GF-DWA can be seamlessly extended to the fleet collision avoidance problem, where each robot regards the predicted trajectories of other robots as obstacles and avoids collisions in a distributed manner. The main contributions of this work are: 
+ 
+ • 
+ 
+ Introducing a new cost term based on the gradient information from GPDF into DWA, enhancing the robot’s ability to avoid non-convex obstacles effectively and efficiently. 
+ 
+ • 
+ 
+ Extending GF-DWA to fleet collision avoidance, where predicted trajectories of other robots are modeled using GPDFs in real-time. This allows for a proactive and distributed approach to collision avoidance within multi-robot systems. 
+ 
+ 
+ 
+ 
+ 
+ II Preliminaries 
+
+ 
+ II-A Dynamic Window Approach 
+
+ 
+ As a sampling-based local motion planning and control method, the DWA algorithm [ 6 ] generates a series of motion plans as candidates by sampling control parameters within a local dynamic window and then selects the one with the lowest cost. To limit the number of candidates, each sampled control action is assumed to stay constant within the window. All candidates are evaluated by a pre-defined objective function, typically comprising collision-avoidance and target-tracking terms. At each time step, the local window shifts according to the current state of the robot, and the best action is adopted to guide the robot. This process loops until the robot reaches the target or halts due to collisions and deadlocks, which is a receding horizon control strategy. At each iteration, the DWA has the following steps:
+(i) dynamic window generation, (ii) candidate trajectory generation, and
+(iii) candidate evaluation. 
+ 
+ 
+ In order to generate trajectories, a motion model with kinematic constraints is necessary. For the mobile robot navigation task, assuming the discrete motion model is 𝒙 k + 1 = f ⁡ ( 𝒙 k , 𝒖 k ) \bm{x}_{k+1}=f(\bm{x}_{k},\bm{u}_{k}) , where 𝒙 k \bm{x}_{k} is the state and 𝒖 k \bm{u}_{k} is the action at time step k k .The robot state 𝒙 k = [ x , y , θ ] ⊤ \bm{x}_{k}=[x,y,\theta]^{\top} consists of the location ( x , y ) (x,y) and the heading θ \theta , and the action space 𝒖 k = [ v , ω ] ⊤ \bm{u}_{k}=[v,\omega]^{\top} contains the linear speed v v and the angular velocity ω \omega . The control action is restraint by ( 𝒖 max , 𝒖 min , Δ ​ 𝒖 max + , Δ ​ 𝒖 max − ) (\bm{u}_{\text{max}},\bm{u}_{\text{min}},\Delta\bm{u}^{+}_{\text{max}},\Delta\bm{u}^{-}_{\text{max}}) , which defines the bound of the action, 𝒖 max ≤ 𝒖 ≤ 𝒖 min \bm{u}_{\text{max}}\leq\bm{u}\leq\bm{u}_{\text{min}} , and its changing rate Δ ​ 𝒖 max − ≤ Δ ​ 𝒖 ≤ Δ ​ 𝒖 max + \Delta\bm{u}^{-}_{\text{max}}\leq\Delta\bm{u}\leq\Delta\bm{u}^{+}_{\text{max}} . At time k k , the dynamic window for control action ranges over the interval ( 𝒖 k − , 𝒖 k + ) (\bm{u}^{-}_{k},\bm{u}^{+}_{k}) , where 
+ 
+
+ 
+ 
+ 𝒖 k − \displaystyle\bm{u}^{-}_{k} 
+ = max ⁡ ( 𝒖 min , 𝒖 k − 1 − Δ ​ 𝒖 max − ) , \displaystyle=\max(\bm{u}_{\text{min}},\bm{u}_{k-1}-\Delta\bm{u}^{-}_{\text{max}}), 
+ 
+ (1) 
+ 
+ 
+ 𝒖 k + \displaystyle\bm{u}^{+}_{k} 
+ = min ⁡ ( 𝒖 max , 𝒖 k − 1 + Δ ​ 𝒖 max + ) . \displaystyle=\min(\bm{u}_{\text{max}},\bm{u}_{k-1}+\Delta\bm{u}^{+}_{\text{max}}). 
+ 
+ (2) 
+ 
+ Given the dynamic window horizon N N , and the sampling number 𝜸 = [ γ v , γ ω ] ⊤ \bm{\gamma}=[\gamma_{v},\gamma_{\omega}]^{\top} of the action, a set 𝒞 \mathcal{C} of control actions can be generated as 
+ 
+
+ 
+ 
+ 𝒞 = { 𝒖 k ( i , j ) | \displaystyle\mathcal{C}=\Bigl\{\bm{u}^{(i,j)}_{k}\,|\, 
+ i ∈ { 0 , 1 , … , γ v − 1 } , \displaystyle i\in\{0,1,\ldots,\gamma_{v}-1\}, 
+ 
+ 
+ 
+ 
+ j ∈ { 0 , 1 , … , γ ω − 1 } , \displaystyle j\in\{0,1,\ldots,\gamma_{\omega}-1\}, 
+ 
+ 
+ 
+ 
+ 𝒖 k ( i , j ) = 𝒖 k − + [ i / ( γ v − 1 ) j / ( γ ω − 1 ) ] ⊙ ( 𝒖 k + − 𝒖 k − ) } , \displaystyle\bm{u}^{(i,j)}_{k}=\bm{u}^{-}_{k}+\begin{bmatrix}i/(\gamma_{v}-1)\\
+j/(\gamma_{\omega}-1)\end{bmatrix}\odot(\bm{u}^{+}_{k}-\bm{u}^{-}_{k})\Bigr\}, 
+ 
+ 
+ where 𝒂 ⊙ 𝒃 \bm{a}\odot\bm{b} means element-wise product. For each 𝒖 k ( i , j ) ∈ 𝒞 \bm{u}^{(i,j)}_{k}\in\mathcal{C} , a candidate trajectory is then obtained, 
+ 
+
+ 
+ 
+ 𝒯 k ( i , j ) = { 𝒙 k ( i , j , n ) | \displaystyle\mathcal{T}^{(i,j)}_{k}=\Bigl\{\bm{x}^{(i,j,n)}_{k}\,|\, 
+ n ∈ { 0 , 1 , … , N } , \displaystyle n\in\{0,1,\ldots,N\}, 
+ 
+ 
+ 
+ 
+ 𝒙 k ( i , j , 0 ) = 𝒙 k , \displaystyle\bm{x}^{(i,j,0)}_{k}=\bm{x}_{k}, 
+ 
+ 
+ 
+ 
+ 𝒙 k ( i , j , n ) | n > 0 = f ( 𝒙 k ( i , j , n − 1 ) , 𝒖 k ( i , j ) ) . } \displaystyle\bm{x}^{(i,j,n)}_{k}|_{n>0}=f(\bm{x}^{(i,j,n-1)}_{k},\bm{u}^{(i,j)}_{k}).\Bigr\} 
+ 
+ 
+ 
+ 
+ Although the design of the objective function varies depending on the specific application, two basic cost terms are usually included: the collision-avoidance term and the target-tracking term. The collision-avoidance term J col ​ ( ⋅ ) J_{\text{col}}(\cdot) quantifies the risk of collision with obstacles or other robots, often defined as the minimum distance to surrounding obstacles. The target tracking term J tar ​ ( ⋅ ) J_{\text{tar}}(\cdot) determines the trajectory’s progress toward the target, commonly measured as the distance from the trajectory endpoint to the final goal. For any trajectory that results in a collision, the collision-avoidance cost is set to positive infinity, rendering it infeasible. Among all feasible trajectories, the one with the lowest total cost is selected for execution. 
+ 
+ 
+ Fig. 2: Visualization of the proposed gradient field-based collision avoidance term J col-grad J_{\text{col-grad}} given Δ ​ θ thre = 2 ​ π / 3 \Delta\theta_{\text{thre}}=2\pi/3 . The black U-shaped polygon represents the obstacle. The contour and color bar illustrate the distance field obtained from the GPDF of the obstacle. Each arrow denotes a robot state, with its tail position indicating the robot’s location and its orientation corresponding to the robot’s heading direction. The arrow color represents the intensity of the cost term, where redder hues indicate a higher cost and vice versa. This cost term effectively prevents the robot from being trapped in local minima. 
+ 
+ 
+ 
+ II-B Gaussian Process Distance Field 
+
+ 
+ Given a set of points 𝒫 = { 𝒑 1 , 𝒑 2 , … , 𝒑 M } \mathcal{P}=\{\bm{p}_{1},\bm{p}_{2},\ldots,\bm{p}_{M}\} representing obstacles, which may be sampled from geometric obstacles or acquired from LiDAR sensory data, each point can be modeled as a Gaussian distribution centered at its measured position, with associated uncertainty.
+Accordingly, a GPDF [ 19 , 18 ] can be built to estimate a continuous, differentiable representation of the distance to all detected obstacles at any point in the robot’s workspace.
+Define a latent field o ⁡ ( 𝒑 ) o(\bm{p}) and the inverse function f inv f_{\text{inv}} mapping to the distance field f dist ​ ( 𝒑 ) f_{\text{dist}}(\bm{p}) , 
+ 
+
+ 
+ 
+ f inv ​ ( k o ​ ( 𝒑 , 𝒫 ) ) \displaystyle f_{\text{inv}}\left(k_{o}(\bm{p},\mathcal{P})\right) 
+ ≔ ‖ 𝒑 − 𝒫 ‖ , \displaystyle\coloneq||\bm{p}-\mathcal{P}||, 
+ 
+ (3) 
+ 
+ 
+ f dist ​ ( 𝒑 ) \displaystyle f_{\text{dist}}(\bm{p}) 
+ = f inv ​ ( o ​ ( 𝒑 ) ) , \displaystyle=f_{\text{inv}}(o(\bm{p})), 
+ 
+ (4) 
+ 
+ 
+ o ⁡ ( 𝒑 ) \displaystyle o(\bm{p}) 
+ ∼ 𝒢 ⁡ ( 0 , k o ​ ( 𝒑 , 𝒫 ) ) , \displaystyle\sim\mathcal{G}(0,k_{o}\left(\bm{p},\mathcal{P})\right), 
+ 
+ (5) 
+ 
+ where 𝒢 \mathcal{G} is Gaussian process and k o k_{o} is the covariance kernel function. This latent field can be regarded as a smooth occupancy field. According to the Gaussian process regression, 
+ 
+
+ 
+ 
+ o ¯ ​ ( 𝒑 ) \displaystyle\bar{o}(\bm{p}) 
+ = k o ​ ( 𝒑 , 𝒫 ) ​ ( K o ​ ( 𝒫 , 𝒫 ) + σ o 2 ​ 𝐈 ) − 1 ⋅ 𝟏 ⏟ α ⁡ ( 𝒫 , σ o ) , \displaystyle=k_{o}(\bm{p},\mathcal{P})\underbrace{\left(K_{o}(\mathcal{P},\mathcal{P})+\sigma_{o}^{2}\mathbf{I}\right)^{-1}\cdot\bm{1}}_{\alpha(\mathcal{P},\sigma_{o})}, 
+ 
+ (6) 
+ 
+ 
+ 𝐜𝐨𝐯 ⁡ ( o ⁡ ( 𝒑 ) ) \displaystyle\mathbf{cov}(o(\bm{p})) 
+ = k o ​ ( 𝒑 , 𝒑 ) \displaystyle=k_{o}(\bm{p},\bm{p}) 
+ 
+ 
+ 
+ 
+ − k o ​ ( 𝒑 , 𝒫 ) ​ ( K o ​ ( 𝒫 , 𝒫 ) + σ o 2 ​ 𝐈 ) − 1 ​ k o ​ ( 𝒫 , 𝒑 ) , \displaystyle-k_{o}(\bm{p},\mathcal{P})\left(K_{o}(\mathcal{P},\mathcal{P})+\sigma_{o}^{2}\mathbf{I}\right)^{-1}k_{o}(\mathcal{P},\bm{p}), 
+ 
+ (7) 
+ 
+ where K o ​ ( 𝒫 , 𝒫 ) K_{o}(\mathcal{P},\mathcal{P}) is the covariance kernel of the given obstacle points, σ o \sigma_{o} is the noise covariance, 𝐈 \mathbf{I} is an identity matrix, 𝟏 \bm{1} is a vector of ones (setting k o ​ ( 𝒫 , 𝒫 ) = 𝟏 k_{o}(\mathcal{P},\mathcal{P})=\bm{1} ), and α ⁡ ( ⋅ ) \alpha(\cdot) is the GP model. The gradient of the distance field can be derived as 
+ 
+
+ 
+ 
+ f grad ​ ( 𝒑 ) \displaystyle f_{\text{grad}}(\bm{p}) 
+ = ∇ 𝒑 f dist ​ ( 𝒑 ) \displaystyle=\nabla_{\bm{p}}f_{\text{dist}}(\bm{p}) 
+ 
+ 
+ 
+ 
+ = ∂ f inv ∂ o ⋅ [ ∇ 𝒑 k o ​ ( 𝒑 , 𝒫 ) ⋅ α ⁡ ( 𝒫 , σ o ) ] . \displaystyle=\frac{\partial f_{\text{inv}}}{\partial o}\cdot\left[\nabla_{\bm{p}}k_{o}(\bm{p},\mathcal{P})\cdot\alpha(\mathcal{P},\sigma_{o})\right]. 
+ 
+ (8) 
+ 
+ In the GPDF, the distance field provides direct information about how far a point is from the surrounding obstacles, while the gradient field, obtained by differentiating the distance field, encodes both the direction and rate of change of the distance with respect to the robot’s position.
+In the context of collision avoidance, the gradient field effectively acts as a repulsive vector field, which can guide the robot away from obstacles. 
+ 
+ 
+ Fig. 3: Scenarios with a single robot and static obstacles. The first row demonstrates three scenes (from left to right: S1, S2, and S3) with different static obstacles in the red area. The second row shows two turning scenarios (from left to right: S4 and S5). Note that in turning scenarios, a small rectangle obstacle is put on the reference path, which creates a local minimum. 
+ 
+ 
+ 
+ 
+ III Gradient-aware Sampling-based Motion Planning 
+
+ 
+ III-A Predictive Obstacle Avoidance based on Gradient Field 
+
+ 
+ While most DWA-based methods consider only the distance field, this work introduces a new cost term utilizing the gradient information from the GPDF. Considering a candidate 𝒯 = { 𝒙 ( n ) } n = 0 N \mathcal{T}=\left\{\bm{x}^{(n)}\right\}^{N}_{n=0} , after querying the GP model α \alpha and processing the model outputs, a distance set { d ( n ) } n = 0 N \{d^{(n)}\}^{N}_{n=0} and a gradient set { 𝒈 ( n ) } n = 0 N \{\bm{g}^{(n)}\}^{N}_{n=0} are obtained for all states in the trajectory. A cost term for being too close to any obstacles can be easily defined based on the distance set (ignoring the current state of the robot), 
+ 
+
+ 
+ 
+ J col-dist = 1 / min ⁡ ( d ( 1 ) , d ( 2 ) , … , d ( N ) ) . J_{\text{col-dist}}=1/\min(d^{(1)},d^{(2)},\ldots,d^{(N)}). 
+ 
+ (9) 
+ 
+ This term alone only gives the instant distance information, which is not enough to capture the potential collision risk. For example, a trajectory that is relatively close to an obstacle but not moving toward it is less dangerous than a trajectory that is moving toward the obstacle but is currently further away. To capture this, we introduce a new cost term based on the gradient set, 
+ 
+
+ 
+ 
+ J col-grad = { ∑ n = 1 N e β ​ | Δ ​ θ | − 1 , | Δ ​ θ | ≥ Δ ​ θ thre 0 , otherwise J_{\text{col-grad}}=\begin{cases}\sum^{N}_{n=1}e^{\beta|\Delta\theta|}-1,\,&|\Delta\theta|\geq\Delta\theta_{\text{thre}}\\
+0,\,&\text{otherwise}\end{cases} 
+ 
+ (10) 
+ 
+ where Δ ​ θ = θ ( n ) − θ d ( n ) \Delta\theta=\theta^{(n)}-\theta^{(n)}_{d} is the difference between the heading angle θ ( n ) \theta^{(n)} of the robot and the normalized heading direction θ d ( n ) \theta^{(n)}_{d} of the gradient at state 𝒙 ( n ) \bm{x}^{(n)} , Δ ​ θ thre \Delta\theta_{\text{thre}} is the threshold to include the collision-gradient term, and β \beta is a tuning parameter to control changing rate of the cost term.
+The cost term J col-grad J_{\text{col-grad}} is designed to provide a smooth, continuous cost increase as heading misalignment grows.
+The exponential form imposes stronger penalties when the robot moves toward obstacles in its forward direction.
+Although the gradient-based term J col-grad J_{\text{col-grad}} can capture the potential collision risks, it may lead to overly conservative behavior, causing the robot to avoid obstacles even when not moving toward them. The choice of Δ ​ θ thre \Delta\theta_{\text{thre}} plays a crucial role in balancing the trade-off between collision avoidance and regular path following. Consequently, it should be satisfies that Δ ​ θ thre ∈ ( π / 2 , π ] \Delta\theta_{\text{thre}}\in(\pi/2,\pi] .
+Fig. 2 visualizes this cost term for a U-shaped non-convex obstacle. The distance field alone creates a local minimum near the dead end, while the gradient-based cost successfully identifies the directions leading to the dead end, preventing the robot from becoming trapped. 
+ 
+ 
+ The overall collision-avoidance cost term is defined as a combination of the distance-based term and the gradient-based term, 
+ 
+
+ 
+ 
+ J col = Q col-dist ​ J col-dist + Q col-grad ​ J col-grad , J_{\text{col}}=Q_{\text{col-dist}}J_{\text{col-dist}}+Q_{\text{col-grad}}J_{\text{col-grad}}, 
+ 
+ (11) 
+ 
+ where Q Q variables are the corresponding weights to each term. 
+ 
+ 
+ Fig. 4: Multi-robot test 1 (using DF-DWA) with four robots intersecting in the middle of the map. This figure shows the candidate trajectories and unified GPDF from the perspective of the robot starting from the bottom right corner. Gray trajectories are infeasible, blue ones are feasible, and red ones are the best in the corresponding time step. 
+ 
+ 
+ Fig. 5: Multi-robot test 2 (using DF-DWA) with two robots with overlapping reference paths meeting in a narrow corridor. This figure shows the candidate trajectories and unified GPDF from the perspective of the robot starting from the left side. Apart from visual elements as in Fig. 3 and Fig. 4 , red dashed lines indicate the inflated boundary of static obstacles by the size of the robot. 
+ 
+ 
+ 
+ III-B Gradient Field-based Dynamic Window Approach 
+
+ 
+ Apart from the collision-avoidance term, there are also other cost terms that need to be considered in trajectory selection. In this work, it is assumed that a reference path, a target position 𝒑 tar = ( x tar , y tar ) \bm{p}_{\text{tar}}=(x_{\text{tar}},y_{\text{tar}}) , and a reference speed v ref v_{\text{ref}} are given. Based on the current position of the robot, a reference trajectory 𝒯 ref , k \mathcal{T}_{\text{ref},k} sampled from the reference path is generated at each time step k k (the time step is omitted if there is no ambiguity). To penalize the deviation from the reference trajectory, a cost term J ref J_{\text{ref}} is defined as 
+ 
+
+ 
+ 
+ J ref = 1 N ​ ∑ n = 1 N ‖ 𝒙 ( n ) − 𝒙 ref ( n ) ‖ , J_{\text{ref}}=\frac{1}{N}\sum^{N}_{n=1}||\bm{x}^{(n)}-\bm{x}_{\text{ref}}^{(n)}||, 
+ 
+ (12) 
+ 
+ where 𝒙 ref ( n ) \bm{x}_{\text{ref}}^{(n)} is the n n -th state of the reference trajectory. The reference speed deviation is also considered in the cost function as 
+ 
+
+ 
+ 
+ J vel = | v − v ref | . J_{\text{vel}}=|v-v_{\text{ref}}|. 
+ 
+ (13) 
+ 
+ For the target-reaching behavior, rather than calculating the Euclidean distance between the robot and the goal position, a cost term J tar J_{\text{tar}} is defined to penalize the deviation from the heading direction to the target position, 
+ 
+
+ 
+ 
+ J tar = | tan − 1 ⁡ ( y tar − y x tar − x ) − tan − 1 ⁡ ( y ( N ) − y x ( N ) − x ) | , J_{\text{tar}}=\left|\tan^{-1}\left(\frac{y_{\text{tar}}-y}{x_{\text{tar}}-x}\right)-\tan^{-1}\left(\frac{y^{(N)}-y}{x^{(N)}-x}\right)\right|, 
+ 
+ (14) 
+ 
+ where ( x , y ) = ( x ( 0 ) , y ( 0 ) ) (x,y)=(x^{(0)},y^{(0)}) is the current position of the robot. The target-reaching term is mainly active when the robot is close to the final goal. The overall cost function is defined as a combination of all the cost terms, 
+ 
+
+ 
+ 
+ J = Q col ​ J col + Q ref ​ J ref + Q vel ​ J vel + Q tar ​ J tar , J=Q_{\text{col}}J_{\text{col}}+Q_{\text{ref}}J_{\text{ref}}+Q_{\text{vel}}J_{\text{vel}}+Q_{\text{tar}}J_{\text{tar}}, 
+ 
+ (15) 
+ 
+ where Q Q variables are the corresponding weights. After calculating costs for all candidate trajectories, the trajectory with the minimum cost is selected as the optimal trajectory, i.e., 𝒯 opt = arg ⁡ min 𝒯 ⁡ J \mathcal{T}_{\text{opt}}=\mathop{\arg\min}_{\mathcal{T}}J . 
+ 
+ 
+ TABLE I: Success rates of different methods avoiding different static obstacles. The “✓” symbol indicates 100% success rate, while “ × \times ” indicates 0% success rate. The results for DDPG are obtained via 50 runs. The other results are deterministic. 
+ 
+ 
+ 
+ MPC 
+ DDPG 
+ DWA 
+ GF-DWA 
+ 
+ S1 - Rectangle obstacle 
+ ✓ 
+ ✓ 
+ ✓ 
+ ✓ 
+ 
+ S2 - Double obstacles 
+ × \times 
+ × \times 
+ ✓ 
+ ✓ 
+ 
+ S3 - U-shape obstacle 
+ × \times 
+ ✓ 
+ × \times 
+ ✓ 
+ 
+ S4 - Sharp turn 
+ × \times 
+ 96% 
+ ✓ 
+ ✓ 
+ 
+ S5 - U-turn 
+ × \times 
+ 74% 
+ ✓ 
+ ✓ 
+ 
+ 
+ 
+ 
+ III-C Predictive Fleet Collision Avoidance 
+
+ 
+ In the presence of multiple robots, the collision avoidance problem becomes more complex due to two main reasons.
+First, each robot must actively avoid collisions with other robots, all of which are moving simultaneously.
+Second, the dynamic interaction between other robots and static obstacles can create non-convex obstacles with continuously changing shapes.
+In [ 8 ] , it was proposed to consider the predicted trajectories of other robots to avoid collisions, which can also be seamlessly integrated into our GF-DWA framework.
+At each time step, a mobile robot models the predicted trajectories of other robots from the previous time step using GPDFs. These GPDFs are then merged with environmental obstacles to construct a unified distance field and gradient field.
+The GPDFs generated from predicted robot trajectories are continuously updated at each time step or whenever the robots’ states change. In this way, fleet collision avoidance is naturally integrated into the GF-DWA framework, allowing for a distributed and scalable solution to multi-robot navigation in dynamic environments. 
+ 
+ 
+ 
+ 
+ IV Implementation 
+
+ 
+ In this work, the nonholonomic unicycle model is used as the motion model: 
+ 
+
+ 
+ 
+ [ x k + 1 y k + 1 θ k + 1 ] = [ x k + v k ​ cos ⁡ ( θ k ) ​ Δ ​ t y k + v k ​ sin ⁡ ( θ k ) ​ Δ ​ t θ k + ω k ​ Δ ​ t ] , \begin{bmatrix}x_{k+1}\\
+y_{k+1}\\
+\theta_{k+1}\end{bmatrix}=\begin{bmatrix}x_{k}+v_{k}\cos(\theta_{k})\Delta t\\
+y_{k}+v_{k}\sin(\theta_{k})\Delta t\\
+\theta_{k}+\omega_{k}\Delta t\end{bmatrix}, 
+ 
+ (16) 
+ 
+ where Δ ​ t \Delta t is the sampling time and is set to be 0.2 seconds. The covariance kernel function of the GPDF is the Matérn ν = 1 / 2 \nu=1/2 kernel with σ = 1 \sigma=1 : 
+ 
+
+ 
+ 
+ k o ​ ( d ) = σ 2 ​ exp ⁡ ( − d L ) , k_{o}(d)=\sigma^{2}\exp\left(-\frac{d}{L}\right), 
+ 
+ (17) 
+ 
+ where d d is the distance between two points and L = 0.2 L=0.2 is a positive parameter controlling the interpolation degree. The boundary points of obstacles are sampled from the obstacle edges at a resolution of 0.1 meters.
+For the DWA, the horizon N N is 20, the threshold to include the collision-gradient term is set as Δ ​ θ thre = 2 ​ π / 3 \Delta\theta_{\text{thre}}=2\pi/3 , and the tuning parameter is set as β = 2 \beta=2 . The choice of Δ ​ θ thre \Delta\theta_{\text{thre}} creates a strong repulsive force when heading toward obstacles, and minimizes impact when moving parallel or away from obstacles. In addition, to avoid over-conservative behavior, the collision-avoidance cost term is inactive unless any point on the candidate is within a one-meter range of any obstacle. To generate the candidate control set, the speed resolution is 0.3 meters per second and the angular velocity resolution is 0.08 radians per second (about 4.6 degrees per second). The maximal total number of candidate trajectories is 84.
+For the GPDF, after ahead-of-time compilation, on an Intel i7-9750H CPU, the inference time is around 0.008 seconds in every time step, which achieves highly real-time performance. Note that this can be further improved using GPUs. 
+ 
+ 
+ 
+ V Evaluation 
+
+ 
+ In the evaluation 1 1 
+ 1 
+ 
+ 
+ 
+ The demo video is available at https://youtu.be/Et4C5oGHlF0 , the proposed GF-DWA is compared with the regular DWA, optimization-based MPC, and learning-based Deep Deterministic Policy Gradient (DDPG) algorithm [ 20 ] in different scenarios. The regular DWA shares the same objective function as GF-DWA except for the collision-avoidance term, which is only based on the minimal distance to any obstacles. The implementation of MPC and DDPG is according to [ 13 ] . For the single-robot cases, the success rates of selected methods are compared. A successful run means the robot can reach the final goal without any collisions. For the multi-robot cases, besides the success rate, the number of time steps needed to finish the case is also compared. Note that the proposed GF-DWA is sampling-based, with no need to solve an optimization problem at each time step or pre-train any models. 
+ 
+ 
+ V-A Static Obstacle Avoidance 
+
+ 
+ As demonstrated in Fig. 3 , five test scenarios (S1 to S5) are set for the single-robot evaluation. The result of success rates is shown in TABLE I .
+It is noteworthy that MPC fails in almost all cases due to the presence of local minima, which arise when encountering large or non-convex obstacles. The learning-based DDPG algorithm successfully avoids the non-convex U-shape obstacle but lacks stability when navigating through environments with closely spaced obstacles. From the evaluation, the proposed GF-DWA is the only method that guarantees collision-free navigation in all cases, showing its stability and adaptability in complex environments. 
+ 
+ 
+ Fig. 6: Evaluation of the multi-agent cases. Each bar shows the average time step to reach the goals. Black bars indicate the standard deviations of instances in the category. Black dots are individual trials. The timeout limit is 200 steps, which means MPC has failures in the first case. 
+ 
+ 
+ 
+ V-B Gradient information 
+
+ 
+ To further investigate the effectiveness of the gradient information from GPDFs, additional tests were conducted in S3 with a U-shape obstacle. Variants of DWA were tested using distance-only data from GPDF, gradient data from ESDF, and gradient data from GPDF. Results show that only the GPDF-based gradient enables successful navigation, as ESDF gradients reflect only the nearest obstacle point and fail to capture the global structure of non-convex obstacles. 
+ 
+ 
+ 
+ V-C Multi-robot collision avoidance 
+
+ 
+ To evaluate the proposed GF-DWA in multi-robot environments, two scenarios are designed. As shown in Fig. 4 , the first scenario includes four robots starting from the corners of an empty map and moving to the opposite corners, which leads to an intersection at the center of the map. At this intersection, each robot perceives the other three robots as a dynamically changing non-convex obstacle, making collision avoidance more challenging.
+The second scenario, as illustrated in Fig. 5 , involves two mobile robots moving in opposite directions through a narrow corridor. While the corridor has the capacity of two robots side by side, navigating through it simultaneously poses a collision risk. As an alternative, a wider parallel path is available, requiring the robots to decide whether to pass through the corridor or take the wider path to ensure collision-free navigation. 
+ 
+ 
+ Unlike the single-robot static obstacle avoidance tests, all compared methods can handle the multi-robot tests but with varying levels of efficiency and stability. The detailed finishing time step of each trial is reported in Fig. 6 . While DWA and GF-DWA generate deterministic control actions, MPC exhibits instability since it requires numerical solvers in practice.
+In multi-robot test 1, for the regular DWA, the intersection distance between different robots is very small, posing a significant collision risk in practical deployment. On the contrary, GF-DWA produces predictive collision avoidance behavior as shown in Fig. 4 , ensuring a safer and more stable navigation strategy.
+Overall, GF-DWA outperforms other methods by achieving a better balance between stability, safety, and efficiency, making it a more robust solution for multi-robot collision avoidance in complex environments. 
+ 
+ 
+ 
+ 
+ VI Conclusion 
+
+ 
+ In this work, we propose a Gradient Field-Based Dynamic Window Approach (GF-DWA) for mobile robot navigation in complex environments and extend it to fleet collision avoidance with predictive behavior in a distributed manner.
+While the underlying principle is straightforward, the integration of unified gradient information from the Gaussian process distance field makes the approach safe, stable, effective, and flexible, particularly in non-convex obstacle avoidance.
+Extensive evaluations, including both single-robot and multi-robot settings, demonstrate that our approach outperforms other popular obstacle avoidance approaches, including optimization-based and learning-based methods, in terms of efficiency, stability, and collision-free navigation. 
+ 
+ 
+ Future work would focus on three aspects. The first one is to consider dynamic obstacle (such as humans) avoidance in the method. Unlike mobile robots, the future states of dynamic obstacles are typically unknown, posing a significant challenge for predictive navigation.
+Another future work is to explore the combination of GF-DWA with other planning and control methods, such as model predictive control, for leveraging the advantages of both sampling-based and optimization-based approaches for improved motion planning and collision avoidance.
+The last one is to conduct real-world evaluations of the proposed approach in a physical multi-robot fleet scenario to assess its practical applicability, robustness, and scalability in dynamic and unstructured environments. 
+ 
+ 
+ 
+ References 
+
+ 
+ 
+ [1] 
+ 
+R. Siegwart, I. R. Nourbakhsh, and D. Scaramuzza, Introduction to autonomous mobile robots . MIT press, 2011.
+
+ 
+ 
+ [2] 
+ 
+A. Sathya, P. Sopasakis, R. Van Parys, A. Themelis, G. Pipeleers, and P. Patrinos, “Embedded nonlinear model predictive control for obstacle avoidance using PANOC,” in European control conference (ECC) . IEEE, 2018, pp. 1523–1528.
+
+ 
+ 
+ [3] 
+ 
+Z. Zhang, H. Hajieghrary, E. Dean, and K. Åkesson, “Prescient collision-free navigation of mobile robots with iterative multimodal motion prediction of dynamic obstacles,” IEEE Robotics and Automation Letters , vol. 8, no. 9, pp. 5488–5495, 2023.
+
+ 
+ 
+ [4] 
+ 
+A. Thirugnanam, J. Zeng, and K. Sreenath, “Safety-critical control and planning for obstacle avoidance between polytopes with control barrier functions,” in International Conference on Robotics and Automation (ICRA) , 2022, pp. 286–292.
+
+ 
+ 
+ [5] 
+ 
+Y. Xue and N. Figueroa, “No minima, no collisions: Combining modulation and control barrier function strategies for feasible dynamical collision avoidance,” arXiv preprint arXiv:2502.14238 , 2025.
+
+ 
+ 
+ [6] 
+ 
+D. Fox, W. Burgard, and S. Thrun, “The dynamic window approach to collision avoidance,” Robotics & Automation Magazine , vol. 4, no. 1, pp. 23–33, 1997.
+
+ 
+ 
+ [7] 
+ 
+D. H. Lee, S. S. Lee, C. K. Ahn, P. Shi, and C.-C. Lim, “Finite distribution estimation-based dynamic window approach to reliable obstacle avoidance of mobile robot,” IEEE Transactions on Industrial Electronics , vol. 68, no. 10, pp. 9998–10 006, 2021.
+
+ 
+ 
+ [8] 
+ 
+M. Missura and M. Bennewitz, “Predictive collision avoidance for the dynamic window approach,” in International Conference on Robotics and Automation (ICRA) . IEEE, 2019, pp. 8620–8626.
+
+ 
+ 
+ [9] 
+ 
+S. Yasuda, T. Kumagai, and H. Yoshida, “Safe and efficient dynamic window approach for differential mobile robots with stochastic dynamics using deterministic sampling,” IEEE Robotics and Automation Letters , vol. 8, no. 5, pp. 2614–2621, 2023.
+
+ 
+ 
+ [10] 
+ 
+M. Dobrevski and D. Skočaj, “Adaptive dynamic window approach for local navigation,” in IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2020, pp. 6930–6936.
+
+ 
+ 
+ [11] 
+ 
+A. Perez, R. Platt, G. Konidaris, L. Kaelbling, and T. Lozano-Perez, “LQR-RRT*: Optimal sampling-based motion planning with automatically derived extension heuristics,” in IEEE International Conference on Robotics and Automation , 2012, pp. 2537–2542.
+
+ 
+ 
+ [12] 
+ 
+A. Orthey, C. Chamzas, and L. E. Kavraki, “Sampling-based motion planning: A comparative review,” Annual Review of Control, Robotics, and Autonomous Systems , vol. 7, 2023.
+
+ 
+ 
+ [13] 
+ 
+K. Ceder, Z. Zhang, A. Burman, I. Kuangaliyev, K. Mattsson, G. Nyman, A. Petersén, L. Wisell, and K. Åkesson, “Bird’s-eye-view trajectory planning of multiple robots using continuous deep reinforcement learning and model predictive control,” in IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , 2024, pp. 8002–8008.
+
+ 
+ 
+ [14] 
+ 
+E. Kaufmann, L. Bauersfeld, A. Loquercio, M. Müller, V. Koltun, and D. Scaramuzza, “Champion-level drone racing using deep reinforcement learning,” Nature , vol. 620, no. 7976, pp. 982–987, 2023.
+
+ 
+ 
+ [15] 
+ 
+Y. F. Chen, M. Liu, M. Everett, and J. P. How, “Decentralized non-communicating multiagent collision avoidance with deep reinforcement learning,” in International Conference on Robotics and Automation (ICRA) . IEEE, 2017, pp. 285–292.
+
+ 
+ 
+ [16] 
+ 
+H. Oleynikova, A. Millane, Z. Taylor, E. Galceran, J. Nieto, and R. Siegwart, “Signed distance fields: A natural representation for both mapping and planning,” in RSS workshop: geometry and beyond-representations, physics, and scene understanding for robotics , 2016.
+
+ 
+ 
+ [17] 
+ 
+L. Han, F. Gao, B. Zhou, and S. Shen, “Fiesta: Fast incremental euclidean distance fields for online motion planning of aerial robots,” in IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , 2019, pp. 4423–4430.
+
+ 
+ 
+ [18] 
+ 
+C. Le Gentil, O.-L. Ouabi, L. Wu, C. Pradalier, and T. Vidal-Calleja, “Accurate gaussian-process-based distance fields with applications to echolocation and mapping,” IEEE Robotics and Automation Letters , vol. 9, no. 2, pp. 1365–1372, 2023.
+
+ 
+ 
+ [19] 
+ 
+H. J. Choi and N. Figueroa, “Towards feasible dynamic grasping: Leveraging gaussian process distance field, SE (3) equivariance, and riemannian mixture models,” in International Conference on Robotics and Automation (ICRA) . IEEE, 2024, pp. 6455–6461.
+
+ 
+ 
+ [20] 
+ 
+T. P. Lillicrap, J. J. Hunt, A. Pritzel, N. Heess, T. Erez, Y. Tassa, D. Silver, and D. Wierstra, “Continuous control with deep reinforcement learning,” in International Conference on Learning Representations (ICLR) , 2016.
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Experimental support, please
+ view the build logs 
+ for errors. Generated by
+ 
+ 
+ L
+ A 
+ T
+ E 
+ 
+ xml 
+ 
+ .
+ 
+ 
+ Instructions for reporting errors 
+ We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+ support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+ methods listed below: 
+ 
+ Click the "Report Issue" ( 
+ 
+ ) button, located in the page header. 
+ 
+ Tip: You can select the relevant text first, to include it in your report. 
+ Our team has already identified the following issues . We appreciate your time reviewing and reporting rendering errors we
+ may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+ should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+ all. 
+ Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion , and welcome developer contributions . 
+ 
+ 
+ 
+ 
+ 
+ We gratefully acknowledge support from our major funders ,
+ member institutions , ,
+ and all contributors.
+ 
+ 
+ About · 
+ Help · 
+ Contact · 
+ Subscribe · 
+ Copyright · 
+ Privacy · 
+ Accessibility · 
+ Operational Status (opens in new tab) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

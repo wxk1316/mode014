@@ -1,0 +1,27 @@
+{
+  "case": "car_1.0",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 2.8,
+  "goal_distance_m": 5.0,
+  "min_gap_m": -2.220446049250313e-16,
+  "collision": true,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "dynamic_yield": 27,
+    "mode_switch_wait": 1
+  },
+  "final_reason": "dynamic_yield",
+  "plan_p95_ms": 26.464358548400924,
+  "plan_max_ms": 26.63379200384952,
+  "worker_delay_s": 0.0,
+  "time_model": "virtual time excluding synchronous solve wall time",
+  "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+}

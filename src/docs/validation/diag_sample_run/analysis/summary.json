@@ -1,0 +1,279 @@
+{
+  "duration_s": 9.68,
+  "measurement_scope": "message callback arrivals",
+  "message_counts": {
+    "command": 1,
+    "traj": 1,
+    "car_cmd": 5,
+    "mode_ready": 4,
+    "car_state": 1,
+    "loc": 1,
+    "ctrl_status": 1
+  },
+  "source_progress_counts": {
+    "command": {
+      "new": 1,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    },
+    "traj": {
+      "new": 1,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    },
+    "car_cmd": {
+      "unstamped": 5,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    },
+    "mode_ready": {
+      "unstamped": 4,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    },
+    "car_state": {
+      "unstamped": 1,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    },
+    "loc": {
+      "new": 1,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    },
+    "ctrl_status": {
+      "unstamped": 1,
+      "future": 0,
+      "stale": 0,
+      "clock_jump": 0,
+      "payload_invalid": 0
+    }
+  },
+  "sequence_gaps": 0,
+  "nonmonotonic_sequences": 0,
+  "command_heartbeat_missing_count": 0,
+  "command_heartbeat_duplicate_count": 0,
+  "metrics": {
+    "planning_duration_s": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "p95": null,
+      "quantile_scope": "all samples"
+    },
+    "planning_cycle_s": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "p95": null,
+      "quantile_scope": "all samples"
+    },
+    "controller_cycle_s": {
+      "count": 1,
+      "min": 0.02,
+      "max": 0.02,
+      "mean": 0.02,
+      "p95": 0.02,
+      "quantile_scope": "all samples"
+    },
+    "steering_rate_abs_deg_s": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "p95": null,
+      "quantile_scope": "all samples"
+    },
+    "command_acceleration_m_s2": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "p95": null,
+      "quantile_scope": "all samples"
+    },
+    "command_feedback_speed_error_m_s": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "p95": null,
+      "quantile_scope": "all samples"
+    },
+    "reference_pair_receive_gap_s": {
+      "count": 1,
+      "min": 0.01,
+      "max": 0.01,
+      "mean": 0.01,
+      "p95": 0.01,
+      "quantile_scope": "all samples"
+    },
+    "cloud_to_obstacle_observed_receive_gap_s": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "p95": null,
+      "quantile_scope": "all samples"
+    },
+    "localization_yaw_rate_rad_s": {
+      "count": 1,
+      "min": 0.12,
+      "max": 0.12,
+      "mean": 0.12,
+      "p95": 0.12,
+      "quantile_scope": "all samples"
+    },
+    "localization_source_dt_s": {
+      "count": 1,
+      "min": 0.1,
+      "max": 0.1,
+      "mean": 0.1,
+      "p95": 0.1,
+      "quantile_scope": "all samples"
+    }
+  },
+  "stop_reason_counts": {},
+  "event_counts": {},
+  "command_steering_sign_changes": 0,
+  "command_mode_changes": [
+    {
+      "t": 0.28,
+      "from": 0,
+      "to": 4
+    },
+    {
+      "t": 6.68,
+      "from": 4,
+      "to": 0
+    }
+  ],
+  "spin_sessions": [
+    {
+      "request_s": 0.28,
+      "left_censored": false,
+      "ready_s": 3.28,
+      "first_rotation_command_s": 3.3,
+      "first_observed_yaw_motion_s": 3.4,
+      "ack_request_s": 6.68,
+      "ack_ready_s": 9.68
+    }
+  ],
+  "reference_epochs": {
+    "seen": 1,
+    "paired": 1,
+    "unpaired_older_than_0_5s_examples": [],
+    "controller_consumed_epochs_missing_recorder_pair": 0,
+    "missing_consumed_pair_examples": []
+  },
+  "observations": {
+    "invalid_wheel_feedback": {
+      "count": 1,
+      "examples": [
+        {
+          "t": 0.3,
+          "detail": {
+            "finite_wheel_count": 0
+          }
+        }
+      ]
+    }
+  },
+  "runtime_telemetry_parameters": {},
+  "last_snapshot_writer_stats": {},
+  "limits": [
+    "No measured steering angle exists in current CarState; command angle is not actual steering.",
+    "CarState has no source timestamp; wheel averaging and receipt-time errors do not identify physical response latency.",
+    "DDS arrival order and recorder drops can explain unmatched references; controller consumption and writer health must be checked together.",
+    "Command heartbeat gaps show missing observations, not where a message was lost or whether firmware applied it; heartbeat resets are not automatically loss.",
+    "Cloud-to-obstacle matching uses equal source stamps; the receipt gap includes processing and transport, may be negative from DDS ordering, and is not pure perception CPU time.",
+    "Sign changes may be a normal S-bend. Clusters are investigation clues, not proof of instability.",
+    "Threshold flags use the current low-speed 3s/.3s/.5s profile; compare runtime/config provenance before treating them as violations.",
+    "Point-cloud metadata does not reproduce segmentation, missed detections or collision candidates; use rosbag/raw cloud for those questions."
+  ],
+  "report_version": 1,
+  "run_dir": "/Users/bytedance/learn/src/docs/validation/diag_sample_run",
+  "log_files": {
+    "messages": [
+      "messages.jsonl",
+      "messages_000001.jsonl"
+    ],
+    "snapshots": [
+      "snapshots.jsonl"
+    ],
+    "events": [
+      "events.jsonl"
+    ]
+  },
+  "log_quality": {
+    "invalid_json_lines": 0,
+    "invalid_line_examples": []
+  },
+  "parameters": {
+    "schema_version": 2,
+    "synthetic": true,
+    "scope": "Synthetic file-format/mode-timeline smoke test, no ROS/DDS/vehicle",
+    "actual_steering_available": false
+  },
+  "writer_summary": {
+    "accepted": 14,
+    "written": 14,
+    "dropped": 0,
+    "write_errors": 0,
+    "queue_highwater": 14,
+    "flush_count": 1,
+    "last_error": null,
+    "segments": [
+      {
+        "stream": "messages",
+        "index": 0,
+        "path": "messages.jsonl",
+        "bytes": 3852,
+        "rows": 8
+      },
+      {
+        "stream": "snapshots",
+        "index": 0,
+        "path": "snapshots.jsonl",
+        "bytes": 0,
+        "rows": 0
+      },
+      {
+        "stream": "events",
+        "index": 0,
+        "path": "events.jsonl",
+        "bytes": 0,
+        "rows": 0
+      },
+      {
+        "stream": "messages",
+        "index": 1,
+        "path": "messages_000001.jsonl",
+        "bytes": 3011,
+        "rows": 6
+      }
+    ],
+    "by_stream": {
+      "messages": 14
+    },
+    "clean_close": true,
+    "close_timed_out": false,
+    "oversized_rows": 0,
+    "queue_depth": 0,
+    "pending_rows": 0
+  }
+}

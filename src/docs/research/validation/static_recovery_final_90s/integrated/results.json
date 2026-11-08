@@ -1,0 +1,251 @@
+[
+  {
+    "case": "multi_blocks",
+    "duration_s": 90.0,
+    "reached": false,
+    "distance_to_goal_m": 0.8097134919053427,
+    "minimum_conservative_circle_gap_m": 0.2282958355108471,
+    "mode_requests": [
+      {
+        "t": 24.08,
+        "target_mode": 4
+      },
+      {
+        "t": 30.2,
+        "target_mode": 0
+      }
+    ],
+    "steering_sign_flips_over_half_degree": 1,
+    "maximum_command_steer_rate_deg_s": 45.000000000000014,
+    "plan_p95_ms": 36.542834001011215,
+    "plan_max_ms": 46.467000000120606,
+    "stop_reasons": {
+      "motion": 805,
+      "spin_requested": 1,
+      "spin_session": 64,
+      "mode_recovery": 30
+    },
+    "path_length_m_10hz_model": 11.25852128534469,
+    "yaw_to_global_goal_rmse_rad_10hz_model": 1.4256326650051598,
+    "speed_jerk_max_mps3_10hz_model": 7.999999999999887,
+    "mode_switch_count": 2,
+    "mode_wait_s_10hz": 5.9,
+    "trap_entries": 1,
+    "trap_reentries": 0,
+    "plan_p50_ms": 13.483041999279521,
+    "plan_p99_ms": 38.653250005154405,
+    "deadline_misses_100ms": 0,
+    "hard_deadline_misses_300ms": 0,
+    "failure_type": "safe_stop_or_local_failure",
+    "minimum_oracle_gap_m": 0.2282958355108471,
+    "ttc": null,
+    "ttc_reason": "real vehicle TTC unavailable; separate synthetic CV-circle TTC reported when known",
+    "actual_steering_measurement": null,
+    "metrics_scope": "synthetic geometry / bounded actuator model; command steer rate; 10Hz model jerk, not vehicle measurements",
+    "oracle_margin_violation_obstacle_ticks_50hz": 0,
+    "minimum_physical_aabb_oracle_gap_lower_bound_m": 0.2282958355108471,
+    "physical_aabb_collision_free_oracle": true,
+    "collision_free_oracle": true,
+    "configured_margin_preserved_oracle": true,
+    "minimum_cv_circle_ttc_s_model": null,
+    "ttc_model_known_dynamic_seen": false,
+    "ttc_model_assumption": "constant velocities and enclosing circles from synthetic oracle; separate from safety checker and real TTC",
+    "gap_method": "SAT separation lower bound for static AABB; exact point-to-vehicle rectangle minus circle radius for dynamic",
+    "navigation_success_with_no_oracle_collision": false
+  },
+  {
+    "case": "u_shape",
+    "duration_s": 83.14,
+    "reached": true,
+    "distance_to_goal_m": 0.2943436084711145,
+    "minimum_conservative_circle_gap_m": 0.6179999999999995,
+    "mode_requests": [
+      {
+        "t": 26.08,
+        "target_mode": 4
+      },
+      {
+        "t": 32.6,
+        "target_mode": 0
+      },
+      {
+        "t": 46.18,
+        "target_mode": 4
+      },
+      {
+        "t": 53.2,
+        "target_mode": 0
+      }
+    ],
+    "steering_sign_flips_over_half_degree": 1,
+    "maximum_command_steer_rate_deg_s": 45.000000000000014,
+    "plan_p95_ms": 36.3980839974829,
+    "plan_max_ms": 43.64283299946692,
+    "stop_reasons": {
+      "motion": 624,
+      "trap_recovery_started": 1,
+      "trap_align_stop": 3,
+      "trap_phase_spin_requested": 2,
+      "spin_session": 141,
+      "mode_recovery": 60,
+      "reached": 1
+    },
+    "path_length_m_10hz_model": 15.110547396958609,
+    "yaw_to_global_goal_rmse_rad_10hz_model": 1.7472440949458559,
+    "speed_jerk_max_mps3_10hz_model": 11.00000000000004,
+    "mode_switch_count": 4,
+    "mode_wait_s_10hz": 11.8,
+    "trap_entries": 1,
+    "trap_reentries": 0,
+    "plan_p50_ms": 25.044583999260794,
+    "plan_p99_ms": 39.85491600178648,
+    "deadline_misses_100ms": 0,
+    "hard_deadline_misses_300ms": 0,
+    "failure_type": "reached",
+    "minimum_oracle_gap_m": 0.6179999999999995,
+    "ttc": null,
+    "ttc_reason": "real vehicle TTC unavailable; separate synthetic CV-circle TTC reported when known",
+    "actual_steering_measurement": null,
+    "metrics_scope": "synthetic geometry / bounded actuator model; command steer rate; 10Hz model jerk, not vehicle measurements",
+    "oracle_margin_violation_obstacle_ticks_50hz": 0,
+    "minimum_physical_aabb_oracle_gap_lower_bound_m": 0.6179999999999995,
+    "physical_aabb_collision_free_oracle": true,
+    "collision_free_oracle": true,
+    "configured_margin_preserved_oracle": true,
+    "minimum_cv_circle_ttc_s_model": null,
+    "ttc_model_known_dynamic_seen": false,
+    "ttc_model_assumption": "constant velocities and enclosing circles from synthetic oracle; separate from safety checker and real TTC",
+    "gap_method": "SAT separation lower bound for static AABB; exact point-to-vehicle rectangle minus circle radius for dynamic",
+    "navigation_success_with_no_oracle_collision": true
+  },
+  {
+    "case": "thick_u",
+    "duration_s": 87.44,
+    "reached": true,
+    "distance_to_goal_m": 0.2970045922826338,
+    "minimum_conservative_circle_gap_m": 0.3280911931815387,
+    "mode_requests": [
+      {
+        "t": 28.08,
+        "target_mode": 4
+      },
+      {
+        "t": 34.6,
+        "target_mode": 0
+      },
+      {
+        "t": 48.18,
+        "target_mode": 4
+      },
+      {
+        "t": 55.2,
+        "target_mode": 0
+      }
+    ],
+    "steering_sign_flips_over_half_degree": 1,
+    "maximum_command_steer_rate_deg_s": 45.000000000000014,
+    "plan_p95_ms": 44.43316700053401,
+    "plan_max_ms": 50.28808300266974,
+    "stop_reasons": {
+      "motion": 666,
+      "trap_recovery_started": 1,
+      "trap_align_stop": 4,
+      "trap_phase_spin_requested": 2,
+      "spin_session": 141,
+      "mode_recovery": 60,
+      "reached": 1
+    },
+    "path_length_m_10hz_model": 15.116469627484896,
+    "yaw_to_global_goal_rmse_rad_10hz_model": 1.5955796968754923,
+    "speed_jerk_max_mps3_10hz_model": 6.9999999999999005,
+    "mode_switch_count": 4,
+    "mode_wait_s_10hz": 11.8,
+    "trap_entries": 1,
+    "trap_reentries": 0,
+    "plan_p50_ms": 25.071625001146458,
+    "plan_p99_ms": 46.63929199887207,
+    "deadline_misses_100ms": 0,
+    "hard_deadline_misses_300ms": 0,
+    "failure_type": "reached",
+    "minimum_oracle_gap_m": 0.3280911931815387,
+    "ttc": null,
+    "ttc_reason": "real vehicle TTC unavailable; separate synthetic CV-circle TTC reported when known",
+    "actual_steering_measurement": null,
+    "metrics_scope": "synthetic geometry / bounded actuator model; command steer rate; 10Hz model jerk, not vehicle measurements",
+    "oracle_margin_violation_obstacle_ticks_50hz": 0,
+    "minimum_physical_aabb_oracle_gap_lower_bound_m": 0.3280911931815387,
+    "physical_aabb_collision_free_oracle": true,
+    "collision_free_oracle": true,
+    "configured_margin_preserved_oracle": true,
+    "minimum_cv_circle_ttc_s_model": null,
+    "ttc_model_known_dynamic_seen": false,
+    "ttc_model_assumption": "constant velocities and enclosing circles from synthetic oracle; separate from safety checker and real TTC",
+    "gap_method": "SAT separation lower bound for static AABB; exact point-to-vehicle rectangle minus circle radius for dynamic",
+    "navigation_success_with_no_oracle_collision": true
+  },
+  {
+    "case": "narrow_u",
+    "duration_s": 82.78,
+    "reached": true,
+    "distance_to_goal_m": 0.2945393678543443,
+    "minimum_conservative_circle_gap_m": 0.32499999999999996,
+    "mode_requests": [
+      {
+        "t": 26.98,
+        "target_mode": 4
+      },
+      {
+        "t": 33.5,
+        "target_mode": 0
+      },
+      {
+        "t": 46.98,
+        "target_mode": 4
+      },
+      {
+        "t": 54.0,
+        "target_mode": 0
+      }
+    ],
+    "steering_sign_flips_over_half_degree": 1,
+    "maximum_command_steer_rate_deg_s": 45.000000000000014,
+    "plan_p95_ms": 33.22512500017183,
+    "plan_max_ms": 43.06287500367034,
+    "stop_reasons": {
+      "motion": 620,
+      "trap_recovery_started": 1,
+      "trap_align_stop": 3,
+      "trap_phase_spin_requested": 2,
+      "spin_session": 141,
+      "mode_recovery": 60,
+      "reached": 1
+    },
+    "path_length_m_10hz_model": 14.084191644682472,
+    "yaw_to_global_goal_rmse_rad_10hz_model": 1.737347936662401,
+    "speed_jerk_max_mps3_10hz_model": 11.000000000000037,
+    "mode_switch_count": 4,
+    "mode_wait_s_10hz": 11.8,
+    "trap_entries": 1,
+    "trap_reentries": 0,
+    "plan_p50_ms": 21.899040999414865,
+    "plan_p99_ms": 35.2200420020381,
+    "deadline_misses_100ms": 0,
+    "hard_deadline_misses_300ms": 0,
+    "failure_type": "reached",
+    "minimum_oracle_gap_m": 0.32499999999999996,
+    "ttc": null,
+    "ttc_reason": "real vehicle TTC unavailable; separate synthetic CV-circle TTC reported when known",
+    "actual_steering_measurement": null,
+    "metrics_scope": "synthetic geometry / bounded actuator model; command steer rate; 10Hz model jerk, not vehicle measurements",
+    "oracle_margin_violation_obstacle_ticks_50hz": 0,
+    "minimum_physical_aabb_oracle_gap_lower_bound_m": 0.32499999999999996,
+    "physical_aabb_collision_free_oracle": true,
+    "collision_free_oracle": true,
+    "configured_margin_preserved_oracle": true,
+    "minimum_cv_circle_ttc_s_model": null,
+    "ttc_model_known_dynamic_seen": false,
+    "ttc_model_assumption": "constant velocities and enclosing circles from synthetic oracle; separate from safety checker and real TTC",
+    "gap_method": "SAT separation lower bound for static AABB; exact point-to-vehicle rectangle minus circle radius for dynamic",
+    "navigation_success_with_no_oracle_collision": true
+  }
+]

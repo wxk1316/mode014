@@ -1,0 +1,1125 @@
+ 
+ 
+ 
+ Open-Source, Cost-Aware Kinematically Feasible Planning for Mobile and Surface Robotics 
+ 
+ 
+ 
+ 
+ 
+ // Restore the saved color scheme preference, or
+ // enact the browser preference if "automatic", 
+ // without expecting DOM load to have completed.
+ //
+ // Also restore any saved readingmode and ToC display preferences.
+ function initializeReadingPreferences() {
+ let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+ if (saved_theme === "automatic") {
+ if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+ saved_theme = "dark";
+ }
+ }
+ if (saved_theme == "dark") {
+ document.documentElement.setAttribute("data-theme", "dark");
+ } else {
+ document.documentElement.setAttribute("data-theme", "light");
+ }
+
+ const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+ if (tocDisplay) {
+ document.documentElement.setAttribute("data-toc-display", tocDisplay);
+ }
+ const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+ if (readingMode) {
+ document.documentElement.setAttribute("data-reading-mode", readingMode);
+ }
+ // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+ // never flashes in only to be hidden later by the deferred arxiv-header.js.
+ // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+ if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+ document.documentElement.setAttribute("data-banner-dismissed", "");
+ }
+ }
+ // Run as soon as JS starts, to minimize repainting
+ initializeReadingPreferences();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ /* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+ reading-mode chrome hiding. */
+ html[data-banner-dismissed] .ds-announcement { display: none; }
+ html[data-reading-mode="enabled"] .ds-announcement,
+ html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+ /* Keep the announcement text dark on the Open-Blue band in both colour themes
+ (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+ .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Report GitHub Issue 
+ × 
+ 
+
+ 
+ Title: 
+ 
+
+ Content selection saved. Describe the issue below: 
+
+ Description: 
+ 
+ 
+
+ 
+ Submit without GitHub 
+ Submit in GitHub 
+ 
+ 
+ 
+ 
+ arXiv is now an independent nonprofit! 
+ Learn more 
+ × 
+ 
+
+ 
+ 
+ 
+ Back to arXiv 
+ 
+ 
+ 
+ 
+ Why HTML? 
+ 
+ 
+ 
+ 
+ Report Issue 
+ 
+ 
+ 
+ 
+ 
+ 
+ Back to Abstract 
+ 
+ 
+ 
+ 
+ 
+ 
+ Download PDF 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Abstract 
+ I Introduction 
+ II Related Work 
+ III Smac Planner Framework 
+ IV Variations for Mobile Robots 
+ 
+ IV-A Cost-Aware Obstacle Heuristic 
+ IV-B Traversal Penalty Functions 
+ IV-C Search Resolution 
+ 
+ V Path Planners 
+ 
+ V-A Cost-Aware 2D-A* Planner 
+ V-B Cost-Aware Hybrid-A* Planner 
+ V-C Cost-Aware State Lattice Planner 
+ 
+ V-C 1 Generating the Minimum Control Set 
+ V-C 2 Generating Trajectories in the Set 
+ 
+ 
+ VI Experiments and Analysis 
+ 
+ VI-A Random Environments 
+ VI-B Real-World Warehouse 
+ 
+ VII Conclusion 
+ References 
+ 
+ 
+ 
+ 
+ 
+ License: CC BY 4.0
+ 
+ 
+arXiv:2401.13078v1 [cs.RO] 23 Jan 2024 
+ 
+ 
+ Open-Source, Cost-Aware Kinematically Feasible Planning 
+ for Mobile and Surface Robotics 
+ 
+ 
+ Steve Macenski
+ 
+ Affiliation:  Open Navigation LLC
+ steve@opennav.org
+ 
+    
+ Matthew Booker
+ 
+ Affiliation:  Carnegie Mellon University
+ mrbooker@andrew.cmu.edu
+ 
+    
+ Joshua Wallace
+ 
+ Affiliation:  Locus Robotics
+ jwallace@locusrobotics.com
+ 
+
+ Abstract 
+ 
+ This paper introduces the Smac Planner , an openly available search-based planning framework with multiple algorithm implementations including 2D-A*, Hybrid-A*, and State Lattice planners.
+This work is motivated by the lack of performant and available feasible planners for mobile and surface robotics research. 
+ 
+ This paper contains three main contributions.
+First, it briefly describes a minimal open-source software framework where search-based planners may be easily added.
+Further, this paper characterizes new variations on the feasible planners - dubbed Cost-Aware - specific to mobile roboticist’s needs.
+This fills the gap of missing kinematically feasible implementations suitable for academic, extension, and deployed use.
+Finally, we provide baseline benchmarking against other standard planning frameworks. 
+ 
+ Smac Planner has further significance by becoming the standard open-source planning system within ROS 2’s Nav2 framework which powers thousands of robots in research and industry. 
+ 
+ 
+ 
+ I Introduction 
+
+ 
+ Path planning for mobile platforms has undertaken significant development in recent years.
+The classical infeasible or holonomic techniques have made way for a more mature class of algorithms.
+These can provide additional features such as guaranteeing drivability, respecting kinodynamic constraints, and operating in advanced environmental representations. 
+ 
+ 
+ The DARPA Grand and Urban Challenges created innovation in planning to support Ackermann models [ 1 ] .
+These competitions can be accredited with the creation or refinement of techniques such as Hybrid-A* and State Lattice. 
+ 
+ 
+ Due to Moore’s law, many of these techniques are now applicable to mobile and surface marine robot systems which contain far more limited compute resources.
+Search-based methods continue to be efficient and effective in low-dimensional state spaces.
+However, mobile robots continue to rely on these infeasible techniques such as Dikjstra’s Algorithm, Navigation Function, and numerous forms of grid-based heuristic search (e.g. A*, D*) [ 2 , 3 ] .
+For circular differential-drive or holonomic robots, this class of algorithm is still suitable for many uses. 
+ 
+ 
+ Fig. 1: Large, non-circular industrial robot using Nav2 uniquely enabled by this open-source Framework. 
+ 
+ 
+ However, the sector has evolved away from simple circular robots and towards new industries outside of warehouses and research laboratories.
+There is a growing use of Ackermann, large non-circular, and quadruped robots in new applications such as last-mile delivery, automated platform lifts, and construction monitoring.
+These robots cannot utilize single-point holonomic planning techniques previously deployed and require, at minimum, kinematically-feasible paths.
+Yet, common feasible algorithms have no quality implementations accessible for academic use, are not integrated with any major research framework (MRPT, ROS, etc), nor have variants unique to mobile roboticist’s needs [ 4 , 5 ] . 
+ 
+ 
+ Our work was motivated by this gap: to serve these new styles of robots and its researchers.
+To fill this, we created the Smac Planner : a templated, C++-based search-based planning framework designed to make creating search-based planning algorithms simple.
+Within it, we propose three planners; 2D-A*, Hybrid-A*, and State Lattice. 
+ 
+ 
+ This paper contains three areas of contribution.
+It describes the high-level design of the Smac Planner framework, enabling performant planners to be added in approximately 200 lines of C++.
+More substantially, this work characterizes several variations of the kinematically feasible planners (Hybrid-A*, State Lattice) to build upon them for the requirements and conventions in mobile robotics.
+Finally, we provide performance benchmarking and analysis of the planners. 
+ 
+ 
+ We provide high-quality implementations in Nav2 1 1 
+ 1 
+ 
+ 
+ 
+ https://github.com/ros-planning/navigation2 for rapid benchmarking and evaluation [ 6 ] .
+This is in use by over a dozen organizations worldwide in research, warehouses, outdoors, and in surface marine applications; including the industrial warehouse robot in Fig 1 .
+Its presence has enabled Nav2 to be integrated with a broader class of robots including Ackermann, legged, and large non-circular robots, accelerating research on these platforms [ 7 ] . 
+ 
+ 
+ 
+ II Related Work 
+
+ 
+ Systems that are not able to be modeled as circular or holonomic require more developed planning techniques for robust operation.
+Kinematically feasible and kinodynamic planners model kinematics and/or dynamics to provide plans for limited maneuverability drive-trains and arbitrarily shaped robots [ 8 ] .
+Popular search-based feasible planners include Hybrid-A* and State Lattice.
+Hybrid-A* makes use of Ackermann curvature-constrained models such as Dubins and Reeds-Shepp to search grid maps.
+Meanwhile State Lattice applies a set of pre-generated motion primitives, known as the control set, to find its neighbors for arbitrary motion models [ 9 , 10 ] .
+As such, it is required to generate the control set, usually offline.
+One such algorithm is described in [ 10 ] and in later detail (Sec. V-C ). 
+ 
+ 
+ Sampling-based methods are common for kinodynamic planning, however they have slow run-time performance over large distances in the presence of non-trivial obstacles (e.g. long time horizons) [ 12 ] .
+Favorably, hybrid planning used in navigation systems creates a distinction between global path planning and local trajectory planning such that kinodynamic planning is leveraged only in the local time horizon.
+Generally, global planning need only apply kinematic constraints [ 13 ] . 
+ 
+ 
+ Many planning frameworks have been proposed, notable among them with staying power are the Open Motion Planning Library (OMPL) and the Search-Based Planning Library (SBPL) [ 14 , 15 ] .
+OMPL specializes in sampling-based techniques with implementations of common methods, including PRM, RRT and its variants.
+While OMPL can sample using mobile robot models, in experiments, it provided plans with irregular run-times often an order of magnitude (or more) slower than search-based methods for the low-dimensional and non-trivially occupied state spaces.
+While technically drivable, it suffers from significant unnecessary sudden turns - including long segments of reversing near obstacles even when both are explicitly penalized. 
+ 
+ 
+ SBPL instead focuses on search-based planning with several heuristic search options such as Anytime Repairing A* and D* Lite [ 17 ] .
+It uses motion primitives to search, but the primitive generators within SBPL are manually-engineered and do not create principled minimum control sets, limiting maneuverability.
+SBPL also only provides naive distance-based heuristics, resulting in acutely slow planning times in structured, realistic environments.
+The current state of this framework is more suitable for local trajectory planning - as recent publications would also suggest [ 15 ] . 
+ 
+ 
+ Cost maps or grids are a common environmental model which balances fidelity with efficiency to aggregate information about a scene from various sources [ 16 ] .
+While they evolved from early probability occupancy grids, the modern cost map uses values to represent relative costs-to-go rather than likelihoods of occupancy.
+Though, there are special values reserved for occupancy to provide hard collision constraints.
+These cost grids are common to mobile robotic navigation systems as the model of the world for which planning and control takes place. 
+ 
+ 
+ Prior to this work, the primary planner in the Nav2 framework is the NavFn planner [ 6 ] .
+It implements a Navigation Function planner that uses cost grid information in its search and collision checks based on point-costs.
+Is is unable to navigate a highly asymmetric robot through narrow spaces or provide any feasibility guarantees.
+While NavFn is efficient, it lacks the necessary features for Ackermann, legged, or non-circular robot systems - representing a significant gap.
+All path and trajectory planners in the framework utilize the cost grid information to generate plans. 
+ 
+ 
+ 
+ III Smac Planner Framework 
+
+ 
+ The Smac Planner consists of three fundamental layers - a templated A* for search, node planner templates, and an integration layer.
+A* was selected due to its ease of integration with arbitrary graph types, search neighborhoods, and heuristic computations needed for a variety of planners.
+The A* is templated by the node planner type, NodeT in Fig. 2 , which implements the planner-specifics.
+Different templates use the decoupled and abstracted A* algorithm to create new planners with different characteristics, which minimizes boilerplate.
+This abstraction decouples the cost functions and neighbor selection policies of a particular planner from the shared A* algorithm.
+While this framework is not particularly novel, it is beneficial to expand briefly on its design as a reference to the openly available implementation also provided in 1 . 
+ 
+ 
+ Fig. 2: Outline of the A* and key node template methods. 
+ 
+ 
+ Node planner types serve two purposes - they contain the node’s state in the graph and implement the planner.
+As a node, it stores the typical data such as the collision state, if it has been queued or visited, and the accumulated cost. 
+ 
+ 
+ It also contains the planner-specific logic used to compute traversal costs, heuristics, and expansion characteristics, shown in Fig. 2 .
+The non-state data associated with the planner are shared across all node instances using static members to gain the performance of a standalone implementation.
+New planners are created as NodeT ’s to implement the appropriate search methodology. 
+ 
+ 
+ The link to a robotics framework is created only at the highest level integration layer using an instantiation of the A* algorithm with the appropriate template. Thereby, this work may be applied to multiple robotics frameworks easily and has been done so. 
+ 
+ 
+ 
+ IV Variations for Mobile Robots 
+
+ 
+ Mobile robots generally have a different operating context than autonomous vehicles (AV) on roads.
+They have less structured interactions with other agents in the environment - often without lanes, intersections, or speed conventions.
+Additionally, their free-space planners must run on more restricted compute and provide tunable behaviors for a broad range of applications. 
+ 
+ 
+ This section explores a few alterations applied to the feasible AV planners motivated by the application to mobile robotics.
+Chief amongst them is the Cost-Aware Obstacle Heuristic, giving the planner variants their namesake. 
+ 
+ 
+ IV-A Cost-Aware Obstacle Heuristic 
+
+ 
+ The Cost-Aware Obstacle Heuristic shepherds the expensive feasible search away from obstacles, towards optimal path solutions, while respecting soft grid map constraints.
+It performs a 2D-grid search and caches the accumulated path costs to use as the heuristic.
+It reduces planning time by avoiding dead-ends, U-turns, and wrong directions using the obstacle occupancy information in the grid map.
+ Cost-aware refers to utilizing all cost map values rather than only the binary obstacle information, allowing behavioral constraints placed in the cost grid to be accounted for during planning. 
+ 
+ 
+ The heuristic is computed from the goal pose so that it can be expanded dynamically and cached.
+It uses a dynamic programming implementation of a Differential A* so that preexisting queued nodes may be re-prioritized and heuristic search restarted during the feasible planner’s execution [ 3 ] . 
+ 
+ 
+ The 2D search’s traversal cost uses the distance traveled and an additional weighted cost-proportional term, in Eq. 1 . 
+ 
+ 
+ 
+
+ 
+ 
+ c ​ o ​ s ​ t t ​ r ​ a ​ v ​ e ​ r ​ s ​ a ​ l = d ​ i ​ s ​ t ∗ ( 1 + w c ​ o ​ s ​ t ∗ c ​ o ​ s ​ t i , j c ​ o ​ s ​ t m ​ a ​ x ) cost_{traversal}=dist*(1+\frac{w_{cost}*cost_{i,j}}{cost_{max}})\\
+ 
+ 
+ (1) 
+ 
+ 
+ 
+ where w c ​ o ​ s ​ t w_{cost} is the path cost penalty, c ​ o ​ s ​ t i , j cost_{i,j} is the cost of moving from cell i to cell j and c ​ o ​ s ​ t m ​ a ​ x cost_{max} is the maximum value in the cost map. Normalizing the grid cost scales it proportionally to the travel distance, while the penalty weight tunes the trade off between path cost and path length.
+This can be interpreted as a percentage increase in cost-to-travel based on the grid cost.
+The planners’ traversal costs are formulated the same as Eq. 1 using cost-weighted distances. Thereby this 2D cost-weighted search heuristic is admissible. 
+ 
+ 
+ This heuristic has an equally admissible analog in classical Hybrid-A* and others which takes into account only lethal occupancy information [ 9 , 18 ] .
+They instead use an expensive path smoothing algorithm to maximize the distance from all obstacles irrespective of context using a Voronoi diagram of the map.
+The State Lattice technique has no such analogous heuristic. 
+ 
+ 
+ Fig. 3: Cost-Aware Obstacle Heuristic (left) vs Obstacle Heuristic (right). 
+ 
+ 
+ Our method has several advantages for mobile robotics.
+Often, the behavior of the mobile robot is created through costs and potential fields in a grid map.
+These costs create desirable behaviors, such as punishing traversal in front of other dynamic agents, inflating obstacles to punish traversal close to potential collisions, or rewarding exploration in certain regions over others.
+In that way, robot systems define more complex behaviors and constraints in the environment than simply maximizing distance from obstacles, which could be effectively modelled in a Voronoi diagram. 
+ 
+ 
+ Instead, it is favorable to use this contextual information in the search itself for mobile robotics applications.
+Many behaviors are conventionally conveyed in the grid map, not as least squares constraints for post-search smoothing.
+Further, behaviors similar to those in Fig. 3 explore an entirely separate solution space and would be challenging to obtain reliably with only post-processing. 
+ 
+ 
+ Fig. 3 shows an illustrative example where higher costs are applied to a region to dissuade travel.
+This soft constraint may be introduced due to increased risk or danger in that area (red).
+On the left, the Cost-Aware Obstacle Heuristic uses this constraint and finds a longer path, going around the danger zone to achieve a lower path cost.
+On the right, the binary Obstacle Heuristic ignores this constraint and marches through the region for a slight improvement in path length.
+Similarly, a potential field penalty was added to the walls.
+Our heuristic uniquely steered towards the goal and maintained acceptably navigable distances from obstacles. 
+ 
+ 
+ As this heuristic has cost-awareness, it curtails the strict requirement for expensive path smoothing.
+Indeed, using an aggressive smoothing algorithm could easily erase the behaviors and constraints considered during search. 
+ 
+ 
+ 
+ IV-B Traversal Penalty Functions 
+
+ 
+ In addition to constraints in the grid map from external factors, it is beneficial to constrain the search for path quality.
+Thus, we define a set of trivial penalty functions in the traversal function to influence the planners’ search behavior.
+This, in conjunction with the Cost-Awareness, removes the requirement for expensive path post-processing for smoothness when well tuned. 
+ 
+ 
+ The first of these is the cost penalty discussed in Sec. IV-A .
+This penalty is unique in that it is applied in both the cost-aware heuristic and planners’ traversal functions for admissibility.
+Thus, we can study the impact of varying heuristic behavior by analyzing the Smac 2D-A* planner in isolation with varying cost penalties, shown in Fig 5 .
+Eq. 1 indicates larger values of this penalty will punish expanding search into higher cost areas at the expense of longer paths.
+Set to 0.0 0.0 , the cost-awareness is disabled and the optimal path skirts the walls.
+With modest weights applied ( 1.0 1.0 - 4.0 4.0 ), the path displays a more rational approach into the narrow corridor on the lower right and favors open spaces to varying degrees.
+The higher the value in the 1.0 1.0 - 4.0 4.0 range, the longer the path in attempt to minimize proximity to the walls.
+Sufficiently high values ( 5.0 5.0 +) punishes narrow spaces severely - as 8.0 8.0 explores another route solution entirely. 
+ 
+ 
+ The next two penalty functions are the non-straight and change penalties.
+These two penalties correct for any wobbling or unnecessary turning behavior.
+The non-straight penalty applies a cost to any not straight motion primitive.
+The change penalty is complementary - it punishes changing turning directions ( Δ ​ α \Delta\alpha ) to commit to an action.
+A small penalty helps create smooth and reliable behavior ( 2 2 - 5 % 5\% yields good results) but larger values can create straight-line and rigid behavior which may be beneficial in some settings.
+These penalties are multiplied with the c ​ o ​ s ​ t t ​ r ​ a ​ v . cost_{trav.} in Eq. 1 to find the final travel cost.
+When both changing direction and non-straight, the penalties are summed, Eq. 2 . 
+ 
+ 
+ 
+
+ 
+ 
+ c ​ o ​ s ​ t t ​ r ​ a ​ v ​ e ​ l = cost_{travel}= 
+ 
+ 
+ 
+
+ 
+ 
+ { c ​ o ​ s ​ t t ​ r ​ a ​ v . α i = 0 ( 1 + w n ​ o ​ n ​ s ​ t ​ r ​ t ) ​ c ​ o ​ s ​ t t ​ r ​ a ​ v . s ​ g ​ n ​ ( α i ) = s ​ g ​ n ​ ( α i − 1 ) ( 1 + w n ​ o ​ n ​ s ​ t ​ r ​ t + w c ​ h ) ​ c ​ o ​ s ​ t t ​ r ​ a ​ v . s ​ g ​ n ​ ( α i ) ≠ s ​ g ​ n ​ ( α i − 1 ) \begin{cases}cost_{trav.}&\alpha_{i}=0\\
+(1+w_{nonstrt})\hskip 2.84526ptcost_{trav.}&sgn(\alpha_{i})=sgn(\alpha_{i-1})\\
+(1+w_{nonstrt}+w_{ch})\hskip 2.84526ptcost_{trav.}&sgn(\alpha_{i})\neq sgn(\alpha_{i-1})\\
+\end{cases} 
+ 
+ (2) 
+ 
+ 
+ 
+ where α i \alpha_{i} is the change in turning direction, w n ​ o ​ n ​ s ​ t ​ r ​ t w_{nonstrt} is the non-straight path penalty, and w c ​ h w_{ch} is the penalty for flipping directions from turning left to right or vice-versa. 
+ 
+ 
+ The final traversal penalty is reverse .
+This penalizes any motion primitive in the reverse direction to dissuade backing up.
+A value of 2.1 2.1 allows reversing to turn around when given a goal in the opposite heading direction, but solemnly used otherwise.
+This is applied after all other penalties. 
+ 
+ 
+ 
+ IV-C Search Resolution 
+
+ 
+ The grid map’s primary purpose is to provide a search space for planning.
+An architect must make a determination about the resolution of a grid map based on the fidelity of sensor data, type of environment (such as confined spaces), and compute available. 
+ 
+ 
+ Originally, Hybrid-A* was introduced using a 0.5m search grid on a 0.15m obstacle map to achieve 50-300ms performance - effectively reducing the chosen search resolution and increasing the primitive lengths by ∼ \sim 3.3x.
+Then, it smooths and upsamples to create a plan at the original resolution.
+Fig 4 analyzes paths generated using Hybrid search on a Dubin’s model, with primitives proportional to 1x and 3x the grid resolution with otherwise identical settings.
+The smaller primitives at grid resolution create more stable search behavior while the 3x effectively requires expensive smoothing to recover an acceptable path.
+Further, lengthy primitives can make planning in narrow passages difficult. 
+ 
+ 
+ Fig. 4: Hybrid-A* primitive size vs unsmoothed path quality. 
+ 
+ 
+ Thus, all of the Smac Planner s use the grid resolution to adjust their motion primitives.
+Naturally, the 2D-A* uses its neighboring cells exactly.
+Smac’s Hybrid-A* planner dynamically generates a set of primitives dependent on the grid resolution to guarantee that its length will leave the current grid cell and is at least one angular quantization away (for turning motions).
+The State Lattice implementation computes a minimum control set offline.
+Each of its primitives are non-trivially longer than the grid resolution, so they are distretized by the grid map resolution for collision detection and path reconstruction. 
+ 
+ 
+ 
+ 
+ V Path Planners 
+
+ 
+ The planners are created as node planner types ( NodeT ) on A*.
+The framework provides three implementations; 2D-A*, Hybrid-A*, and State Lattice.
+Each are implemented in under 300 lines of planner-specific code with an average of 188; additional templates can be easily created. 
+ 
+ 
+ V-A Cost-Aware 2D-A* Planner 
+
+ 
+ A Cost-Aware 2D-A* algorithm is included to provide baseline functionality for circular robots.
+It is similar to the heuristic search from Sec. IV-A that provides the feasible planners with its Cost-Aware search guide.
+In fact, it has identical traversal and heuristic properties to the Cost-Aware Obstacle Heuristic, but is structured as an end-user 2D planner that does not cache its heuristic field to save compute resources.
+Hence it shares the Cost-Aware moniker. 
+ 
+ 
+ Fig. 5: Cost-Aware 2D-A* with variable cost penalties. 
+ 
+ 
+ It uses Moore (8) connected spaces for search with an L2 distance heuristic, which is admissible for any possible value of cost.
+Fig. 5 shows the Cost-Aware 2D-A* in a warehouse environment finding paths approximately 85m in length. 
+ 
+ 
+ 
+ V-B Cost-Aware Hybrid-A* Planner 
+
+ 
+ The Cost-Aware Hybrid-A* planner provides feasible paths using a Dubins or Reeds-Shepp motion model constrained by a minimum turning radius for ackermann vehicles.
+It stores the continuous coordinates of the expanded nodes to create a drivable path.
+This planner typically runs in 20-300ms across a warehouse (approx. 6500 m 2 m^{2} ), dependent on the space’s complexity.
+Speeds as fast as 5ms are displayed when the heuristic is cached for replanning (optional). 
+ 
+ 
+ It uses two admissible heuristics, of which it takes the maximum.
+The first is the Cost-Aware Obstacle heuristic previously discussed in Sec. IV-A which steers the expansion down useful directions with particular behaviors.
+The second is the same as in the original paper’s ‘non-holonomic without obstacles’ admissible distance heuristic, using a pre-computed lookup table of Dubin or Reeds-Shepp distances from each grid cell and angular quantization around the goal pose assuming no obstacles [ 9 ] .
+The lookup table uses a technique introduced by State Lattice- storing half the window and using the model’s symmetry to mirror poses [ 10 ] .
+This halves the memory usage for the same sized heuristic lookup window and is newly applied to the Hybrid-A* technique.
+This heuristic prunes approach headings to the goal that would be difficult to achieve from the drivetrain’s constraints. 
+ 
+ 
+ The planner’s traversal function is that from Sec. IV-B .
+Also as previously discussed, the motion primitives are dynamically computed proportional to the grid map resolution.
+The minimum required angular change ( Δ ​ θ \Delta\theta ) is determined by the angle of a chord of at least 2 \sqrt{2} cells long from a circle with minimum turning radius, r m ​ i ​ n r_{min} , Eq. 3 .
+ Δ ​ θ \Delta\theta is converted into angle quantization coordinates ( Δ ​ θ q \Delta\theta_{q} ); the position changes are determined geometrically.
+Each angle has its primitives pre-computed and translated to avoid repeated trigonometric operations. 
+ 
+ 
+ 
+
+ 
+ 
+ Δ ​ θ ≥ 2 ​ sin − 1 ⁡ ( 2 2 ​ r m ​ i ​ n ) Δ ​ x = r m ​ i ​ n ​ sin ⁡ Δ ​ θ q Δ ​ y = r m ​ i ​ n ​ ( 1 − cos ⁡ Δ ​ θ q ) \begin{gathered}\Delta\theta\geq 2\sin^{-1}({\dfrac{\sqrt{2}}{2r_{min}}})\\
+\Delta x=r_{min}\sin\Delta\theta_{q}\\
+\Delta y=r_{min}(1-\cos\Delta\theta_{q})\\
+\end{gathered} 
+ 
+ (3) 
+ 
+ 
+ 
+ Analytic expansion is employed to determine an obstacle-agnostic minimal path to the goal from a currently expanded node.
+It is attempted at a higher frequency in closer proximity to the goal using the heuristic as a measure.
+New to this variant, the analytic path is only used if it is sufficiently close to the goal.
+This continues the search process while still far from the goal to account for the map constraints.
+While using the Reeds-Shepp model, the maximum length also prevents returning auto-generated, long, backward paths unless on approach to the goal, where it may be strictly required.
+The expansion is finally utilized if collision-free. 
+ 
+ 
+ Collision checking is performed on each end pose.
+Like the cached primitives, the footprint is pre-rotated, then translated at run-time.
+When a potential field is applied, an optimization may be used.
+We find the cost of the center of the robot at which the footprint is possibly in collision.
+Then, a single point check can indicate the pose’s feasibility in some cases.
+Because the heuristic steers away from obstacles, the proportion of full footprint checks is small. 
+ 
+ 
+ 
+ V-C Cost-Aware State Lattice Planner 
+
+ 
+ The Cost-Aware State Lattice planner searches using a set of motion primitives generated using an arbitrary motion model’s constraints (e.g. ackermann, differential, omnidirectional).
+The run-time of this planner is similar to Cost-Aware Hybrid-A* at 10-350ms in the same environment.
+With the heuristics cached for replanning, it approaches 1-3ms.
+Motion primitives may be created using the provided generator, which builds principled minimum control sets discussed below.
+However, other techniques may be substituted. 
+ 
+ 
+ Similar to the previous section, this planner uses the same admissible heuristics, continuous cell coordinates, pre-computation optimizations, and traversal functions as the Cost-Aware Hybrid-A*.
+The analytic expansion and cost-aware heuristic are both new to the state lattice planner regime and significantly decrease planning times [ 10 ] .
+Differently, this planner’s primitives are discretized by the grid resolution to construct dense paths and evaluate intermediary poses for collision. 
+ 
+ 
+ V-C 1 Generating the Minimum Control Set 
+
+ 
+ The minimal control set is the smallest set of motions needed to represent the state lattice of a motion model.
+The method utilized removes pairs of states with similar motions which can be considered redundant, condensing the state lattice to its minimal set [ 11 , 10 ] .
+A minimal control set generated using our system is given in Fig. 6 .
+In this figure, each of 16 angular quantizations have between 3-5 unique motion primitives. 
+ 
+ 
+ Fig. 6: A control set using a 5cm grid resolution and a 1m turning radius with 16 angle quantizations. 
+ 
+ 
+ An important aspect in creating the minimal control set is path decomposition .
+A path is decomposable if it can be replaced by the concatenation of paths in the control set.
+This is evaluated by checking if the composed constituent path has an end configuration within half a grid cell or angle orientation quantization of the original.
+Thus, the minimal control set is what remains when all decomposable paths are removed; yielding the minimum spanning motions. 
+ 
+ 
+ Generating the minimal control set is achieved by iterating over all end poses and start headings from the origin to find feasible trajectories.
+If one exists, it is checked for decomposition by trajectories in the current set and added if unique.
+End points are selected based on a wavefront that moves away from the origin.
+This process generates shorter paths first, leading to a higher likelihood of subsequent paths being decomposable.
+Eventually, all candidate trajectories in a given wavefront will be decomposable and add no new information to the control set.
+The number of fully-represented consecutive wavefronts is the termination condition. 
+ 
+ 
+ One consideration when generating the set lies in the discretization of headings.
+A uniform discretization leads to the generation of minimal control sets with excessively long, non-straight paths [ 11 ] .
+Instead, center positions of cells in the wavefront are used to derive non-uniform heading angles.
+In doing so, useful motions are significantly shorter and decompose to fewer consequential trajectories- creating a more tractable control set. 
+ 
+ 
+ 
+ V-C 2 Generating Trajectories in the Set 
+
+ 
+ To generate control sets, we must generate candidate feasible trajectories to any given state.
+We propose an intuitive method for trajectory generation that guarantees minimal curvature, Fig. 7 .
+Given a start configuration ( x i , y i , θ i ) (x_{i},y_{i},\theta_{i}) and an end configuration ( x f , y f , θ f ) (x_{f},y_{f},\theta_{f}) , we define two lines, l 1 l_{1} which passes through the start configuration and l 2 l_{2} which passes through the end configuration. Then, we compute their intersection point, I, Eq. 4 . 
+ 
+ 
+ 
+
+ 
+ 
+ a = \displaystyle a= 
+ y f − x f tan θ f − y i + x i tan θ i tan ⁡ θ i − tan ⁡ θ f \displaystyle\frac{y_{f}-x_{f}\tan\theta_{f}-y_{i}+x_{i}\tan\theta_{i}}{\tan\theta_{i}-\tan\theta_{f}} 
+ 
+ 
+ 
+ I = \displaystyle I= 
+ [ a , l 1 ​ ( a ) ] \displaystyle[a,l_{1}(a)] 
+ 
+ (4) 
+ 
+ 
+ 
+ Next, we calculate the end points of the trajectories arc by Eq. 5 . p a ​ r ​ c p^{arc} will lie on l 1 l_{1} and q a ​ r ​ c q^{arc} will lie on l 2 l_{2} . The end points are calculated using distance d d , the minimum of either I to p or I to q,
+where p = ( x i , y i ) p=(x_{i},y_{i}) and q = ( x f , y f ) q=(x_{f},y_{f}) .
+By nature of d d , either p a ​ r ​ c p^{arc} will be coincident with p p , or q a ​ r ​ c q^{arc} will be coincident with q q . 
+ 
+ 
+ 
+
+ 
+ 
+ d = \displaystyle d= 
+ min ⁡ ( ∥ I − p ∥ , ∥ I − q ∥ ) \displaystyle\min(\lVert I-p\rVert,\lVert I-q\rVert) 
+ 
+ 
+ 
+ p a ​ r ​ c = \displaystyle p^{arc}= 
+ d ​ p − I → + I \displaystyle d\>\overrightarrow{p-I}+I 
+ 
+ 
+ 
+ q a ​ r ​ c = \displaystyle q^{arc}= 
+ d ​ q − I → + I \displaystyle d\>\overrightarrow{q-I}+I 
+ 
+ (5) 
+ 
+ 
+ 
+ Finally, we find the center point C C and radius r r of the circle whose arc joins p a ​ r ​ c p^{arc} at an angle of θ i \theta_{i} , to q a ​ r ​ c q^{arc} at θ f \theta_{f} .
+This is found via an intersection point of perpendicular bisectors of l 1 l_{1} at p a ​ r ​ c p^{arc} and l 2 l_{2} at q a ​ r ​ c q^{arc} .
+This is the center since the distances from p a ​ r ​ c p^{arc} and q a ​ r ​ c q^{arc} are r r (Eq. 6 ). 
+ 
+ 
+ 
+
+ 
+ 
+ l 1 ⟂ ​ ( x ) = \displaystyle l_{1}^{\perp}(x)= 
+ x ​ − 1 tan ⁡ θ i + p y a ​ r ​ c + p x a ​ r ​ c tan ⁡ θ i \displaystyle x\frac{-1}{\tan\theta_{i}}+p^{arc}_{y}+\frac{p^{arc}_{x}}{\tan\theta_{i}} 
+ 
+ 
+ 
+ l 2 ⟂ ​ ( x ) = \displaystyle l_{2}^{\perp}(x)= 
+ x ​ − 1 tan ⁡ θ f + q y a ​ r ​ c + q x a ​ r ​ c tan ⁡ θ f \displaystyle x\frac{-1}{\tan\theta_{f}}+q^{arc}_{y}+\frac{q^{arc}_{x}}{\tan\theta_{f}} 
+ 
+ 
+ 
+ b = \displaystyle b= 
+ q y a ​ r ​ c + q x a ​ r ​ c tan ⁡ θ f − p y a ​ r ​ c − p x a ​ r ​ c tan ⁡ θ i − 1 tan ⁡ θ i + 1 tan ⁡ θ f \displaystyle\frac{q^{arc}_{y}+\frac{q^{arc}_{x}}{\tan\theta_{f}}-p^{arc}_{y}-\frac{p^{arc}_{x}}{\tan\theta_{i}}}{\frac{-1}{\tan\theta_{i}}+\frac{1}{\tan\theta_{f}}} 
+ 
+ 
+ 
+ C = \displaystyle C= 
+ [ b , l 1 ⟂ ​ ( b ) ] \displaystyle[b,l_{1}^{\perp}(b)] 
+ 
+ (6) 
+ 
+ 
+ r = \displaystyle r= 
+ ∥ C − p a ​ r ​ c ∥ \displaystyle\lVert C-p^{arc}\rVert 
+ 
+ (7) 
+ 
+ 
+ 
+ A straight-line segment is added to the start or end configuration connected to the arc to complete the trajectory.
+Using this method, the trajectory is either an arc or contains an arc and a line segment, depending on the inputs, in which guarantees that the trajectory contains the minimal curvature. 
+ 
+ 
+ Fig. 7: An example trajectory for start configuration (0,0, π 8 \frac{\pi}{8} ) to end configuration (2,2, π 2 \frac{\pi}{2} ). 
+ 
+ 
+ An additional step ensures that the minimal curvature is within the vehicle’s physical constraint, R R .
+The closer q a ​ r ​ c q^{arc} and p a ​ r ​ c p^{arc} are to I, the smaller the radius of the path.
+This places a lower limit on d d for the trajectory to be valid.
+Eq. 8 gives the expression for the minimum distance. 
+ 
+ 
+ 
+
+ 
+ 
+ ψ = \displaystyle\psi= 
+ π 2 − | θ f − θ i | \displaystyle\frac{\pi}{2}-|\theta_{f}-\theta_{i}| 
+ 
+ 
+ 
+ d m ​ i ​ n = \displaystyle d_{min}= 
+ R tan ⁡ ψ 2 \displaystyle\frac{R}{\tan\frac{\psi}{2}} 
+ 
+ (8) 
+ 
+ 
+ 
+ 
+ 
+ 
+ VI Experiments and Analysis 
+
+ 
+ VI-A Random Environments 
+
+ 
+ This experiment benchmarks the performance of each of the planners in the framework along with baseline planners NavFn and SBPL using ARA*.
+Three random maps of 10,000 m 2 m^{2} with varying occupancy of 10%, 15%, 20% were generated [ 19 ] .
+The compute time and paths were recorded for each plan.
+All experiments were run on an AMD Ryzen 5 5600X CPU with Ubuntu 20.04. 
+ 
+ 
+ A set of 1,000 start and goal pairs were randomly generated.
+The pairings had at least 3m of distance between them and were verified to be reachable.
+Fig. 8 shows all of the paths generated on the 20% occupancy map. 
+ 
+ 
+ Each of the Smac Planners were run with complimentary parameters: r m ​ i ​ n r_{min} of 0.4m, reversing was allowed, a cost penalty of 2.0 2.0 and a 5 % 5\% non-straight and change penalties.
+SBPL’s primitive set was created using its provided generator with equivalent parameters: 16 heading discretizations, 5cm grid resolution and 5 primitives per heading.
+The results are shown in Table I . 
+ 
+ 
+ TABLE I: Random occupancy map results. Best results and those within 1% are marked in bold. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Hybrid-A* 
+ State Lattice 
+ 2D-A* 
+ SBPL 
+ NavFn 
+ 
+ 
+ 
+ 10 % 10\% 
+ t ⁡ ( m ​ s ) t(ms) 
+ 39.07 
+ 42.31 42.31 
+ 66.15 66.15 
+ 5,640 5,640 
+ 71.11 71.11 
+ 
+ l p ​ a ​ t ​ h ​ ( m ) l_{path}(m) 
+ 51.41 
+ 51.40 
+ 50.96 
+ 51.99 51.99 
+ 52.60 52.60 
+ 
+ 15 % 15\% 
+ t ⁡ ( m ​ s ) t(ms) 
+ 40.73 
+ 43.25 43.25 
+ 85.63 85.63 
+ 6,587 6,587 
+ 66.45 66.45 
+ 
+ l p ​ a ​ t ​ h ​ ( m ) l_{path}(m) 
+ 51.10 51.10 
+ 51.15 51.15 
+ 50.45 
+ 54.87 54.87 
+ 52.50 52.50 
+ 
+ 20 % 20\% 
+ t ⁡ ( m ​ s ) t(ms) 
+ 38.77 
+ 39.40 39.40 
+ 88.82 88.82 
+ 6,633 6,633 
+ 61.02 61.02 
+ 
+ l p ​ a ​ t ​ h ​ ( m ) l_{path}(m) 
+ 50.78 50.78 
+ 50.51 50.51 
+ 49.65 
+ 53.68 53.68 
+ 52.25 52.25 
+ 
+ 
+ 
+ 
+ 
+ Fig. 8: All paths generated for the 20% occupied map. 
+ 
+ 
+ Across the experiments, the feasible Smac Planners had the most stable behavior.
+Both Cost-Aware Hybrid-A* and State Lattice had run-times between 39-42ms, on average.
+In fact, they demonstrated less than 5% difference in run-time performance and less than 0.2% difference in paths lengths.
+This similar behavior only appears to differ to the extent that their available primitive sets attempts to approximate the same motion.
+This can be attributed to the use of the same traversal and heuristic functions for both of the search models.
+Further, they were both markedly faster than Cost-Aware 2D-A* (approx. 50%) and NavFn (approx. 38%). 
+ 
+ 
+ Fig. 9: Example paths in the 20% occupied map. 
+ 
+ 
+ The Cost-Aware 2D-A* had reliably the shortest paths.
+However, the lengths of the Cost-Aware Hybrid-A* and State Lattice paths were within 2.5% of it in the experiments.
+Cost-Aware 2D-A* has slightly shorter paths due to its 8-connected search model preferring straight line motions, rather than restricted turning maneuvers.
+A slight increase in length is to be expected to achieve feasibility. 
+ 
+ 
+ SBPL’s state lattice ARA* planner displayed two orders of magnitude slower global planning than any other method tested - 150x slower than its Cost-Aware State Lattice counterpart.
+This is due to the lack of modern heuristics and optimizations.
+Much of the compute time is spent searching on approach to the goal at the right heading.
+SBPL also has longer paths than any of the proposed planners, as well as 2/3 of NavFn’s evaluations.
+SBPL paths regularly have more sharp, unsmooth turning behaviors. 
+ 
+ 
+ Fig. 9 shows a set of example paths from the experiment with randomized start and goal poses.
+The Cost-Aware 2D-A* is rather mechanical with straight-line segments.
+Smac’s Hybrid-A* and State Lattice planners have significant overlap and feasibly navigated the maze retaining suitably navigable distances from obstacles.
+The NavFn planner also created a relatively smooth motion maintaining its distance from obstacles.
+However, it still lacks in guaranteed feasibility and is slower. 
+ 
+ 
+ Overall, the experiment shows that the feasible Smac Planners have run-times well in excess to its 2D and SBPL counterparts.
+All of the Smac Planners generate paths shorter than both of the baselines - and the kinematically-feasible Smac Planners are notably faster.
+The behavior of Cost-Aware Hybrid-A* and State Lattice in this experiment is largely equivalent.
+Thus, the selection between them may depend more on the motion model most desired rather than specific architectures. 
+ 
+ 
+ 
+ VI-B Real-World Warehouse 
+
+ 
+ In this experiment, we tested the three Smac Planners in a 363,000 f ​ t 2 ft^{2} warehouse using an Intel i7-8565U CPU with same parameters as in Sec.  VI .
+While this map was generated using a proprietary system, similar may be obtained using open tools like SLAM Toolbox [ 20 ] .
+The three goal poses in Fig. 10 were selected to display planning characteristics in both major and minor aisles distributed across the map. 
+ 
+ 
+ Fig. 10: A set of example paths of the Smac Planner in a warehouse serviced by Locus Robotics (33,600 m 2 m^{2} ). 
+ 
+ 
+ It is clear that the Cost-Aware 2D-A* plans are suboptimal for execution and make unnatural movements when outside the main thoroughfares.
+The feasible planners create high-quality paths even in challenging confined environments in the minor aisles.
+They both display instinctive maneuvers to transition from one aisle to another.
+Unsurprisingly, both Hybrid-A* and State Lattice in Smac demonstrate similar behavior. 
+ 
+ 
+ The feasible planners also show better run-time performance.
+The Smac Planner computation times averaged over 10 trials showed that Hybrid-A* is the fastest at 290ms, State Lattice at 473ms, and the 2D-A* at 1358ms in this exceptionally large and dense warehouse environment. 
+ 
+ 
+ 
+ 
+ VII Conclusion 
+
+ 
+ We introduced the Smac Planner , a minimal framework for building performant search-based planners.
+Within it, we described our variations to create a set of kinematically-feasible path planners specific to the needs of modern mobile roboticists.
+The Cost-Aware planners contain variations in their heuristics, traversal functions, and high level architecture to maximize performance and follow conventions common to the mobile robotics field.
+Experiments benchmarked the new planners’ performance in sandbox and real-world, large-scale situations. 
+ 
+ 
+ This fills the gap of missing feasible planners within a robotics frameworks.
+These planners are in use today by over a dozen organizations worldwide, enabling car-like, legged, and large non-circular robots for the first time in ROS.
+The software behind this work can be found here 1 . 
+ 
+ 
+ 
+ Acknowledgements 
+
+ 
+ We would like to thank Locus Robotics for their generous assistance in providing the warehouse map. We would also like to thank RoboTech Vision for their detailed assistance. 
+ 
+ 
+ 
+ References 
+
+ 
+ 
+ [1] 
+ B. Paden, M. Čáp, S. Z. Yong, D. Yershov and E. Frazzoli. ”A Survey of Motion Planning and Control Techniques for Self-Driving Urban Vehicles,” in IEEE Transactions on Intelligent Vehicles, vol. 1, no. 1, pp. 33-55, March 2016.
+
+ 
+ 
+ [2] 
+ J.-C. Latombe. ”Robot motion planning”. Kluwer Academic Publishers, Dordrecht, Netherlands, 1991.
+
+ 
+ 
+ [3] 
+ K. Trovato. ”Differential A*: An adaptive search method illustrated with robot path planning for moving obstacles and goals, and an uncertain environment”. International Journal of Pattern Recognition and Artificial Intelligence 4.02, 1990.
+
+ 
+ 
+ [4] 
+ S. Macenski, T. Foote, B. Gerkey, C. Lalancette, W. Woodall. ”Robot Operating System 2: Design, architecture, and uses in the wild”. Science Robotics, 7(66), eabm6074, May 2022.
+
+ 
+ 
+ [5] 
+ J. Claraco. ”Development of scientific applications with the mobile robot programming toolkit”, 2008.
+
+ 
+ 
+ [6] 
+ S. Macenski and F. Martin and R. White and J. Ginés Clavero. ”The Marathon 2: A Navigation System”. 2020 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS).
+
+ 
+ 
+ [7] 
+ S. Macenski, T. Moore, DV Lu, A. Merzlyakov, M. Ferguson, ”From the desks of ROS maintainers: A survey of modern & capable mobile robotics algorithms in the robot operating system 2”, Robotics and Autonomous Systems, 2023.
+
+ 
+ 
+ [8] 
+ E. Schmerling, and M. Pavone. ”Kinodynamic Planning”. Encyclopedia of Robotics, Springer, 2019.
+
+ 
+ 
+ [9] 
+ D. Dolgov, S. Thrun, M. Montemerlo and J. Diebel. ”Practical Search Techniques in Path Planning for Autonomous Driving”. AAAI Workshop - Technical Report, 2008.
+
+ 
+ 
+ [10] 
+ M. Pivtoraiko, R. Knepper, and A. Kelly. ”Optimal, smooth, nonholonomic mobile robot motion planning in state lattices”. Robotics Institute, Carnegie Mellon University, Pittsburgh, PA, Tech. Rep. CMU-RI-TR-07-15, 2007.
+
+ 
+ 
+ [11] 
+ M. Pivtoraiko and A. Kelly, ”Generating near minimal spanning control sets for constrained motion planning in discrete state spaces,” 2005 IEEE/RSJ International Conference on Intelligent Robots and Systems, 2005, pp. 3231-3237
+
+ 
+ 
+ [12] 
+ D. J. Webb and J. van den Berg, “Kinodynamic RRT*: Optimal motion planning for systems with linear differential constraints,” in Proc. IEEE Conf. on Robotics and Automation, 2013.
+
+ 
+ 
+ [13] 
+ L. Wang, L. Yong and M. H. Ang, ”Hybrid of global path planning and local navigation implemented on a mobile robot in indoor environment,” Proceedings of the IEEE Internatinal Symposium on Intelligent Control, 2002, pp. 821-826.
+
+ 
+ 
+ [14] 
+ I. Șucan, M. Moll, L. Kavraki, The Open Motion Planning Library, IEEE Robotics & Automation Magazine, 19(4):72–82, December 2012.
+
+ 
+ 
+ [15] 
+ N. Limpert, S. Schiffer and A. Ferrein. ”A local planner for Ackermann-driven vehicles in ROS SBPL”. 2015 Pattern Recognition Association of South Africa and Robotics and Mechatronics International Conference (PRASA-RobMech), 2015, pp. 172-177.
+
+ 
+ 
+ [16] 
+ D. Du, D. Hershberger, W. Smart. ”Layered costmaps for context-sensitive navigation”. 2014 IEEE/RSJ International Conference on Intelligent Robots and Systems, 2014.
+
+ 
+ 
+ [17] 
+ M. Likhachev, G. Gordon, S. Thrun. ”ARA*: Formal Analysis”. School of Computer Science Carnegie Mellon University, 2003.
+
+ 
+ 
+ [18] 
+ D. Ferguson and M. Likhachev. ”Efficiently using cost maps for planning complex maneuvers”. Lab Papers (GRASP), page 20, 2008.
+
+ 
+ 
+ [19] 
+ “Generate map with randomly scattered obstacles,” MATLAB. Available: https://www.mathworks.com/help/nav/ref/mapclutter.html. [Accessed: 25-Feb-2022].
+
+ 
+ 
+ [20] 
+ S. Macenski and I. Jambrecic. ”SLAM Toolbox: SLAM for the dynamic world,” in Journal of Open Source Software, 6(61), 2783.
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Experimental support, please
+ view the build logs 
+ for errors. Generated by
+ 
+ 
+ L
+ A 
+ T
+ E 
+ 
+ xml 
+ 
+ .
+ 
+ 
+ Instructions for reporting errors 
+ We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+ support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+ methods listed below: 
+ 
+ Click the "Report Issue" ( 
+ 
+ ) button, located in the page header. 
+ 
+ Tip: You can select the relevant text first, to include it in your report. 
+ Our team has already identified the following issues . We appreciate your time reviewing and reporting rendering errors we
+ may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+ should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+ all. 
+ Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion , and welcome developer contributions . 
+ 
+ 
+ 
+ 
+ 
+ We gratefully acknowledge support from
+ our major funders ,
+ member institutions , ,
+ and all contributors.
+ 
+ 
+ About 
+ · 
+ Help 
+ · 
+ Contact 
+ · 
+ Subscribe 
+ · 
+ Copyright 
+ · 
+ Privacy 
+ · 
+ Accessibility 
+ · 
+ Operational Status (opens in new tab) 
+ 
+ 
+
+ 
+ Major funding support from 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

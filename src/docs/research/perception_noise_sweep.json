@@ -1,0 +1,95 @@
+{
+  "scope": "Synthetic Gaussian centroid noise over 20 seeds; no annotation/sensor calibration; tests source-time window sensitivity.",
+  "rows": [
+    {
+      "centroid_noise_sigma_m": 0.01,
+      "source_dt_seconds": 0.1,
+      "window_seconds": 0.1,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 1.0,
+      "max_unknown_frames": 1,
+      "final_static_trials": 20
+    },
+    {
+      "centroid_noise_sigma_m": 0.01,
+      "source_dt_seconds": 0.1,
+      "window_seconds": 0.2,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 1.0,
+      "max_unknown_frames": 1,
+      "final_static_trials": 20
+    },
+    {
+      "centroid_noise_sigma_m": 0.01,
+      "source_dt_seconds": 0.1,
+      "window_seconds": 0.3,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 1.0,
+      "max_unknown_frames": 1,
+      "final_static_trials": 20
+    },
+    {
+      "centroid_noise_sigma_m": 0.04,
+      "source_dt_seconds": 0.05,
+      "window_seconds": 0.1,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 43.05,
+      "max_unknown_frames": 79,
+      "final_static_trials": 2
+    },
+    {
+      "centroid_noise_sigma_m": 0.04,
+      "source_dt_seconds": 0.05,
+      "window_seconds": 0.2,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 9.35,
+      "max_unknown_frames": 53,
+      "final_static_trials": 17
+    },
+    {
+      "centroid_noise_sigma_m": 0.04,
+      "source_dt_seconds": 0.05,
+      "window_seconds": 0.3,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 8.3,
+      "max_unknown_frames": 32,
+      "final_static_trials": 18
+    },
+    {
+      "centroid_noise_sigma_m": 0.08,
+      "source_dt_seconds": 0.05,
+      "window_seconds": 0.1,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 97.25,
+      "max_unknown_frames": 100,
+      "final_static_trials": 0
+    },
+    {
+      "centroid_noise_sigma_m": 0.08,
+      "source_dt_seconds": 0.05,
+      "window_seconds": 0.2,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 94.65,
+      "max_unknown_frames": 100,
+      "final_static_trials": 0
+    },
+    {
+      "centroid_noise_sigma_m": 0.08,
+      "source_dt_seconds": 0.05,
+      "window_seconds": 0.3,
+      "seeds": 20,
+      "frames_per_seed": 100,
+      "mean_unknown_frames": 91.95,
+      "max_unknown_frames": 97,
+      "final_static_trials": 0
+    }
+  ]
+}

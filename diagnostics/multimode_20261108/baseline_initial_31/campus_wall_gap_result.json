@@ -1,0 +1,25 @@
+{
+  "case": "campus_wall_gap",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 10.62,
+  "goal_distance_m": 0.18862425053044873,
+  "min_gap_m": 0.3999999999999999,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "motion": 106,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 3.0569159891456366,
+  "plan_max_ms": 3.097000007983297,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

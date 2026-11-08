@@ -1,0 +1,16 @@
+path_planner:
+  ros__parameters:
+    # 路网文件路径
+    roadmap_path: "/home/bit/car_0513/src/planning/path_planner/config/road_graph.pkl"
+
+    # 加密参数
+    resolution: 0.1
+
+    # 运动参数
+    max_speed: 2.0            # 最大速度(m/s)
+    accel_dist: 1.0         # 加速距离(m)
+    decel_dist: 1.5         # 减速距离(m)
+
+    # 规划参数
+    angle_threshold: 60.0   # 分段转角阈值(度)
+    max_adhesion_dist: 3.0  # 最大吸附距离(m)

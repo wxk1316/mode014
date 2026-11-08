@@ -1,0 +1,25 @@
+{
+  "case": "campus_planter",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 15.82,
+  "goal_distance_m": 0.1915893454652197,
+  "min_gap_m": 0.15734902284895091,
+  "collision": false,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.9763674333396267,
+  "reasons": {
+    "motion": 158,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 2.8551624971441925,
+  "plan_max_ms": 3.4864579793065786,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

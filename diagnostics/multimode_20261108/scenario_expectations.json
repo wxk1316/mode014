@@ -1,0 +1,615 @@
+[
+  {
+    "name": "open",
+    "objects": [],
+    "expected": "Keep ACK; no trap or spin; brake at goal.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "pedestrian_0.4",
+    "objects": [
+      {
+        "x": 3.0,
+        "y": 0.0,
+        "length": 0.45,
+        "width": 0.45,
+        "heading": 0.0,
+        "vx": -0.4,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Early safe side avoidance; compare ACK with 3s CRAB waiting. No trap for a passing actor.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "pedestrian_0.45",
+    "objects": [
+      {
+        "x": 3.0,
+        "y": 0.0,
+        "length": 0.45,
+        "width": 0.45,
+        "heading": 0.0,
+        "vx": -0.45,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Early safe side avoidance; compare ACK with 3s CRAB waiting. No trap for a passing actor.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "pedestrian_0.5",
+    "objects": [
+      {
+        "x": 3.0,
+        "y": 0.0,
+        "length": 0.45,
+        "width": 0.45,
+        "heading": 0.0,
+        "vx": -0.5,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Early safe side avoidance; compare ACK with 3s CRAB waiting. No trap for a passing actor.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "car_0.5",
+    "objects": [
+      {
+        "x": 4.0,
+        "y": 0.0,
+        "length": 1.2,
+        "width": 0.8,
+        "heading": 0.0,
+        "vx": -0.5,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Early side avoidance and checked waiting refuge. If switch cannot finish before contact, use ACK or stop safely; no unnecessary spin.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "car_0.75",
+    "objects": [
+      {
+        "x": 4.0,
+        "y": 0.0,
+        "length": 1.2,
+        "width": 0.8,
+        "heading": 0.0,
+        "vx": -0.75,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Early side avoidance and checked waiting refuge. If switch cannot finish before contact, use ACK or stop safely; no unnecessary spin.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "car_1.0",
+    "objects": [
+      {
+        "x": 4.0,
+        "y": 0.0,
+        "length": 1.2,
+        "width": 0.8,
+        "heading": 0.0,
+        "vx": -1.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Early side avoidance and checked waiting refuge. If switch cannot finish before contact, use ACK or stop safely; no unnecessary spin.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "single_barrier",
+    "objects": [
+      {
+        "x": 2.5,
+        "y": 0.0,
+        "length": 0.6,
+        "width": 0.6,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "ACK side arc if cheaper; otherwise one CRAB segment, hold side until obstacle passed.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "staggered_barriers",
+    "objects": [
+      {
+        "x": 1.5,
+        "y": 0.65,
+        "length": 0.6,
+        "width": 0.6,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 3.7,
+        "y": -0.65,
+        "length": 0.6,
+        "width": 0.6,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Continuous safe S/translation route; no left-right mode chattering or false trap.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "u_window",
+    "objects": [
+      {
+        "x": 0.1,
+        "y": 0.95,
+        "length": 2.4,
+        "width": 0.1,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 0.1,
+        "y": -0.95,
+        "length": 2.4,
+        "width": 0.1,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 1.35,
+        "y": 0.0,
+        "length": 0.1,
+        "width": 2.0,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 3,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Check full spin sweep first. Rotate toward rear opening if safe, exit, then route around U to default goal; road-side corridors may be too narrow at .12m clearance.",
+    "exit_x": -1.8,
+    "goal": [
+      5.0,
+      0.0
+    ]
+  },
+  {
+    "name": "u_exit_only",
+    "objects": [
+      {
+        "x": 0.1,
+        "y": 0.95,
+        "length": 2.4,
+        "width": 0.1,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 0.1,
+        "y": -0.95,
+        "length": 2.4,
+        "width": 0.1,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 1.35,
+        "y": 0.0,
+        "length": 0.1,
+        "width": 2.0,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 3,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "goal": [
+      -2.0,
+      0.0
+    ],
+    "expected": "Compare CRAB backing with SPIN+ACK; preserve body yaw when backing is cheaper.",
+    "exit_x": -1.8
+  },
+  {
+    "name": "u_spin_blocked",
+    "objects": [
+      {
+        "x": 0.1,
+        "y": 0.7,
+        "length": 2.4,
+        "width": 0.1,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 0.1,
+        "y": -0.7,
+        "length": 2.4,
+        "width": 0.1,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 1.35,
+        "y": 0.0,
+        "length": 0.1,
+        "width": 1.5,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 3,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "goal": [
+      -2.0,
+      0.0
+    ],
+    "expected": "Refuse unsafe rotation; compare CRAB backing exit without rotating body.",
+    "exit_x": null
+  },
+  {
+    "name": "staggered_tight",
+    "objects": [
+      {
+        "x": 2.0,
+        "y": 0.65,
+        "length": 0.6,
+        "width": 0.6,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 3.4,
+        "y": -0.65,
+        "length": 0.6,
+        "width": 0.6,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Retain original tight geometry as pressure test; safe failure allowed when route does not fit.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_bollards",
+    "objects": [
+      {
+        "x": 2.0,
+        "y": 0.7,
+        "length": 0.25,
+        "width": 0.25,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 2.0,
+        "y": -0.7,
+        "length": 0.25,
+        "width": 0.25,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 3.5,
+        "y": 1.15,
+        "length": 0.3,
+        "width": 0.3,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 3,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "ACK through central opening; no mode switch.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_bench",
+    "objects": [
+      {
+        "x": 2.7,
+        "y": 0.6,
+        "length": 1.8,
+        "width": 0.5,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Pass on right within road boundaries.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_bins",
+    "objects": [
+      {
+        "x": 2.1,
+        "y": -0.6,
+        "length": 0.5,
+        "width": 0.5,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 3.7,
+        "y": 0.75,
+        "length": 0.5,
+        "width": 0.5,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Smooth alternating avoidance; avoid repeated switching.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_planter",
+    "objects": [
+      {
+        "x": 2.8,
+        "y": 0.0,
+        "length": 1.2,
+        "width": 1.0,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Side passage with full body clearance; return toward goal.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_chicane",
+    "objects": [
+      {
+        "x": 1.9,
+        "y": 1.1,
+        "length": 0.6,
+        "width": 1.5,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 3.5,
+        "y": -1.1,
+        "length": 0.6,
+        "width": 1.5,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Use feasible S passage or CRAB segments; evaluate 3s cost.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_wall_gap",
+    "objects": [
+      {
+        "x": 2.6,
+        "y": 1.4,
+        "length": 0.15,
+        "width": 1.2,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      },
+      {
+        "x": 2.6,
+        "y": -1.4,
+        "length": 0.15,
+        "width": 1.2,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 2,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Straight ACK through wide door, no trap.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "campus_full_block",
+    "objects": [
+      {
+        "x": 2.7,
+        "y": 0.0,
+        "length": 0.4,
+        "width": 4.0,
+        "heading": 0.0,
+        "vx": 0.0,
+        "vy": 0.0,
+        "ident": 1,
+        "uncertain": false,
+        "uncertainty_speed": 0.0
+      }
+    ],
+    "expected": "Safe bounded failure; do not claim goal reachable or spin indefinitely.",
+    "goal": [
+      5.0,
+      0.0
+    ],
+    "exit_x": null
+  },
+  {
+    "name": "lateral_goal",
+    "objects": [],
+    "goal": [
+      0.0,
+      1.2
+    ],
+    "expected": "One CRAB +90deg switch, translate without yaw; remain CRAB at arrival.",
+    "exit_x": null
+  }
+]

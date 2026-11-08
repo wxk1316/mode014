@@ -1,0 +1,56 @@
+{
+  "case": "staggered_barriers",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 60.0,
+  "goal_distance_m": 4.63422479869704,
+  "min_gap_m": 0.14981047788724144,
+  "collision": false,
+  "switches": [
+    {
+      "t": 16.96,
+      "mode": 1
+    },
+    {
+      "t": 25.240000000000002,
+      "mode": 4
+    },
+    {
+      "t": 37.08,
+      "mode": 0
+    },
+    {
+      "t": 49.44,
+      "mode": 4
+    },
+    {
+      "t": 56.92,
+      "mode": 0
+    }
+  ],
+  "spin_count": 2,
+  "crab_count": 1,
+  "trap_ticks": 369,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 3.519889149128171,
+  "reasons": {
+    "motion": 216,
+    "mode_switch_wait": 133,
+    "goal_braking": 12,
+    "crab_requested": 1,
+    "crab_hold": 14,
+    "spin_requested": 2,
+    "spin_active": 215,
+    "spin_reached": 2,
+    "orientation_stall": 5
+  },
+  "final_reason": "mode_switch_wait",
+  "plan_p95_ms": 5.8508494039415355,
+  "plan_max_ms": 14.529415988363326,
+  "worker_delay_s": 0.0,
+  "time_model": "virtual time excluding synchronous solve wall time",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP or real lidar"
+}

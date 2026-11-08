@@ -1,0 +1,87 @@
+{
+  "code_commit": "32f65fc9b482fbb484a53a31a789abd0ac0b218c",
+  "source_sha256": {
+    "src/rda_dwa/rda_dwa/motion_safety.py": "0e7185d32d59444557369dd80253e03fe0b653b73e32b527571486d59e580e69",
+    "src/rda_dwa/rda_dwa/realtime_ackermann.py": "28823fdb737ba253511a48a61395b618f309dd16234bd656dba8301938e4da54",
+    "src/rda_dwa/rda_dwa/collision_checker.py": "c69780dd086beafaed94755fde6e2bc96d6fa22a193135ff1586eea7408b76c3",
+    "src/rda_dwa_real/rda_dwa_real/kf_tracker.py": "ade4eba0e8aaed6a19b30f9553f2d2f593fa6159f2d68ab980d747146ec077f5",
+    "src/rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py": "60f3cd14573851b730e568a8e8a7aa52eec4962e7328f60b97f817b0d2ca55c9",
+    "src/rda_dwa_real/rda_dwa_real/traj_tracker_core.py": "8d9e3b66e4d53894da780eba9f879769875da6e19379c02f9a9bc92a62d93f3e",
+    "src/rda_dwa_real/rda_dwa_real/async_planner.py": "eda81d1c8807b5b87bdbedd363dd4a0e33c84c8f7d3462c30eef2a7fd214b20f",
+    "src/rda_dwa_real/rda_dwa_real/pose_velocity.py": "424b218764d3cf77cf96cfae442c7ee2b58c8e3a41857127e01f0653e4aa0dfd",
+    "src/rda_dwa_real/rda_dwa_real/adaptive_preview.py": "699e9e59246934d7fa340437fd08b294f76ca30d697d5e349cceec0c0cfaacc0",
+    "src/rda_dwa_real/config/real_vehicle.yaml": "d60dfbaa9cdb0e3b7856ce1f0f7ce6941718127c24a8c5af85d60564ae2da0fa",
+    "src/rda_dwa_real/rda_dwa_real/perception_core.py": "e966f5af0553e595f872c4fc99cfbd3569c5039e390e9975ab8ac2f123e10e63"
+  },
+  "goal": [
+    5.0,
+    0.0
+  ],
+  "road_width_m": 4.0,
+  "vehicle_size_m": [
+    1.2,
+    0.8
+  ],
+  "road_is_supplied_as_static_boundary_obstacles": true,
+  "physical_check_hz": 100,
+  "controller_hz": 50,
+  "perception_detection_hz": 20,
+  "planning_hz": 10,
+  "planner_delivery_delay_s": 0.25,
+  "observation_latency_s": 0.1,
+  "command_latency_s": 0.08,
+  "noise_seeds": [
+    19,
+    37,
+    71
+  ],
+  "new_detection_position_noise_std_m": 0.01,
+  "pose_noise_std_m": 0.003,
+  "pose_yaw_noise_std_deg": 0.2,
+  "independent_geometry_oracle_random_checks": 500,
+  "raw_lidar_or_ros_hardware_test": false,
+  "primary_road_boundary_model": "fixed map tiles, 1.2m, sensed within8m",
+  "suite_summary": {
+    "primary_runs": 127,
+    "noise_cold_runs": 69,
+    "clean_cold_runs": 23,
+    "noise_warm_runs": 18,
+    "cluster_snapshot_runs": 17,
+    "boundary_representation_comparison_runs": 110,
+    "noise_outcomes": {
+      "collision": 18,
+      "not_reached": 17,
+      "reached": 13,
+      "not_exited_u": 8,
+      "exited_u": 10,
+      "safe_blocked": 3
+    },
+    "warm_dynamic_outcomes": {
+      "collision": 18
+    },
+    "clean_outcomes": {
+      "collision": 6,
+      "reached": 6,
+      "not_reached": 4,
+      "exited_u": 4,
+      "not_exited_u": 2,
+      "safe_blocked": 1
+    },
+    "cluster_snapshot_outcomes": {
+      "not_exited_u": 6,
+      "reached": 6,
+      "not_reached": 2,
+      "safe_blocked": 1,
+      "clearance_below_12cm": 2
+    },
+    "current_production_code_modified": false
+  },
+  "test_script_sha256": {
+    "run_suite.py": "34b5698dd21c984da499cf2a2122100ce619440396c462645622ba10e2549483",
+    "run_perception_tests.py": "18350d5ffdf30671c5ef5a448a5e5d6345d8e44af1c44875fc1bd10b308129a6",
+    "build_report.py": "4c5e86e1b60f23682677c91be925e7116eb166b34a3bb8f1578a03b31a798514"
+  },
+  "matching_backend": "greedy fallback (SciPy unavailable in this local environment)",
+  "self_contained_harness_check": "passed pedestrian failure/static success/U exit branches",
+  "production_source_unchanged": true
+}

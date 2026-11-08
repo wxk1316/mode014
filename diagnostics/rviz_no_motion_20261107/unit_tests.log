@@ -1,0 +1,11 @@
+test_all_consumers_ignore_topic_and_accept_fresh_tf (test_localization_input.LocalizationInputTests.test_all_consumers_ignore_topic_and_accept_fresh_tf) ... ok
+test_forward_goal_produces_motion_and_tf_loss_stops_it (test_localization_input.LocalizationInputTests.test_forward_goal_produces_motion_and_tf_loss_stops_it) ... ok
+test_latest_tf_uses_source_time_and_body_frame (test_localization_input.LocalizationInputTests.test_latest_tf_uses_source_time_and_body_frame) ... ok
+test_missing_stale_future_and_invalid_tf_rejected (test_localization_input.LocalizationInputTests.test_missing_stale_future_and_invalid_tf_rejected) ... ok
+test_repeated_tf_does_not_refresh_tracker_source (test_localization_input.LocalizationInputTests.test_repeated_tf_does_not_refresh_tracker_source) ... ok
+test_topic_mode_has_no_tf_dependency_or_lookup (test_localization_input.LocalizationInputTests.test_topic_mode_has_no_tf_dependency_or_lookup) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.043s
+
+OK

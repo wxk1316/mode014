@@ -1,0 +1,1470 @@
+
+PAGE 1
+Th e Dyn am ic Win do wA p proac ht oC o l l isio n A v oid ance
+Diet er F o x
+y
+W o lf ram Burgard
+y
+Se bast ian Thru n
+y z
+y
+Dept/. of Compu t er Science I I I/, Univ ers it y of Bonn/, D/-/5/3/1/1/7 Bonn/, Germ an y
+z
+Dept/. of Compu t er Science/, Car n egie M ellon Univ ers it y /, Pit t sburgh/, P A /1/5/2/1/3
+Em ail/: f fo x/,w olf r am g /@ur an/. cs/.u ni/-b onn/.d e/, t hru n/@cs/.cm u/.e d u
+A b stract
+Thi s pap er d e scr ib e s t h e dyn amic win do wa p proac ht o react iv e colli s ion a v oid ance
+for mobile rob ot s equip ped w i t h sync hro/-dr iv es /. T h ea p proac hi s d er iv e d direct ly
+f rom t h e mot ion dyn amics of t h e rob ot an di st h erefore part icularly w ell/-suit e d for
+rob ot so p era t in ga t high sp ee d/. It di/#0Bers f rom previous ap proac h e s in t h a tt h e s earc h
+for comm an ds con trollin gt h e transla t ion a la n d rot a t ion al v elo cit yo f t h e rob ot i s
+carr ie d ou t direct ly in t h e space of v elo cit ie s/. Th e adv an t a ge of our ap proac hi s t h a t
+it correct ly an d in an elegan tw ay incorp ora t es t h e dyn amics of t h e rob ot/. Thi s i s don e
+b yr e d u cin gt h e s earc h space t ot h e dynamic window /, whic h cons i st so ft h ev elo cit ie s
+reac h a ble wit hin a sh ort t im ei n t erv al/. Wit hin t h e dyn amic win do wt h ea p proac h only
+cons id ers admi ss ible v elo cit ie s yieldin g a tra ject ory on whic ht h e rob ot i s a ble t os t o p
+safely /. Amon gt h ese v elo cit ie s t h e com bin a t ion of transla t ion al an d rot a t ion al v elo cit y
+is c h os en b ym aximizin g an ob ject iv ef u nct ion/. Th e ob ject iv ef u nct ion includ es a
+m easure of progre ss t o w ards a goal lo ca t ion/, t h e forw ard v elo cit yo ft h e rob ot/, an d
+t h ed i s t ance t ot h en ext obst acle on t h e tra ject ory /. In ext ens iv e exp er im en t st h e
+ap proac h p r ese n t ed h ere h as b een fou n dt o safely con trol our mobile rob ot RHINO
+wit h s pe ed s o f u p t o /9/5 cm/#2Fs ec/, in p o pula t ed a n d dyn amic en vironm en t s/.
+/1 In tro d u ct ion
+On eo f t h eu l t im a t e goals of in do or mobile rob ot ics re s e arc hi st o build rob ot st h a t can
+safely carry ou t mi s s ions in h azardous an dp o pula t ed e n vironm en t s/. F or examp le/, a
+s ervice/-rob ot t h a t a ssis t sh u m ans in in do or o/#0Ece en vironm en t ss h ould b e a b le t o re act
+rapidly t ou nfore s een c h an ge s/, an d p erform it st ask u n d er a wid ev ar iet yo fe x t er n al cir/-
+cu mst ance s/. Mo st of t od ay/'s comm erc ial mobile d evice s scale p o orly alon gt hi s dim ens ion/.
+Th e ir mot ion p lannin g relie s on accura t e/, st a t ic mo d els of t h ee n vironm en t s/, an dt h erefore
+t h ey oft en s e ize t of u nct ion if h u m ans or ot h er u npre dict a b le ob st acle s b lo c kt h ei r p a t h/.
+T o build a u t onomous mobile rob ot so n eh as t o build syst ems t h a t can p erce iv et h ei r e n vir/-
+onm en t s/, re act t ou nfore s een circu mst ance s/, an d /#28re/#29p lan dyn amically in ord er t oa c hiev e
+t h e ir mi s s ions/.
+/1
+
+PAGE 2
+Thi s pap er fo cus e s on on e part icular asp ect of t h ed e s ign of su c h a rob ot/: t h e re act iv e
+a v oid ance of co lli s ions wit ho b s t acle s/. Th e dynamic window appr o ach pro posed i n t hi s
+pap er i s e sp ecially d e s ign ed t od e al wit ht h e constrain t s i m posed b y limit ed v elo cit ie s
+an d accelera t ions/, b eca u s ei ti sd er iv e d direct ly f rom t h e mot ion dyn amics of sync hro/-
+dr iv e mobile rob ot s/. In a n u t sh ell/, our ap proac h cons id ers p er io dically only a sh ort t im e
+in t erv al wh en compu t in gt h en ext st eer in g comm an dt oa v oid t h e enormous comp lexit yo f
+t h e gen eral mot ion p lannin g prob lem/. Th ea p pro xim a t ion of tra ject or ie s d ur in gs u c ha t im e
+in t erv al b y circular curv a t ure s re sul t si na t w o/-dim ens ion al s e arc h space of transla t ion al
+an d rot a t ion al v elo cit ie s/. Thi s s e arc h space i s re d u ce d t ot h e a d m issi b le v elo cit ie s allo win g
+t h e rob ot t os t o p safely /. Due t ot h e limit e d accelera t ions of t h e mot ors a furt h er re str ict ion
+is i m posed o n t h ev elo cit ie s/: t h e rob ot only cons id ers v elo cit ie s t h a t can b e re ac h e d wit hin
+t h en ext t im ei n t erv al/. Th ese v elo cit ie s form t h e dynamic window whic h i s cen tre d arou n d
+t h e curren tv elo cit ie s of t h e rob ot in t h ev elo cit y space/.
+Amon gt h e a d m issi b le v elo cit ie s wit hin t h e dyn amic win do wt h e com bin a t ion of transla/-
+t ion al an d rot a t ion al v elo cit yi s c h ose n b ym aximiz in g an ob ject iv ef u nct ion/. Th e ob ject iv e
+fu nct ion includ es a m e asure of progre s s t o w ards a goal lo ca t ion/, t h e forw ard v elo cit yo f
+t h e rob ot/, an dt h ed i s t ance t ot h en ext ob st acle on t h e tra ject ory /. By com binin gt h ese /,
+t h e rob ot trad e s o/#0B it sd e s ire t om o v e f ast t o w ards t h e goal an di t sd e s ire t o ship arou n d
+ob st acle s /#28whic hd ecre as e t h e f ree space/#29/. Th e com bin a t ion of all ob ject iv e s le ads t oa
+v ery robust an d elegan tc o lli s ion a v oid ance stra t egy /.
+Figure /1/. Th e rob ot RHINO/, an R WI B/2/1/.
+Th e dyn amic win do wa p proac hh as b een imp lem en t ed a n dt es t e d us in g RHINO/, a
+B/2/1 rob ot m an uf act ure d b yR e a lW orld In t erf ace Inc/. /#28s ee Figure /1/#29/, an do t h er sync hro/-
+dr iv e rob ot s/. In ext ens iv e exp er im en t al ev alua t ions us in gu l trasonic pro ximit y s ensors
+/2
+
+PAGE 3
+for t h e constru ct ion of lo cal w orld mo d els /#28ob st acle lin e /#0Celds/#29/, t h em et h od h as pro v en
+t oa v oid co lli s ions relia b ly wit h s pe ed s o f u p t o /9/5 cm/#2Fs ec on s ev eral rob ot si n s e v eral
+in do or en vironm en t s /#28Univ ers it y of Bonn/, Car n egie M ellon Univ ers it y /, /1/9/9/4 AAAI rob ot
+comp et it i on/, /1/9/9/5 IJCAI rob ot exhibit ion/, an do t h ers/, s ee also /#5B/3/#5D/#29/. Th em et h od h as also
+su cce s sfully b een o p era t e d bas e d on cam eras an d inf rare d d et ect ors as s ensory inpu t/.
+Our ap proac h di/#0Bers f rom previous ap proac h e s in /#28a/#29 t h a t i ti sd er iv e d direct ly f rom
+t h e mot ion dyn amics of a mobile rob ot/, /#28b/#29 it t h erefore t ak es t h ei n ert ia of t h e rob ot
+in t o accou n t /#7B whic h i s part icularly imp ort an t if a rob ot wit ht orque limit s tra v els a t high
+sp ee d /#7B/, an d /#28c/#29 h as safely con tro lle d s ev eral R WI rob ot si n v ar ious clu t t ere d an d dyn amic
+en vironm en t s wit h s p e e d so fu pt o/9 /5c e n t im e t er p er s econ d/. W ee n vi s ion t hi s ap proac ht o
+b e part icularly us eful for rob ot st h a t tra v el a te v en high er sp ee ds an d for lo w/-co st rob ot s
+wit h limit e d mot or t orque s/, for whic ht h e constrain t s i m posed b yt h e mot ion dyn amics
+are ev en more imp era t iv e/.
+Th e rem ain d er of t hi s pap er i s organize d as fo llo ws/. Aft er di scus s in g rela t ed w or k
+Sect ion /3 giv es t h e gen eral mot ion equa t ions for sync hro/-dr iv e mobile rob ot s/. On eo f t h e
+k ey re sul t sh ere i s t h a t tra ject or ie s of sync hro/-dr iv e rob ot s can b e ap pro xim a t e d accura t ely
+b y /#0Cnit ely m an y s egm en t s of circle s/. Sect i o n/4d e scr ib e s our ap proac h/, as ou t lin ed a bo v e/.
+Exp er im en t al re sul t s are su mm ar ized in Sect ion /5/, fo llo w ed b y a di scus s ion of furt h er
+re s e arc h i s sue s/.
+/2 Rela t ed W or k
+Th ec o lli s ion a v oid ance ap proac h e s for mobile rob ot s can roughly b e divid ed i n t ot w o
+ca t egor ie s/: glob al an d lo c al /.T h e global t ec hnique s/, su c h as road/-m ap/, cell d ecom posi t ion
+an dp o t en t ial /#0Celd m et h o ds /#28s ee /#5B/1/0 /#5D for an o v erview an d furt h er reference s/#29/, gen erally
+as su m et h a t a comp let em o d el of t h e rob ot/'s en vironm en ti s a v aila b le/. Th e adv an t age of
+global ap proac h e s lie s in t h e f act t h a t a comp let e tra ject ory f rom t h es t art in g p oin tt ot h e
+t arget p oin t can b e compu t e d o/#0B/-lin e/. Ho w ev er/, global ap proac h e s are not ap pro pr ia t e
+for f ast ob st acle a v oid ance/. Th e ir stren gt h i s global pa t hp lannin g/. Addit ion ally /,t h ese
+m et h od s h a v e pro v en prob lem a t ic wh en t h e global w orld mo d el i s in accura t e/, or s imp ly
+not a v aila b le/, as i s t ypically t h e c a s e i nm o s tp o pula t ed i n do or en vironm en t s/. Hu/#2FBrady /,
+Mora v ec an do t h ers /#5B/5/, /1/1 /#5D/, h a v es h o wn h o wt ou p d a t e global w orld mo d els bas e d on s ens/-
+ory inpu t/, us in g proba bili st ic repre s en t a t ions/. A s econ d di sadv an t age of global m et h od s
+is t h e ir slo wn ess d ue t ot h e inh eren t comp lexit y of rob ot mot ion p lannin g /#5B/1/2/#5D/. Thi s i s
+part icularly prob lem a t ic if t h eu n d erlyin gw orld mo d el c h an ge s on/-t h e/-/#0Dy /, b eca us e of t h e
+re sul t in gn ee d for rep e a t e d adjust m en t so f t h e global p lan/. In su c h c a ses /, p lannin gi n a
+global mo d el i s usually t o o exp ens iv et o b e don e r e pea t e dly /.
+Lo cal or re act iv ea p proac h es /, o n t h eo t h er h an d/, us e only a sm all f ract ion of t h ew orld
+mo d el/, t o gen era t e rob ot con tro l/. Thi s com es a tt h eo b vious di sadv an t age t h a tt h ey cannot
+pro d u ce o pt im al so lu t ions/. Lo cal ap proac h e s are e as ily trap p e d in lo cal minim a /#28su c ha s
+U/-sh ap e d ob st acle con/#0Cgura t ions/#29/. Ho w ev er/, t h ek ey adv an t age of lo cal t ec hnique s o v er
+global on e s lie s in t h ei r l o w compu t a t ion al comp lexit y /, whic h i s part icularly imp ort an t
+/3
+
+PAGE 4
+wh en t h ew orld mo d el i s up d a t e d f requen t ly bas e d on s ensor inform a t ion/. F or examp le/,
+po t en t ial /#0Celd m et h o ds/, as pro posed b y /#5B/8/#5D/, d et ermin et h es t eer in g direct ion b y/#28 h yp ot h et/-
+ically/#29 as su min gt h a to b s t acle s as s ert n ega t iv e force s on t h e rob ot/, an dt h a tt h et arget
+lo ca t ion as s ert s a posi t iv e force/. Th ese m et h o ds are extrem el y f ast/, an dt h ey t ypically
+cons id er only t h es m all su bse t o f o bs t acle s clo s e t ot h e rob ot/. Borenst ei n a n d Koren /#5B/9/#5D
+id en t i/#0Ce d t h a ts u c hm et h o ds oft en f ail t o/#0C n d tra ject or ie s b et w een clo s ely space d ob st acle s/;
+t h ey also can pro d u ce o scilla t ory b e h a vior in n arro w corr idors/. An ext en d ed v ers ion of
+t h ep o t en t ial /#0Celd ap proac hi s i n tro d u ce d in /#5B/7/#5D/. By mo difyin gt h ep o t en t ial fu nct ion t h e
+mot ion of t h e rob ot b ecom e s more e/#0Ecien ta n d di/#0Beren tb e h a viors su c ha s w all fo llo win g
+an d trac kin g can b e ac hiev ed /.
+In /#5B/2/#5D/, t h e ve ctor /#0Celd histo gr am ap proac h i s pro posed /, whic h ext en ds t h e previously
+d ev elo ped virtual for c e /#0Celd histo gr am /#5B/1/#5D/. Thi s ap proac h us e s an o ccupancy gr id repre s/-
+en t a t ion for mo d elin gt h e rob ot/'s en vironm en t/, whic h i s gen era t ed a n du p d a t e d con t in u/-
+ously us in gu l trasonic pro ximit y s ensors/. Occupancy inform a t ion i s transform ed i n t oa
+hi st ogram d e scr ipt ion of t h e f ree space arou n dt h e rob ot/, whic hi su s e d t o compu t et h e
+mot ion direct ion an dv elo cit y for t h e rob ot/. As not ed a bo v e/, lo cal m et h o ds are t ypically
+v ery f ast/, an dt h ey quic kly ad apt t ou nfore s een c h an ge s in t h ee n vironm en t/.
+1m
+robot
+target
+right wall I right wall II
+left wall
+Figure /2/. Examp le s it ua t ion
+Mo st of t h e s e lo cal ap proac h e s gen era t e mot ion comm an ds for t h e rob ot in t w o s epara t e
+st age s /#5B/1/, /2/, /8 /#5D/. In t h e /#0Crst st a g ead e s ire d mot ion direct ion i s d et ermin ed /. I n t h e s econ d
+st age t h es t eer in g comm an ds yieldin g a mot ion in t ot h ed e s ire d direct ion are gen era t ed /.
+Str ict ly sp e akin g/, su c ha na p proac h i s only just i/#0Ca b le if in/#0Cnit e force s can b e as s ert ed
+on t h e rob ot/. Ho w ev er/, for rob ot s wit h limit e d accelera t ions it i s n ece s sary t ot ak ei n t o
+accou n tt h e impuls e of t h e rob ot/.
+F or examp le cons id er t h es i t ua t ion giv en in Figure /2 an d sup pose t h a tt h e rob ot i s
+in a f ast straigh t mot ion in t h e corr idor while t h et arget p oin ti si n t h es m all o p enin g
+t oi t s r igh t/. Ob viously /,t h eo pt im al t arget direct ion imp lie s a t ur n t ot h e r igh t/. Wit h ou t
+re sp ect in gt h a ti t s force s are not high enough t o p erform t h en ece s sary sh arp t ur n t h e rob ot
+w ould co llid e wit ht h ew all /#28 right wal l II /#29/. By only cons id er in gt h e a d m issi b le v elo cit ie s
+in t h e dyn amic win do w our m et h od d et ect st h a tt h e rob ot cannot p erform t h es h arp t ur n/.
+Th us t h e rob ot w ould st ay on it s curren t straigh t tra ject ory an d not co llid e wit ht h ew all/.
+/4
+
+PAGE 5
+/3 Mot ion Equa t ions for a Sync hro/-Dr iv e Rob ot
+Thi s s ect ion d e scr ib e s t h ef u n d am en t al mot ion equa t ions for a sync hro/-dr iv e mobile rob ot
+/#5B/4/#5D/. Th ed er iv a t ion b egins wit ht h e correct dyn amic laws/, as su min gt h a tt h e rob ot/'s trans/-
+la t ion al an d rot a t ion al v elo cit y can b e con tro lle d in d ep en d en t ly /#28wit h limit ed t orque s/#29/. T o
+m ak et h e equa t ions more pract ical/, w ed er iv ea n a p pro xim a t ion t h a tm o d els v elo cit ya s a
+piecewi s e const an tf u nct ion in t im e/. Un d er t hi s as su mpt ion/, rob ot tra ject or ie s cons i st of
+s equence s of /#0Cnit ely m an y s egm en t s of circle s/. Su c h repre s en t a t ions are v ery con v enien t
+for co lli s ion c h ec kin g/, s ince in t ers ect ions of ob st acle s wit h circle s are e asy t oc h ec k/. W e
+also d er iv ea n u p pe r bo u n d for t h ea p pro xim a t ion error/. Th e piecewi s e circular repre s en t/-
+a t ion forms t h e bas i s of t h e dyn amic win do wa p proac ht oc o lli s ion a v oid ance/, d e scr ib e d
+in Sect ion /4/.
+/3/./1 Gen eral Mot ion Equa t ions
+Let x /#28 t /#29a n d y /#28 t /#29d enot et h e rob ot/'s co ordin a t ea tt im e t in som e global co ordin a t e syst em/,
+an d let t h e rob ot/'s or ien t a t ion /#28h e adin g direct ion/#29 b e d e scr ib e d b y /#12 /#28 t /#29/. Th et r i p let h x/; y /; /#12 i
+d e scr ib e s t h e kin em a t i c con/#0Cgura t ion of t h e rob ot/. Th e mot ion of a sync hro/-dr iv e rob ot
+i s constrain ed i n a w ay su c ht h a tt h e transla t ion al v elo cit y v alw ays le ads in t h es t eer in g
+direct ion /#12 of t h e rob ot/, whic h i s a non/-h o lonomic constrain t /#5B/1/0 /#5D/. Let x /#28 t
+/0
+/#29a n d x /#28 t
+n
+/#29
+d enot et h e x /-co ordin a t e s of t h e rob ot a tt im e t
+/0
+an d t
+n
+/, r es pe c t iv ely /. Let v /#28 t /#29d enot et h e
+transla t ion al v elo cit yo f t h e rob ot a tt im e t /,a n d /! /#28 t /#29i t s rot a t ion al v elo cit y /.T h en x /#28 t
+n
+/#29
+an d y /#28 t
+n
+/#29 can b e expr essed a s a f u nct ion of x /#28 t
+/0
+/#29/, v /#28 t /#29a n d /#12 /#28 t /#29/:
+x /#28 t
+n
+/#29 /= x /#28 t
+/0
+/#29/+
+Z
+t
+n
+t
+/0
+v /#28 t /#29 /#01 co s /#12 /#28 t /#29 dt /#28/1/#29
+y /#28 t
+n
+/#29 /= y /#28 t
+/0
+/#29/+
+Z
+t
+n
+t
+/0
+v /#28 t /#29 /#01 si n /#12 /#28 t /#29 dt /#28/2/#29
+Equa t ions /#28/1/#29 an d /#28/2/#29 d ep en do nt h ev elo cit ie s of t h e rob ot/, whic h usually cannot b e
+s et direct ly /. Inst e ad/, t h ev elo cit y v /#28 t /#29d ep en ds on t h e init ial transla t ion al v elo cit y v /#28 t
+/0
+/#29
+a t t
+/0
+/,a n dt h e transla t ion al accelera t ion /_ v /#28
+/^
+t /#29i nt h et im ei n t erv al
+/^
+t /2 /#5B t
+/0
+/;t /#5D/. Lik e w ise /, t h e
+or ien t a t ion /#12 /#28 t /#29i sa f u nct ion of t h e init ial or ien t a t ion /#12 /#28 t
+/0
+/#29/, t h e init ial rot a t ion al v elo cit y
+/! /#28 t
+/0
+/#29a t t
+/0
+/,a n dt h e rot a t ion al accelera t ion /_ /! /#28
+/^
+t /#29 wit h
+/^
+t /2 /#5B t
+/0
+/;t /#5D/. Su bs t it u t in g v /#28 t /#29a n d /#12 /#28 t /#29
+b yt h e corre sp on din g init ial kin em a t i ca n d dyn amic con/#0Cgura t ion v /#28 t
+/0
+/#29 /;/#12 /#28 t
+/0
+/#29 /;/! /#28 t
+/0
+/#29a n d
+t h e accelera t ions /_ v /#28
+/^
+t /#29a n d/_ /! /#28
+/^
+t /#29 yields t h e expr essi o n
+/1
+/:
+x /#28 t
+n
+/#29/= x /#28 t
+/0
+/#29/+
+Z
+t
+n
+t
+/0
+/#12
+v /#28 t
+/0
+/#29/+
+Z
+t
+t
+/0
+/_v /#28
+/^
+t /#29 d
+/^
+t
+/#13
+/#01 co s
+/#12
+/#12 /#28 t
+/0
+/#29/+
+Z
+t
+t
+/0
+/#12
+/! /#28 t
+/0
+/#29/+
+Z
+/^
+t
+t
+/0
+/_/! /#28
+/~
+t /#29 d
+/~
+t
+/#13
+d
+/^
+t
+/#13
+dt /#28/3/#29
+Th e equa t ions are no wi n t h e form t h a tt h e tra ject ory of t h e rob ot d ep en ds exclus iv ely
+on it s init ial dyn amic con/#0Cgura t ion a tt im e t
+/0
+an dt h e accelera t ions/, whic hw ea s s u m e
+/1
+Not ice t h a tt h ed er iv a t ion of y /#28 t
+n
+/#29i s a n alogous/, t h us w e only d e scr ib e t h ed er iv a t ion for t h ex /-
+co ordin a t e/.
+/5
+
+PAGE 6
+t o b e con tro lla b le /#28for mo st mobile rob ot st h e accelera t ions d et erminin gi t s mot ion are
+monot onic fu nct ions of t h e curren t s/#0D o win gt hrough t h e mot ors /#5B/6/#5D/. Hence/, limit so n t h e
+curren t s direct ly corre sp on dt o limit so n t h e accelera t ions/#29/.
+Digit al h ardw a r e i m poses constrain t sa st ow h en on e can s et t h e mot or curren t s /#28an d
+t h us s et n ew accelera t ions/#29/. Hence/, Eq/. /#28/3/#29 can b e s imp li/#0Ce d b ya s s u min gt h a tb e t w een
+t w o arbitrary p oin t si nt im e/, t
+/0
+an d t
+n
+/,t h e rob ot can only b e con tro lle d b y /#0Cnit ely m an y
+accelera t ion comm an ds/. Let n d enot et hi s n u m be r o f t im et ic ks/. Th en/, t h e accelera t ions /_ v
+i
+an d/_ /!
+i
+for i /=/1 /:/:/:n are k ept const an ti n a t im ei n t erv al /#5B t
+i
+/;t
+i /+/1
+/#5D/#28 i /=/1 /:/:/:n /#29/. Let /#01
+i
+t
+an d
+/#01
+i
+/^
+t
+be d e/#0Cn e d as /#01
+i
+t
+/= t /, t
+i
+an d/#01
+i
+/^
+t
+/=
+/^
+t /, t
+i
+for som ei n t erv al in d ex i /=/1 /:/:/:n /.U s i n gt hi s
+di scret e form/, t h e dyn amic b e h a vior of a sync hro/-dr iv e rob ot i s expr essed b yt h ef o llo win g
+equa t ion/, whic hf o llo ws direct ly f rom Eq/. /#28/3/#29 u n d er t h ea s s u mpt ion of piecewi s e const an t
+accelera t ions/:
+x /#28 t
+n
+/#29/= x /#28 t
+/0
+/#29/+
+n /, /1
+X
+i /=/0
+Z
+t
+i /+/1
+t
+i
+/#10
+v /#28 t
+i
+/#29/+ /_ v
+i
+/#01 /#01
+i
+t
+/#11
+/#01 co s
+/#12
+/#12 /#28 t
+i
+/#29/+ /! /#28 t
+i
+/#29 /#01 /#01
+i
+t
+/+
+/1
+/2
+/_/!
+i
+/#01 /#28/#01
+i
+t
+/#29
+/2
+/#13
+dt /#28/4/#29
+/3/./2 A p pro xim a t e Mot ion Equa t ions
+While Eq/. /#28/4/#29 d e scr ib e s t h e gen eral cas e of mobile ro ot con tro l/, it i s not part icularly h elpful
+wh en d et erminin gt h e act ual st eer in g direct ion/. Thi s i s b eca us e t h e tra ject or ie s gen era t ed
+b yt h e s e equa t ions are comp lex/, an d geom etr ic o p era t ions su c ha sc h ec ks for in t ers ect ions
+are exp ens iv et o p erform/.
+T od er iv e a more pract ical mo d el/, w e will no w s imp lify Eq/. /#28/4/#29 b ya p pro xim a t in gt h e
+rob ot/'s v elo cit ie s wit h i nat im ei n t erv al /#5B t
+i
+/;t
+i /+/1
+/#5Db y a const an tv alue/. Th e re sul t in g mot ion
+equa t ion/, Eq/. /#28/6/#29/, con v erge s t o Eq/. /#28/4/#29 as t h e len gt ho ft h et im ei n t erv als go e s t o zero/.
+As w e will s ee u n d er t hi s as su mpt ion t h e tra ject ory of a rob ot can b e ap pro xim a t ed b y
+piecewi s e circular arcs/. Thi s repre s en t a t ion i s w ell/-suit e d for gen era t in g mot ion con tro li n
+re al t im e/, as d e scr ib e d in Sect ion /4
+If t h et im ei n t erv als /#5B t
+i
+/;t
+i /+/1
+/#5D are su/#0Ecien t ly sm all/, t h et erm v /#28 t
+i
+/#29/+ /_ v
+i
+/#01 /#01
+i
+t
+can b e ap pro x/-
+im a t ed b y an arbitrary transla t ion al v elo cit y v
+i
+/2 /#5B v /#28 t
+i
+/#29 /;v /#28 t
+i /+/1
+/#29/#5D/, d ue t ot h e smo ot hn ess o f
+rob ot mot ion in t im e/. Lik e w ise /, t h et erm /#12 /#28 t
+i
+/#29/+ /! /#28 t
+i
+/#29/+
+/1
+/2
+/_/!
+i
+/#28/#01
+i
+t
+/#29
+/2
+can b e ap pro xim a t ed b y
+an arbitrary /#12 /#28 t
+i
+/#29/+ /!
+i
+/#01 /#01
+i
+t
+/,w h ere /!
+i
+/2 /#5B /! /#28 t
+i
+/#29 /;/! /#28 t
+i /+/1
+/#29/#5D/. Thi s le ads t ot h ef o llo win g mot ion
+equa t ion
+x /#28 t
+n
+/#29 /= x /#28 t
+/0
+/#29/+
+n /, /1
+X
+i /=/0
+Z
+t
+i /+/1
+t
+i
+v
+i
+/#01 co s /#28 /#12 /#28 t
+i
+/#29/+ /!
+i
+/#01 /#28
+/^
+t /, t
+i
+/#29/#29 d
+/^
+t /#28/5/#29
+whic h/, b ys o lvin gt h ei n t egral/, can b e s imp li/#0Ce d t o
+x /#28 t
+n
+/#29 /= x /#28 t
+/0
+/#29/+
+n /, /1
+X
+i /=/0
+/#28 F
+i
+x
+/#28 t
+i /+/1
+/#29/#29 /#28/6/#29
+wh ere
+F
+i
+x
+/#28 t /#29 /=
+/#28
+v
+i
+/!
+i
+/#28s in /#12 /#28 t
+i
+/#29 /, si n /#28 /#12 /#28 t
+i
+/#29/+ /!
+i
+/#01 /#28 t /, t
+i
+/#29/#29/#29 /;/!
+i
+/6/=/0
+v
+i
+co s/#28 /#12 /#28 t
+i
+/#29/#29 /#01 t/; /!
+i
+/=/0
+/#28/7/#29
+/6
+
+PAGE 7
+Th e corre sp on din g equa t ions for t h e y /-co ordin a t e are/:
+y /#28 t
+n
+/#29 /= y /#28 t
+/0
+/#29/+
+n /, /1
+X
+i /=/0
+/#28 F
+i
+y
+/#28 t
+i /+/1
+/#29/#29 /#28/8/#29
+F
+i
+y
+/#28 t /#29 /=
+/#28
+/,
+v
+i
+/!
+i
+/#28co s /#12 /#28 t
+i
+/#29 /, co s/#28 /#12 /#28 t
+i
+/#29/+ /!
+i
+/#01 /#28 t /, t
+i
+/#29/#29/#29 /;/!
+i
+/6/=/0
+v
+i
+s in/#28 /#12 /#28 t
+i
+/#29/#29 /#01 t/; /!
+i
+/=/0
+/#28/9/#29
+Not ice t h a ti f /!
+i
+/=/0 /,t h e rob ot will fo llo w a straigh t lin e/. Con v ers ely /,i f /!
+i
+/6/=/0 /,t h e
+rob ot/'s tra ject ory d e scr ib e s a circle/, as can b e s een b y cons id er in g
+M
+i
+x
+/= /,
+v
+i
+/!
+i
+/#01 si n /#12 /#28 t
+i
+/#29 /#28/1/0/#29
+M
+i
+y
+/=
+v
+i
+/!
+i
+/#01 co s /#12 /#28 t
+i
+/#29 /#28/1/1/#29
+for whic ht h ef o llo win g rela t ion h o lds/:
+/#10
+F
+i
+x
+/, M
+i
+x
+/#11
+/2
+/+
+/#10
+F
+i
+y
+/, M
+i
+y
+/#11
+/2
+/=
+/#12
+v
+i
+/!
+i
+/#13
+/2
+/#28/1/2/#29
+Thi s sh o ws t h a tt h e i /-t h tra ject ory i s a circle M
+i
+a bo u t/#28 M
+i
+x
+/, M
+i
+y
+/#29 wit h radius M
+i
+r
+/=
+v
+i
+/!
+i
+/.
+Hence/, b ya s s u min g piecewi s e const an tv elo cit ie s/, w e can ap pro xim a t et h e tra ject ory of a
+rob ot b y a s equence of circular an d straigh t lin e arcs/.
+Not ice t h a t/, apart f rom t h e init ial con dit ions/, Equa t ions /#28/5/#29 t o /#28/9/#29 d ep en d only on
+v elo cit ie s/. Wh en con tro llin gt h e rob ot/, h o w ev er/, on e i s not f ree t o s et arbitrary v elo cit ie s/,
+s ince t h e dyn amic constrain t so f t h e r o bo t i m pose bo u n ds on t h em axim u md evia t ion of
+v elo cit yv alue s in su b s equen ti n t erv als/.
+/3/./3 An Up p er Bou n do n t h eA p pro xim a t ion Error
+Ob viously /,t h ed er iv a t ion m ak es t h ea p pro xim a t ea s s u mpt ion t h a tv elo cit ie s are piecewi s e
+const an t wit hin a t im ei n t erv al/. Thi s error i s b ou n d e d lin e arly in t im eb e t w een con tro l
+p oin t s/, t
+i /+/1
+/, t
+i
+/| a f act whic h will b e us e d b elo w for mo d elin gu ncert ain t yi nt h e rob ot/'s
+posi t ion/.
+Cons id er t h e errors E
+i
+x
+an d E
+i
+y
+for t h e x /-a n d y /-co ordin a t e/, re sp ect iv ely /, wit hin t h et im e
+in t erv al /#5B t
+i
+/;t
+i /+/1
+/#5D/. Let /#01 t
+i
+/:/= t
+i /+/1
+/, t
+i
+/.T h ed evia t ion in t h e direct ion of an yo f t h et w o axe s i s
+m axim al if t h e rob ot mo v e s on a straigh t tra ject ory parallel t ot h a t axi s/. Since in e ac ht im e
+in t erv al w ea p pro xim a t e v /#28 t /#29b y an arbitrary v elo cit y v
+i
+/2 /#5B v /#28 t
+i
+/#29 /;v /#28 t
+i /+/1
+/#29/#5D/, an up pe r bo u n do f
+t h e errors E
+i
+x
+an d E
+i
+y
+for /#28 i /+ /1/#29/-t ht im ei n t erv al i s go v er n ed b y E
+i
+x
+/;E
+i
+y
+/#14j v /#28 t
+i /+/1
+/#29 /, v /#28 t
+i
+/#29 j/#01 /#01 t
+i
+/,
+whic h i s lin ea r i n /#01 t
+i
+/.
+Th er e a d er sh ould not ice t h a tt hi s b ou n da p p lie s only t ot h ei n t er n al pre dict ion of t h e
+rob ot/'s posi t ion/. Wh en execu t in g con tro l/, t h el o c a t ion of t h e rob ot i s m e asure d p er io dically
+wit hi t sw h eel/-enco d ers /#28four t im e s a s econ d in our imp lem e n t a t ion/#29/.
+Thi s comp let es t h ed er iv a t ion of t h e rob ot mot ion/. T os u mm a rise /, w eh a v ed er iv ed
+an ap pro xim a t e form t h a td e scr ib e s tra ject or ie s b y s equence s of circular arcs/, an dw e
+h a v ed er iv e d a lin ea r bo u n do nt h e error d ue t oa n a p pro xim a t ea s s u mpt ion m ad ei n t h e
+d er iv a t ion /#28piecewi s e const an tv elo cit ie s/#29/.
+/7
+
+PAGE 8
+/4 Th e Dyn amic Win do wA p proac h
+In t h e dyn amic win do wa p proac ht h e s e arc h for comm an ds con tro lin gt h e rob ot i s carr ie d
+ou t direct ly in t h e space of v elo cit ie s/. Th e dyn amics of t h e rob ot i s incorp ora t ed i n t o
+t h em et h od b yr e d u cin gt h e s e arc h space t ot h ose v elo cit ie s whic h are re ac h a b le u n d er t h e
+dyn amic constrain t s/. In addit ion t ot hi s re str ict ion only v elo cit ie s are cons id ere d whic h
+are safe wit h re sp ect t ot h eo b s t acle s/. Thi s pru nin go ft h e s e arc h space i s don ei n t h e /#0Crst
+st ep of t h e algor it hm/. In t h e s econ ds t ep t h ev elo cit ym axim izi n gt h e ob ject iv ef u nct ion i s
+c h o s en f rom t h e rem ainin gv elo cit ie s/. A br ief ou t lin eo f t h e di/#0Beren t part so fo n e cycle of
+t h e algor it hm i s giv en in Figure /3/. In t h e curren t imp lem e n t a t ion su c h a cycle i s p erform ed
+ev ery /0/./2/5 s econ ds/.
+In t h e rem ain d er of t hi s s ect ion w e will us e t h es i t ua t ion sh o wn in Figure /2 t od e scr ib e
+t h e di/#0Beren t asp ect so f t h e dyn amic win do wa p proac h/.
+/4/./1 Se arc h Space
+Circular tra ject or ie s
+In Sect ion /3 w es h o w ed t h a t i t is possi b le t oa p pro xim a t et h e tra ject ory of a sync hro/-
+dr iv e rob ot b y a s equence of circular arcs/. In t h e rem ain d er of t hi s pap er w e will refer t o
+t h e s e circle s as curv a t ure s/. Eac h curv a t ure i s u niquely d et ermin ed b yt h ev elo cit yv ect or
+/#28 v
+i
+/, /!
+i
+/#29/, whic hw e will s imp ly refer as v elo cit y /.T o gen era t e a tra ject ory t o a giv en goal
+p oin t for t h en ext n t im ei n t erv als t h e rob ot h as t od et ermin ev elo cit ie s /#28 v
+i
+/, /!
+i
+/#29/, on e for
+ea c ho f t h e n in t erv als b et w een t
+/0
+an d t
+n
+/. Thi s h as t o b e don eu n d er t h e premi s e t h a t
+t h e re sul t in g tra ject ory do e s not in t ers ect wit ha n o b s t acle/. Th e s e arc h space for t h ese
+v ect ors i s exp on en t ial in t h en u m be r o f t h e cons id ere d in t erv als/.
+T om ak et h eo pt imiza t i on fe as ib le/, t h e dyn amic win do wa p proac h cons id ers exclus iv ely
+t h e /#0Crst t im ei n t erv al/, an da s s u m es t h a tt h ev elo cit ie s in t h e rem ainin g n /, /1t im ei n t erv als
+are const an t /#28whic h i s equiv alen tt oa s s u min g zero accelera t ions in /#5B t
+/1
+/;t
+n
+/#5D/#29/. Thi s re d u ct ion
+i s mot iv a t ed b yt h e ob s erv a t ions t h a t /#28a/#29 t h er e d u ce d s e arc h space i s t w o/-dim ens ion al an d
+t h us tract a b le/, /#28b/#29 t h e s e arc h is r e pea t e d aft er e ac ht im ei n t erv al/, an d /#28c/#29 t h ev elo cit ie s
+will a u t om a t ically st ay const an ti fn o n ew comm an ds are giv en/.
+A d m issi b le V elo cit ie s
+Ob st acle s in t h e c l ose r e n vironm en to f t h e r o bo t i m pose r es t ri c t ions on t h e rot a t ion al an d
+transla t ion al v elo cit ie s/. F or examp le/, t h em axim a l a d m issi b le sp ee d on a curv a t ure d e/-
+pe n ds on t h ed i s t ance t ot h en ext ob st acle on t hi s curv a t ure/. As su m et h a tf o rav elo cit y
+/#28 v/; /! /#29t h et erm dist /#28 v/; /! /#29 repre s en t st h ed i s t ance t ot h e c l oses t o bs t acle on t h e corre s/-
+po n din g curv a t ure /#28in Sect ion /5/./2 w ed e scr ib e h o wt o compu t et hi s di st ance giv en circular
+tra ject or ie s/#29/. Av elo cit y i s cons id e r ed a d m issi b le/, if t h e rob ot i s a b le t os t o p b efore it
+re ac h es t hi s ob st acle/. Let /_ v
+b
+an d /_/!
+b
+be t h e accelera t ions for bre akage/. Th en t h es e t V
+a
+of
+/8
+
+PAGE 9
+/1/. Se arc h space/: Th e s e arc h space of t h e possi b le v elo cit i e si sr e d u ce d in
+t hree st ep s/:
+/#28a/#29 Circular tra ject or ie s/: Th e dyn amic win do wa p proac h cons id ers
+only circular tra ject or ie s /#28curv a t ure s/#29 u niquely d et ermin ed b y pairs
+/#28 v/; /! /#29 of transla t ion al an d rot a t ion al v elo cit ie s/. Thi s re sul t si n a
+t w o/-dim ens ion al v elo cit y s e arc h space/.
+/#28b/#29 A d m issi b le v elo cit ie s/: Th e re str ict ion t o a d m issi b le v elo cit ie s
+ensure s t h a t only safe tra ject or ie s are cons id ere d/. A pair /#28 v/; /! /#29i s
+cons id e r ed a d m issi b le/, if t h e rob ot i s a b le t os t o p b efore it re ac h es
+t h e c l oses t o bs t acle on t h e corre sp on din g curv a t ure/.
+/#28c/#29 Dyn amic win do w/: Th e dyn amic win do w re str ict st h e a d m issi b le
+v elo cit ie s t ot h ose t h a t can b e re ac h e d wit h i nas h ort t im ei n t erv al
+giv en t h e limit e d accelera t ions of t h e rob ot/.
+/2/. Opt imiza t ion/: Th e ob ject iv ef u nct ion
+G /#28 v/; /! /#29/= /#1B /#28 /#0B /#01 h e adin g/#28 v/; /! /#29/+ /#0C /#01 di st/#28 v/; /! /#29/+ /#0D /#01 v el /#28 v/; /! /#29 /#29 /#28/1/3/#29
+is m aximiz e d/. Wit h re sp ect t ot h e curren t posi t ion an d or ien t a t ion of t h e
+rob ot t hi s fu nct ion trad e s o/#0B t h ef o llo win g asp ect s/:
+/#28a/#29 T arget h e adin g/: he ading is a m e asure of progre s s t o w ards t h e
+goal lo ca t ion/. It i s m axim al if t h e rob ot mo v e s direct ly t o w ards t h e
+t arget/.
+/#28b/#29 Cle arance/: dist is t h ed i s t ance t ot h e c l oses t o bs t acle on t h e tra/-
+ject ory /. Th es m aller t h ed i s t ance t oa no b s t acle t h e high er i s t h e
+rob ot/'s d e s ire t om o v e arou n d it/.
+/#28c/#29 V elo cit y/: vel is t h e forw ard v elo cit yo f t h e rob ot an d sup p ort s f ast
+mo v em en t s/.
+Th ef u nct ion /#1B smo ot h es t h ew e igh t ed s u mo f t h et hree comp on en t sa n d
+re sul t s in more s id e/-cle arance f rom ob st acle s/.
+Figure /3/: Di/#0Beren t part so ft h e dyn amic win do wa p proac h
+a d m issi b le v elo cit ie s i s d e/#0Cn ed a s
+V
+a
+/=
+/#1A
+/#28 v/; /! /#29 j v /#14
+q
+/2 /#01 di st/#28 v/; /! /#29 /#01 /_v
+b
+/^ /! /#14
+q
+/2 /#01 di st /#28 v/; /! /#29 /#01 /_/!
+b
+/#1B
+/: /#28/1/4/#29
+Th us V
+a
+is t h e s et of v elo cit ie s /#28 v/; /! /#29 whic h allo wt h e rob ot t os t o p wit h ou tc o llidin g wit h
+an ob st acle/.
+/9
+
+PAGE 10
+Va
+Vs
+90 deg/sec-90 deg/sec
+90 cm/sec
+door
+left wall corridor right wall II
+right wall I
+Figure /4/. V elo cit y space
+Examp le /1 A gain c onsider the example given in Figur e /2/. Figur e /4 shows the velo cities
+admissible in this situation given the ac c eler ations /_v
+b
+/=/5 /0 cm/#2Fse c
+/2
+and /_/!
+b
+/=/6 /0 de g/#2Fse c
+/2
+/.
+The non/-admissible velo cities ar e denote d by the dark shade da r e as/. F or example al l
+velo cities in ar e a r igh tw all I I would c ause a sharp turn to the right and thus c ause the
+r ob ot to c ol lide with the right wal l in the example situation/. The non/-admissible ar e as ar e
+extr acte df r om r e al world pr oximity information/; in this sp e cial c ase this information was
+obtaine df r om sonar sensors /#28se eS e ction /5/#29/.
+Dyn amic win do w
+In ord er t ot ak ei n t o accou n tt h e limit e d accelera t ions exert a b le b yt h e mot ors t h eo v erall
+s e arc h space i s re d u ce d t ot h e dyn amic win do w whic h con t ains only t h ev elo cit ie s t h a t
+can b e re ac h e d wit hin t h en ext t im ei n t erv al/. Let t be t h et im ei n t erv al d ur in g whic ht h e
+accelera t ions /_ v an d/_ /! will b e ap p lie d an d let /#28 v
+a
+/, /!
+a
+/#29b et h e act ual v elo cit y /.T h en t h e
+dyn amic win do w V
+d
+is d e/#0Cn ed a s
+V
+d
+/= f /#28 v/; /! /#29 j v/#0F /#5B v
+a
+/, /_v /#01 t/; v
+a
+/+/_ v /#01 t /#5D /^ /!/#0F /#5B /!
+a
+/, /_/! /#01 t/; /!
+a
+/+/_ /! /#01 t /#5D g /: /#28/1/5/#29
+Th e dyn amic win do w i s cen tre d arou n dt h e act ual v elo cit ya n dt h e ext ens ions of it d ep en d
+on t h e accelera t ions t h a t can b e exert ed /. All curv a t ure s ou t si d et h e dyn amic win do w
+cannot b e re ac h e d wit hin t h en ext t im ei n t erv al an dt h us are not cons id ere d for t h eo b s t acle
+a v oid ance/.
+Examp le /2 A n exemplary dynamic window obtaine d in the situation shown in Figur e/2
+given ac c eler ations of /5/0 cm/#2Fse c
+/2
+and /6/0 de g/#2Fse c
+/2
+and a time interval of /0/./2/5 se c is shown
+in Figur e/5 /. The two dotte d arr ows p ointing to the c orners of the r e ctangle denote the
+most extr eme curvatur es that c an b er e ache d/.
+/1/0
+
+PAGE 11
+aV
+Vs
+Vr
+90 deg/sec-90 deg/sec
+90 cm/sec
+ddynamic window V
+actual velocity
+Figure /5/. Dyn amic win do w
+Re sul t in g Se arc h Space
+Th ea bo v e giv en re str ict ions im posed o n t h e s e arc h space for t h ev elo cit ie s re sul ti nt h e
+are a V
+r
+wit hin t h e dyn amic win do w/. Let V
+s
+be t h e space of possi b le v elo cit ie s/, t h en t h e
+are a V
+r
+is d e/#0Cn e d as t h ei n t ers ect ion of t h e re str ict e d are as/, n am ely
+V
+r
+/= V
+s
+/#5C V
+a
+/#5C V
+d
+/#28/1/6/#29
+In Figure /5 t h e re sul t in g s e arc h space i s repre s en t ed b yt h e whit e are a/.
+/4/./2 Maximizin gt h e Ob ject iv eF u nct ion
+Aft er h a vin gd et ermin ed t h e re sul t in g s e arc h space V
+r
+av elo cit y i s s elect ed fr o m V
+r
+/.I n
+ord er t o incorp ora t et h ec r i t er ia tar get he ading /, cle ar anc e /,a n d velo city /,t h em axim u mo f
+t h e ob ject iv ef u nct ion
+G /#28 v/; /! /#29 /= /#1B /#28 /#0B /#01 h e adin g /#28 v/; /! /#29/+ /#0C /#01 di st /#28 v/; /! /#29/+ /#0D /#01 v elo cit y /#28 v/; /! /#29/#29
+i s compu t ed o v er V
+r
+/. Thi s i s don eb y di scret iza t ion of t h e re sul t in g s e arc h space/.
+T arget h e adin g
+Th et arget h e adin g he ading /#28 v/; /! /#29m e asure s t h e alignm en to f t h e rob ot wit ht h et arget dir/-
+ect ion/. It i s giv en b y /1/8/0 /, /#12 /,w h ere /#12 is t h ea n gle of t h et arget p oin t rela t iv et ot h e rob ot/'s
+h e adin g direct ion /#28s ee Figure /6/#29/. Since t hi s direct ion c h an ge s wit ht h e di/#0Beren tv elo cit ie s/,
+/#12 i s compu t e d for a pre dict ed posi t ion of t h e rob ot/. T od et ermin et h e pre dict ed posi t ion
+w ea s s u m et h a tt h e rob ot mo v e s wit ht h e s elect ed v elo cit yd ur in gt h en ext t im ei n t erv al/.
+F or a re ali st ic m e asurem e n to f t h et arget h e adin gw eh a v et o cons id er t h e dyn amics of
+t h e rot a t ion/. Th erefore/, /#12 i s compu t ed a tt h e posi t ion/, whic ht h e rob ot will re ac hw h en
+/1/1
+
+PAGE 12
+actual position
+predicted position
+θ
+target targt heading
+-90
+-45
+0
+45 0
+30
+60
+900
+0.5
+1
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+Figure /6/. An gle /#12 t ot h e
+t arget
+Figure /7/. Ev alua t ion of t h et arget
+h e adin g
+exert in gm axim al d ecelera t ion aft er t h en ext in t erv al/. Thi s yields a smo ot ht ur nin gt ot h e
+t arget in t h eb e h a vior of t h e rob ot wh en it h as circu m v en t ed an ob st acle/.
+Examp le /3 Figur e /7 shows the evaluation of the tar get he ading for the di/#0Ber ent velo cities
+in the example situation/. In this /#0Cgur e and the fol lowing /#0Cgur es the values for non/-
+admissible velo cities ar e set to zer o/#28 c omp ar e with Figur es /2 and /4/#29/. F or clarity we show
+the evaluation of the whole velo city sp ac e and do not r estrict it to the dynamic window/.
+The non/-line arity of the function in Figur e/7i s c ause d by the c onsider ation of the dynamics
+in the determination of the pr e dicte dp osition/. Be c ause p ositive r otational velo cities yield
+curvatur es to the right we /#0Cnd the b est velo cities on the right side of the velo city sp ac e/.
+The optimal velo cities ar e those le ading to a p erfe ct he ading to the tar get on the pr e dicte d
+p osition/. The function de clines for even higher r otational velo cities/, b e c ause they yield a
+turning b eyond the tar get/.
+Cle arance
+Th ef u nct ion dist /#28 v/; /! /#29 repre s en t st h ed i s t ance t ot h e c l oses t o bs t acle t h a ti n t ers ect s wit h
+t h e curv a t ure/. If no ob st acle i s on t h e curv a t ure t hi s v alue i s s et t o a large const an t/.
+distance
+-90
+-45
+0
+45 0
+30
+60
+900
+0.5
+1
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+velocity
+-90
+-45
+0
+45 0
+30
+60
+900
+0.5
+1
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+Figure /8/. Ev alua t ion of t h e
+di st ance s
+Figure /9/. Ev alua t ion of t h e
+v elo cit ie s
+/1/2
+
+PAGE 13
+Examp le /4 The evaluation of the distanc es as given in Figur e /8 solely dep ends on the
+pr oximity information ab out obstacles ar ound the r ob ot/. In the given plot one c an /#0Cnd low
+evaluations for those curvatur es which le ad to the wal ls/. F or higher tr anslational velo cities
+these values fal l into the non/-admissible ar e as and ar e thus set to zer o/.
+V elo cit y
+Th ef u nct ion velo city /#28 v/; /! /#29i su s e d t oe v alua t et h e progre s s of t h e rob ot on t h e corre sp on d/-
+in g tra ject ory /. I ti ss i m p ly a pro ject ion on t h e transla t ion al v elo cit y v /, as can b e s een in
+Figure /9/.
+Smo ot hin g
+evaluation function
+-90
+-45
+0
+45 0
+30
+60
+900
+1
+2
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+smoothed evaluation function
+-90
+-45
+0
+45 0
+30
+60
+900
+1
+2
+3
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+Figure /1/0/. Com bin ed e v alua t ion
+fu nct ion
+Figure /1/1/. Ob ject iv ef u nct ion
+All t hree comp on en t so f t h e ob ject iv ef u nct ion are norm alize d t o/#5B /0 /; /1/#5D/. Th ew e igh t ed s u m
+of t h e s e comp on en t si ss h o wn in Figure /1/0/. It i s obt ain ed b yav alue of /2/./0 for /#0B an da
+v alue of /0/./2 for /#0C an d /#0D /. As exp ect ed t h e f ast e st tra ject ory le adin gt hrough t h e do or are a
+get st h e high es t e v alua t ion /#28compare wit h Figure /4/#29/. Smo ot hin g incre as e s s id e/-cle arance
+of t h e rob ot/. Th e re sul t in g ob ject iv ef u nct ion i s sh o wn in Figure /1/1 an dt h e posi t ion of
+t h em axim al v alue i s d epict ed b yt h ev ert ical lin e/.
+It sh ould b e not ice d t h a t all t hree comp on en t so f G /,t h et arget h e adin g/, t h e cle arance
+an dt h ev elo cit y are n ece s sary /.B y m aximiz in gs o lely t h e cle arance an dt h ev elo cit y /,t h e
+rob ot w ould alw ays tra v el in t o f ree space bu tt h ere w ould b e no incen t iv et om o v et o w ards
+a goal lo ca t ion/. By so lely m aximiz in gt h et arget h e adin gt h e rob ot quic kly w ould get
+st o p ped b yt h e /#0Crst ob st acle t h a tb lo c ks it sw ay /,u n a b le t om o v e arou n d it/. By com binin g
+all t hree comp on en t s/, t h e rob ot circu m v en t sc o lli s ions as f ast as it can u n d er t h e constrain t s
+li st ed a bo v e/, while st ill m akin g progre s s t o w ards re ac hin gi t s goal/.
+In a form er v ers ion of our ap proac h /#28s ee /#5B/3/#5D/#29 t h e s e arc h for t h e bes t v elo cit yw as
+carr ie d ou ti n t w os t ep s/. In t h e /#0Crst st ep only t h e curv a t ure w as c h o s en/. Thi s w as don eb y
+ev alua t in gt h et arget an gle an dt h e so/-calle d /#5Cn/-s ec/-rule/"/, n am ely a lin ea r f u nct ion of t h e
+cle arance/. In t h e s econ ds t ep t h ev elo cit yo n t hi s curv a t ure w as m aximi ze d/. Al t h ough t h e
+/1/3
+
+PAGE 14
+re sul t in gb e h a vior of t h e rob ot w as t h e sam e/, w ed ecid ed t ou s et hi s s in gle st ep ev alua t ion
+of t h e ob ject iv ef u nct ion/. W e ado pt ed t h ei d e a for t hi s repre s en t a t ion f rom /#5B/1/3/#5D/.
+/4/./3 Ro le of t h e dyn amic win do w
+In t h e previous s ect ion w ei n tro d u ce d t h e ob ject iv ef u nct ion t ob e m aximiz e d for smo ot h
+an d goal direct ed be h a vior/. F or illustra t i o n p u r poses w e alw ays sh o w ed t h ee v alua t ion
+for t h ew h o le v elo cit y space/. As m en t ion e d in Sect ion /4/./1 t hi s space i s re d u ce d t ot h e
+a d m issi b le v elo cit ie s in t h e dyn amic win do w/. In t hi s s ect ion w ed e scr ib e h o wt h e rob ot
+re sp ect st h e dyn amics b yt hi s re str ict ion/. W e di scus s t h ed ep en d ency of t h eb e h a vior on
+di/#0Beren tv elo cit ie s an d accelera t ions/. In b ot h examp le s t h et im ei n t erv al d et erminin gt h e
+dyn amic win do wi s/#0C x e dt o /0/./2/5 s econ ds/.
+Ro le of t h e Curren tV elo cit y
+In t hi s examp le w es h o wh o wt h eb e h a vior c h an ge s wit ht h e curren tv elo cit ie s/. W ea s s u m e
+accelera t ions of /5/0 cm/#2Fs ec
+/2
+an d/6 /0 d eg/#2Fs ec
+/2
+/. Figure /1/2 sh o ws t h e dyn amic win do ws
+V
+d /1
+an dV
+d /2
+giv en straigh t mot ion wit h transla t ion al v elo cit ie s of /7/5 an d /4/0 cm/#2Fs ec/,
+re sp ect iv ely /.I n t h e Figure s /1/3 an d/1 /4t h e ob ject iv ef u nct ion i s sh o wn for t h e dyn amic
+win do ws/. V elo cit ie s ou t si d et h e dyn amic win do ws h a v ea n e v alua t ion of /-/1/.
+aV
+Vs
+Vd2
+Vd1
+90 deg/sec-90 deg/sec
+90 cm/sec
+door
+corridor
+Figure /1/2/. V elo cit y space
+In t h e /#0Crst cas e/, wh ere t h e curren tv elo cit y i s /7/5 cm/#2Fs ec/, t h e rob ot mo v es t o o f ast t o
+p erform t h es h arp t ur n t ot h e r igh tn ece s sary t od r i v et hrough t h eo pe n d oo r /. Thi s i s
+re/#0Dect e d in Figure /1/3 b yt h e f act t h a tt h ev elo cit ie s re sul t in gi na t ur n t ot h e r igh t are
+n o t a d m issi b le/. Amon gt h ev elo cit ie s in t h e dyn amic win do wt h ev elo cit y wit hm axim al
+ev alua t ion yields straigh t mot ion/, as d enot ed b yt h ev ert ical lin e in Figure /1/3 an db yt h e
+c r oss m ar ka tt h et o po f V
+d /1
+in Figure /1/2/.
+/1/4
+
+PAGE 15
+dynamic window (70,0)
+-90
+-45
+0
+45 0
+30
+60
+90-1-0.500.511.522.5
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+dynamic window (40,0)
+-90
+-45
+0
+45 0
+30
+60
+90
+0
+1
+2
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+Figure /1/3/. Ob ject iv ef u nct ion for
+act ual v elo cit y /#28/7/5/,/0/#29
+Figure /1/4/. Ob ject iv ef u nct ion for
+act ual v elo cit y /#28/4/0/,/0/#29
+If in con trast t h e curren tv elo cit y i s /4/0 cm/#2Fs ec/, t h e dyn amic win do wV
+d /2
+includ es
+curv a t ure s le adin gt hrough t h e do or /#28s ee Figure s /1/2 an d /1/4/#29/. Due t ot h eb e t t er ev alua t ion
+of t h ea n gle an dt h ed i s t ance t h ec h ose n v elo cit yi s t h eo n e yieldin gt h e mo st extrem et ur n
+t ot h e r igh t/.
+Dep en d ency on t h e Accelera t ions
+Th e re str ict ed sea r c h space/, t h ee v alua t ion fu nct ion/, an dt h e dyn amic win do w also d ep en d
+on t h e giv en accelera t ions/. Cons id er t h ev elo cit y space for t h e examp le wit h accelera t ions of
+/2/0 cm/#2Fs ec
+/2
+an d/3 /0 d eg/#2Fs ec
+/2
+as illustra t e d in Figure /1/5/. Beca us e of t h es m all accelera t ions
+t h e space of adm issi b le v elo cit ie s i s sm aller t h an in Figure /4/. Th erefore/, w e only cons id er
+v elo cit ie s up t o /6/0 cm/#2Fs ec an d/5 /0 d eg/#2Fs ec/. Th e dyn amic win do w for straigh t mot ion wit h
+a transla t ion al v elo cit y of /4/0 cm/#2Fs ec i s repre s en t ed b yt h e whit e are a/. Th e s ize of t hi s
+win do wi sr e d u ce d as it d ep en ds on t h e accelera t ions/.
+Figure /1/6 con t ains t h e ob ject iv ef u nct ion of t h ee n t ire v elo cit y space/. Th ee v alua t ion of
+t h e space re str ict ed t ot h ev elo cit ie s in t h e dyn amic win do wi ss h o wn in Figure /1/7/. Again
+t h e rob ot i s t o o f ast for a sh arp t ur n in t ot h ed o o r a n dt h ev elo cit y wit h straigh t mot ion
+h as t h em axim al ev alua t ion /#28compare t o Figure /1/3/#29/.
+/5 Imp lem en t a t ion an d Exp er im en t al Re sul t s
+/5/./1 RHINO
+Th e dyn amic win do wa p proac hh as b een imp lem e n t ed an dt es t e d us in gt h e rob ot RHINO
+whic h i s a sync hro/-dr iv e rob ot curren t ly equip ped w i t ha r i n g o f/2 /4P o laroid ul trasonic
+s ensors/, /5/6 inf rare d d et ect ors/, an das t ereo cam era syst em/. Beca us e t h em ain b e am wid t h
+of an ul trasonic transd u cer i s ap pro xim a t ely /1/5
+/#0E
+/,t h ew h o le /3/6/0
+/#0E
+are a surrou n din gt h e
+rob ot can b e m e asure d wit ho n es w eep of all s ensors/. A comp let e son ar sw eep t ak es
+ap pro xim a t ely /0/./4 s ec/.
+/1/5
+
+PAGE 16
+Va
+dV
+door
+corridor
+-50 deg/sec 50 deg/sec
+60 cm/sec
+Figure /1/5/. Dyn amic win do w for lo w accelera t ions
+smoothed evaluation
+-50
+-25
+0
+25 0
+25
+500
+1
+2
+3
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+dynamic window (40,0)
+-50
+-25
+0
+25 0
+25
+50
+0
+1
+2
+rot. velocity [deg/sec]
+trans. velocity [cm/sec]
+Figure /1/6/. Ob ject iv ef u nct ion for
+lo w accelera t ions
+Figure /1/7/. Ob ject iv ef u nct ion in
+dyn amic win do w
+/5/./2 Th eO b s t acle Lin e Field
+As lo cal w orld mo d el w e us e an ob st acle lin e /#0Celd /#5B/3/#5D/, whic hi sa t w o/-dim ens ion al d e scr ip/-
+t ion of s ensory d a t a rela t iv et ot h e rob ot/'s posi t ion /#28s ee Figure /1/8/#29/. W e adjust e d our son ar
+s ensors su c ht h a t mo st erron eous re adin gs in dica t ea t o o lon gd i s t ance/. T ob e m axim al ly
+cons erv a t iv e/, ev ery re adin g i s con v ert ed t oa n o b s t acle lin e/. If t h e s ensors w ould pro d u ce
+spur ious sh ort re adin gs /#28e/.g/. d ue t o cro s s/-t alk/#29/, more so phi st ica t e d s ensor in t erpret a t ion
+an di n t egra t ion mo d els su c h as for examp le o ccupancy proba bilit yg r i d m ap s /#5B/1/1/#5D w ould
+b e require d/.
+Th eo b s t acle lin e /#0Celd i s cen tre d arou n dt h e rob ot/'s posi t ion an d i s buil to u to ft h e
+d a t ag a t h ere d b y pro ximit y s ensors/. It con t ains a lin e for e ac h re adin g of a son ar s ensor/,
+whic h i s p erp en dicular t ot h em ain axi s of t h e s ensor b e am a tt h em e asure d di st ance/. Th e
+len gt ho ft h e lin ei s d et ermin ed b yt h e bre ad t ho ft h e bea m i n t h e giv en di st ance/. Us in g
+/1/6
+
+PAGE 17
+1m
+robot
+target
+obstacle lines
+left wall
+right wall
+γ
+collision point
+trajectory
+r
+Figure /1/8/. Examp le en vironm en t wit ho b s t acle lin es
+an dt arget p oin t
+Figure /1/9/. Det ermin a t ion of
+t h ed i s t ance
+t hi s ob st acle repre s en t a t ion t h ed i s t ance t oo b s t acle s on curv a t ure s i s compu t e d as fo llo ws/:
+let r be t h e radius of t h e circular tra ject ory /,a n d let /#0D be t h ea n gle b et w een t h ei n t ers ect ion
+wit ht h eo b s t acle lin ea n dt h e posi t ion of t h e rob ot /#28s ee Figure /1/9/#29/. Th en t h ed i s t ance t o
+t h en ext ob st acle i s giv en b y /#0D /#01 r /.
+T o allo wt h e rob ot t o re act quic kly t oc h an ge s in t h ee n vironm en t/, w e limit t h en u m be r
+of lin es t o/7 /2a n da p p ly a /#0Crst/-in/-/#0Crst/-ou t stra t egy t o remo v et h e le ast act ual lin es fr o m
+t h eo b s t acle lin e /#0Celd/. W e fou n dt h ese v alue s t o allo wt h e rob ot t o tra v el safely ev en wit h
+sp ee ds of up t o /9/5 cm/#2Fs ec/, while s im ul t an eously k eepin gt h e compu t a t ion al t im e wit hin
+/0/./2/5 s ec on an i/4/8/6 compu t er/.
+/5/./3 F urt h er Imp lem en t a t ion Det ails
+Th ef o llo win g addit ion al stra t egie s impro v ed t h em an euv era bilit ya n dt h e elegance of rob ot
+mot ion/. Since t h e y a r e n o t esse n t ial for t h ea p proac h pro posed i n t hi s pap er/, w e will only
+sk et c ht h em h ere/.
+/#0F Rot a t ea w ay mo d e/. In rare cas e s w e ob s erv ed t h a tt h e rob ot got st u c ki nl o c a l
+minim a/. Thi s i s t h e c a se i f n o a d m issi b le tra ject ory allo ws t h e rob ot t o transla t e/.
+Wh en t hi s con dit ion o ccurs/, whic h i s e as ily d et ect ed /, t h e rob ot rot a t es a w ay f rom
+t h eo b s t acle u n t il it i s a b le t o transla t e again/.
+/#0F Sp ee d d ep en d en ts i d e cle arance/. T oa d apt t h e s pe ed o f t h e rob ot accordin g
+t ot h es i d e cle arance t oo b s t acle s w ei n tro d u ce d a safet ym argin arou n dt h e rob ot/,
+whic h gro ws lin e arly wit ht h e rob ot/'s transla t ion al v elo cit y /. Th us t h e rob ot will
+tra v el wit h high sp ee d t hrough corr idors an d will d ecelera t ew h en dr ivin gt hrough
+n arro w do ors/. Sim ul t an eously /, possi b le d evia t ions comin g f rom t h ea p pro xim a t ion
+error d e scr ib e d in Sect ion /3/./3 are re sp ect ed /.
+/1/7
+
+PAGE 18
+/5/./4 Exp er im en t al Re sul t s
+Bas e d on t h e dyn amic win do wa p proac ht oc o lli s ion a v oid ance/, RHINO h as b een o p era t ed
+safely in v ar ious en vironm en t s/, o v er t h e last /2 y e ars/. It sm axim u mv elo cit y i s constrain ed
+b yt h eh ardw are t oa p pro xim a t ely /9/5 cm/#2Fs ec/. RHINO re ac h es t hi s v elo cit y in large o p en/-
+in gs an dh allw ays/, if no ob st acle s b lo c ki t sw ay /.I f o b s t acle s b lo c ki t sw ay /, slo w er v elo cit ie s
+are s elect ed /, a n dc o lli s ions are a v oid ed b y s elect in ga p pro pr ia t e tra ject or ie s/. F or examp le/,
+wh en mo vin gt hrough do ors/, RHINO t ypically d ecelera t es t oa p pro xim a t ely /2/0 cm p er
+s econ di n t h e vicinit yo f t h e do or/. In t h e rem ain d er of t hi s s ect ion/, w e will giv e exp er i/-
+m en t al re sul t s gen era t e d wit ht h e dyn amic win do wa p proac h/. In t h ef o llo win g /#0Cgure s t h e
+en vironm en t i s drawn b yh an d/. Non et h e l ess ea c h diagram i s an act ual exp er im en ta n d all
+sh o wn tra ject or ie s are extract ed fr o m r ea l posi t ion d a t a/. Eac ho f t h e s e examp le s sh o wt h e
+comp let ep a t ht o a part icular goal p oin t/, whic h in our t es t si ss e t b yah u m an o p era t or/.
+In t h ee v ery/-d ay us e/, t h e s e goal p oin t s are s et a u t om a t ically b y a global pa t hp lann er
+d e scr ib e d in /#5B/1/4 /, /1/5/, /1/6 /#5D/.
+P aram et er Set t in gs
+Al t h ough t h e p erform ance of t h eo b s t acle a v oid ance d ep en ds on t h ew e igh t in g param et ers
+/#0B /, /#0C /,a n d /#0D /, i ti ss t a b le against sligh tc h an g e so ft h ei r v alue s/. Wit h ou ta n y exh a ust iv e
+t u nin go ft h e s e param et ers w e fou n dv alue s of /0/./8/, /0/./1/, an d /0/./1 for /#0B /, /#0C /,a n d /#0D t o giv e
+go o d re sul t s/. Th e alignm en to f t h e rob ot wit ht h et arget p oin ti sm ainly d et ermin ed b y
+t h er a t io b et w een /#0B an dt h eo t h er t w o param et ers/. V ery lo wv alue s of t h et arget h e adin g
+w e igh t /#0B giv et h e rob ot m u c h f ree dom in mo vin g arou n do b s t acle s/. A tt h e sam et im et h ey
+m ay d et ain t h e rob ot f rom re ac hin gt arget p oin t sb e hin dn arro wo p enin gs if s ensors wit h
+lo wa n gular re so lu t ion are us e d /#28e/.g/. ul trasonic s ensors/#29/. Thi s i s b eca us e t h e rob ot t ur ns
+aw ay f rom t h eo p enin g b efore it s s ensors are a b le t od et ect it/. On t h eo t h er extrem e/, a
+high h e adin gw e igh t force s t h e rob ot t oa p proac h ob ject sv ery clo s ely b efore t ur nin ga w ay /,
+whic h prohibit s smo ot h circu m v en t ion of ob st acle s/.
+By c h oosi n g di/#0Beren tv alue s for /#0B global kno wle dge a bo u tt h ee n vironm en t can b e
+transfere d t ot h e lo cal ob st acle a v oid ance/. While high er v alue s pro d u ce go o d re sul t si n
+n arro we n vironm en t s/, sm aller v alue s are more ap pro pr ia t e in wid ea n dp o pula t ed h allw ays/.
+Ro le of t h e Dyn amic Win do w
+Th e /#0Crst exp er im en td emonstra t es t h e in/#0Duence of t h e dyn amic win do wo nt h eb e h a vior of
+t h e rob ot/. Th et hree pa t hs in Figure /2/0 are examp le s for t h et ypical b e h a vior of t h e rob ot
+u n d er di/#0Beren t dyn amics constrain t s /#28for t h ev elo cit ie s an d accelera t ions w e u sed t h e sam e
+v alue s as in Sect ion /4/./3/#29/. Th e cru cial p oin to ft h e exp er im en ti s t h ep a t ht ak en in t h ed ar k
+sh ad ed de cision ar e a /.I n t hi s are a t h e rob ot d et ect st h eo p enin gt oi t s r igh ta n dh as t o
+d ecid ew h et h er t ot ak et h es h arp t ur n t ot h e r igh t or not/. Thi s d eci s ion stron gly d ep en ds on
+t h e dyn amics of t h e rob ot/. Only if t h e act ual v elo cit ya n dt h e possi b le accelera t ions allo w
+as h arp t ur n t ot h e r igh t/, t h e rob ot direct ly mo v es t ot h et arget p oin t/. Thi s tra ject ory i s
+/1/8
+
+PAGE 19
+d enot ed b yt h ed ash e d lin e/. In t h eo t h er t w o c a ses t h e rob ot d ecid es t o pas s t h eo p enin ga n d
+mo v e s parallel t ot h ew all u n t il t h ee v alua t ion of t h et arget h e adin ga n gle/#28 v/; /! /#29 b ecom es
+v ery sm all/.
+1m
+Decision area
+2
+2
+2
+-  20 cm/sec  , 30 deg/sec
+70 cm/sec
+40 cm/sec
+40 cm/sec
+-  50 cm/sec  , 60 deg/sec
+-  50 cm/sec  , 60 deg/sec
+2
+2
+2
+Figure /2/0/. T ra ject or ie s c h o s en for di/#0Beren t dyn amic
+param et ers
+Not ice t h a t wit h ou t cons id er in gt h e dyn amic constrain t s/, an a t t empt t ot ur n r igh t
+w ould h a v e almo st cert ainly re sul t e d in a co lli s ion wit ha w all/. In f act/, in init ial exp er i/-
+m en t s wit has i m ula t or/, in whic hw e ignore d som eo f t h e dyn amic e/#0Bect s/, w e exp er ience d
+t h ese t yp e co lli s ions f requen t ly /.
+Straigh t Mot ion in Corr idors
+1m
+human
+Figure /2/1/. T ra ject ory t hrough corr idor
+Figure /2/1 sh o ws an examp le of tra v elin g alon ga h allw ay wit h only on eo b s t acle in t h e
+middle of t h eh allw ay /.I n t hi s cas e RHINO /#0Crst or ien t si t s elf t ot h et arget p oin t/. Bu tt h en
+t h eo b s t acle i s d et ect ed a n dt h e rob ot c h ooses a s m oo t h tra ject ory a v oidin gt h eo b s t acle/.
+Al t h ough RHINO slo ws do wn t o /5/5 cm/#2Fs ec b efore pas s in gt h eo b s t acle/, t h ea v erage sp ee d
+in t hi s exp er im en tw as ap pro xim a t ely /7/2 cm/#2Fs ec/. It sh ould b e not ed t h a t aft er h a vin g
+dr iv en rou n dt h eo b s t acle RHINO fo llo ws straigh t lin es w h en ev e r possi b le/, an d d oes n o t
+o scilla t e/, as som et im es is t h e cas e wit ho t h er ap proac h es /.
+/1/9
+
+PAGE 20
+F ast Mot ion t hrough Clu t t ere d En vironm en t
+1m
+humans
+Figure /2/2/. T ra ject ory t hrough clu t t ere d corr idor
+Th et hird exp er im en ti s s h o wn in Figure /2/2 an di n v o lv e s tra v elin gt hrough a clu t t ere d
+corr idor/. All h u m ans in t h e corr idor are smo ot hly circu m v en t e d wit ham axim al sp ee d of
+/9/5 cm/#2Fs ec/. Not ice t h a ta l t h ough t h e rob ot d ecelera t es t o l ess t h an /2/0 cm/#2Fs ec wh en pas s in g
+t h en arro w pas sage /#28le s s t h an /8/0 cm wid e/#29 b et w een t h e fourt h p erson an dt h eo pe n d oo r /,
+it st ill m ain t ains an a v erage sp ee d of /6/5 cm/#2Fs ec/!
+Th e AAAI /'/9/4 Mobile Rob ot Comp et it ion
+Th en ext tra ject ory w as gen era t e d in t h e aren ao f t h e AAAI /'/9/4 mobile rob ot comp et it ion/.
+Figure /2/3 sh o ws a p lot of t h e o ccupancy m ap of t h e aren aa n dt h e tra ject ory of t h e rob ot/.
+Here t h e rob ot mo v e d f ree of co lli s ions in an art i/#0Ccial in do or en vironm en td ur in ga n
+exp lora t ion ru n/. Th et arget p oin t s for t h ec o lli s ion a v oid ance w ere gen era t ed b y a global
+p lannin g algor it hm/. Do ors w ere ap pro xim a t ely /8/0/-/1/1/0 cm wid e/.
+It i s gen erally di/#0Ecul tt o compare t h e re sul t sd e scr ib e d h ere t o re sul t s obt ain ed b yo t h er
+re s e arc h ers/, m ainly b eca us e rob ot sv ary in s ize s/, an ds m all c h an ge s in t h ee n vironm en t can
+h a v e an enormous impact on t h e di/#0Ecul t yo f t h e prob lem/. F or examp le/, in a con/#0Cgura t ion
+s imilar t ot h eo n es s h o wn in Figure s /2/1 an d /2/2 Borenst e in et al/. rep ort t h a tt h e ir rob ot
+tra v ele d wit ha n a v erage sp ee d of /5/8 cm/#2Fs ec t hrough a clu t t ere d en vironm en t /#5B/1/, /2/#5D/. As
+f ar as it can b e judge d f rom a s in gle examp le /#28whic h i s all t h a ti sa v aila b le in /#5B/1/, /2/#5D/#29/, our
+re sul t s compare f a v ora b ly t ot h o s e of Borenst e i ne ta l /.
+/6 Di scus s ion
+Thi s pap er d e scr ib e s an ap proac ht oc o lli s ion a v oid ance for mobile rob ot s equip ped w i t h
+sync hro/-dr iv es /. Bas e d on t h e exact mot ion equa t ions of su c h rob ot s/, it d er iv e s an ap/-
+pro xim a t ev ers ion t h a tm o d els rob ot tra ject or ie s b y /#0Cnit e s equence s of circular arcs/. Th e
+dyn amic win do wa p proac h /#0Crst pru n es t h eo v erall s e arc h space b y cons id er in g only t h e
+n ext st eer in g comm an d/. Thi s re sul t si n at w o/-dim ens ion al s e arc h space of circular tra ject/-
+or ie s/. Aft er t h a t/, t h e s e arc h space i s re d u ce d t ot h e a d m issi b le v elo cit ie s allo win gt h e rob ot
+/2/0
+
+PAGE 21
+st art
+rob ot
+Figure /2/3/. R u na tt h e AAAI /'/9/4 mobile rob ot comp et it ion
+t os t o p safely wit h ou tc o llidin g wit ha n o b s t acle/. Fin ally /,t h e dynamic window re str ict s
+t h e a d m issi b le v elo cit ie s t ot h ose t h a t can b e re ac h e d wit hin a sh ort t im ei n t erv al giv en t h e
+limit e d accelera t ions of t h e rob ot/. Thi s w ay w em ak e sure t h a tt h e dyn amic constrain t s
+are t ak en in t o accou n t/. Th e rob ot const an t ly pic ks a tra ject ory a t whic h it can m aximi ze
+it s transla t ion al v elo cit ya n dt h ed i s t ance t oo b s t acle s/, y et minimi ze t h ea n gle t oi t s goal
+rela t iv et oi t so wn h e adin g direct ion/. Thi s i s don eb ym aximiz in gt h e ob ject iv ef u nct ion/.
+Th e exp er im en t ss h o wt h a tt h e com bin a t ion of all ob ject iv e s le ads t oav ery robust an d
+elegan tc o lli s ion a v oid ance stra t egy whic h safely o p era t e s our rob ot RHINO wit h s pe ed s
+of up t o /9/5 cm/#2Fs ec/. RHINO /, a B/2/1 mobile rob ot/, f requen t ly o p era t e s in our u niv ers it y
+buildin g wit h ou th u m an sup ervi s ion/. Th ea p proac hd e scr ib e d h ere i s only part of t h e
+o v erall arc hit ect ure/. F or examp le/, ap proac h es t o buildin g o ccupancy m ap s/, global pa t h
+p lannin ga n d compu t er vi s ion are surv ey e d in /#5B/3/, /1/5 /, /1/6/#5D/.
+In pr incip le/, t h ea p proac h pro posed h ere only as su m e s geom etr ic inform a t ion a bo u t
+t h e rela t iv el o c a t ion of ob st acle s/. Th erefore/, it i s w ell/-suit e d for pro ximit y s ensors su c ha s
+ul trasonic transd u cers/, whic hw ere us e d in t h e exp er im en t s rep ort ed h ere/, or su c h as las er
+ran ge/-/#0Cn d ers/. In som e prelimin ary t es t sw e also us e d cam era an d inf rare d s ensors for t h e
+d et ect ion of ob st acle s/. Kno win gt h e geom etry of t h e rob ot an dt h ea n gle of it s cam era/,
+/2/1
+
+PAGE 22
+pixel inform a t ion i s con v ert ed t o pro ximit y inform a t ion/. Ho w ev er/, t h e re sul t in g pro ximit y
+es t im a t e i s only accura t e i fa no b s t acle t ou c h es t h e /#0Do or/. Ob st acle s in di/#0Beren th e igh t sl e a d
+t oa n o v ere st im a t i on of di st ance/, whic hm ay ca us e t h e rob ot t oc o llid e/. St ereo vi s ion migh t
+po t en t ially o v ercom et hi s prob lem/. Th e re sul t wit h inf rare d d et ect ors su/#0Bere d f rom t h e
+f act t h a t RHINO /'s d et ect ors h a v e only a sm all ran ge of view /#28 /#3C /3/0 cm/#29/. Th erefore/, wh en
+mo vin g high/-sp ee d t h e rob ot m ay co llid e non et h ele s s/. Com binin ge i t h er of t h et w o s ensor
+syst ems wit hu l trasonic m e asurem en t s/, h o w ev er/, cons i st en t ly impro v ed t h e smo ot hn ess o f
+t h e rob ot/'s tra ject or ie s/.
+Ac kno wle dgm en t
+Th ea u t h ors t h ank Th om as Hofm ann an dt h eo t h er m em b ers of t h e RHINO t e am for
+ins igh tful di scus s ion/, h elp an d advice/.
+On ea u t h or /#28S/.T/./#29 i s sp onsore d in part b yt h eN a t ion al Science F ou n d a t ion u n d er
+aw ard IRI/-/9/3/1/3/3/6/7/, an db yt h eW r igh tL a b ora t ory /, Aeron a u t ical Syst ems Cen t er/, Air
+F orce Ma t er iel Comm an d/, USAF/, an dt h e Defens e Adv ance d R esea r c h Pro ject s Agency
+/#28D ARP A/#29 u n d er gran tn u m b er F/3/3/6/1/5/-/9/3/-/1 /-/1/3 /3/0 /. Th e views an d conclus ions con t ain ed
+in t hi s do cu m en t are t h ose o f t h ea u t h or an ds h ould not b e in t erpret e d as n ece s sar ily
+repre s en t in g o/#0Ecial p o licie s or en dors em en t s/, e it h er expr essed o r i m p lie d/, of NSF/, W r igh t
+La b ora t ory or t h e Unit ed S t a t es G o v er nm en t/.
+Reference s
+/#5B/1/#5D J/. Borenst ei n a n d Y/. Koren/. Re al/-t im eo b s t acle a v oid ance for f ast mobile rob ot si n
+clu t t ere d en vironm en t s/. In Pr o c/. IEEE Int/. Conf/. R ob otics and A utomation /,v o lu m e
+CH/-/2/8/7/6/, page s /5/7/2/#7B/5/7/7/, /1/9/9/0/.
+/#5B/2/#5D J/. Borenst ei n a n d Y/. Koren/. Th ev ect or /#0Celd hi st ogram /- f ast ob st acle a v oid ance for
+mobile rob ot s/. IEEE T r ansactions on R ob otics and A utomation /, /7/#28/3/#29/:/2/7/8/#7B/2/8/8/, /1/9/9/1/.
+/#5B/3/#5D J/. Buhm ann/, W/. Burgard/, A/.B/. Crem ers/, D/. F o x/, T/. Hofm ann/, F/. Sc hn ei d er/,
+J/. Str ik os /, a n d S/. Thru n/. Th e mobile rob ot Rhino/. AI Magazine /, /1/6/#28/1/#29/, /1/9/9/5/.
+/#5B/4/#5D L/. F en g/, J/. Borenst e in/, an d H/.R/. Ev eret t/. /"Wh ere am I/?/" Sensors an dM et h od s
+for A u t onomous Mobile Rob ot P osi t ionin g/. T ec hnical Rep ort UM/-MEAM/-/9/4/-/2/1/,
+Univ ers it y of Mic higan/, Decem b er /1/9/9/4/.
+/#5B/5/#5D H/. Hu an d M/. Brady /. A bay e s ian ap proac ht o re al/-t im eo b s t acle a v oid ance for a
+mobile rob ot/. In A utonomous R ob ots /,v o lu m e /1/, page s /6/9/#7B/9/2/. Klu w er Acad emic
+Pu b li sh ers/, Bo st on/, /1/9/9/4/.
+/#5B/6/#5D J/.L/. Jon es a n d A/.M/. Flynn/. Mobile R ob ots/: Inspir ation to Implementation /. AK
+P et ers/, Ltd/./, /1/9/9/3/. ISBN /1/-/5/6/8/8/1/-/0/1 /1/-/3 /.
+/2/2
+
+PAGE 23
+/#5B/7/#5D M/. Kh a t ib an dR /. C h a t ila/. An ext en d ed po t en t ial /#0Celd ap proac h for mobile rob ot
+s ensor/-bas e d mot ions/. In Pr o c/. International Confer enc e on Intel ligent A utonomous
+Systems /#28IAS/'/4/#29 /, /1/9/9/5/.
+/#5B/8/#5D O/. Kh a t ib/. Re al/-t im eo b s t acle a v oid ance for rob ot m anipula t or an d mobile rob ot s/.
+The International Journal of R ob otics R ese ar ch /, /5/#28/1/#29/:/9/0/#7B/9/8/, /1/9/8/6/.
+/#5B/9/#5D Y/. Koren an d J/. Borenst e in/. P ot en t ial /#0Celd m et h od s a n dt h e ir inh eren t limit a t i ons for
+mobile rob ot n a viga t ion/. In Pr o c/. IEEE Int/. Conf/. R ob otics and A utomation /,A pr il
+/1/9/9/1/.
+/#5B/1/0/#5D J/. La t om be /. R ob ot Motion Planning /. Klu w er Acad emic Pu b li sh ers/, Bo st on/, MA/,
+/1/9/9/1/. ISBN /0/-/7/9/2/3/-/9/2/0 /6/-X/.
+/#5B/1/1/#5D H/.P /. Mora v ec/. Sensor fus ion in cert ain t y gr ids for mobile rob ot s/. AI Magazine /, page s
+/6/1/#7B/7/4/, Su mm er /1/9/8/8/.
+/#5B/1/2/#5D J/.T/. Sc h w artz/, M/. Sc h ar ir/, an dJ /.H o p croft/. Planning/, Ge ometry and Complexity of
+R ob ot Motion /.A b lex Pu b li shin g Corp ora t ion/, Norw o o d/, NJ/, /1/9/8/7/.
+/#5B/1/3/#5D R/. Simmons/. Th e curv a t ure/-v elo cit ym et h o d for lo cal ob st acle a v oid ance/. In Pr o c/.
+IEEE Int/. Conf/. R ob otics and A utomation /, /1/9/9/6/.
+/#5B/1/4/#5D S/. Thru n/. Exp lora t ion an dm o d el buildin g in mobile rob ot dom ains/. In Pr o c e e dings
+of the ICNN/-/9/3 /, page s /1/7/5/#7B/1/8/0/, San F ranci sco/, CA/, /1/9/9/3/. IEEE Neural Net w or k
+Cou ncil/.
+/#5B/1/5/#5D S/. Thru na n dA /. B /#7F uc k en/. In t egra t in g gr id/-bas e d an dt o po logical m ap s for mobile
+rob ot n a viga t ion/. In Pr o c e e dings of the Thirte enth National Confer enc eo n A rti/#0Ccial
+Intel ligen c e AAAI/-/9/6 /, /1/9/9/6/.
+/#5B/1/6/#5D S/. Thru n/, A/. B /#7F uc k en/, W/. Burgard/, D/. F o x/, T/. F r/#7F ohlin gh a us/, D/. Hennig/, T/. Hofm ann/,
+M/. Krell/, an dT /. S c him d t/. Map le ar nin ga n d high/-sp ee d n a viga t ion in RHINO /.I n
+D/. Kort enkamp/, R/.P /. Bon as so/, an d R/. Murph y /, e dit ors/, AI/-b ase d Mobile R ob ots/:
+Case studies of suc c essful r ob ot systems /. MIT Pre s s/, Cam br idge/, MA/, t oa p p e ar/.
+/2/3

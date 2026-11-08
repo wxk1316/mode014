@@ -1,0 +1,9 @@
+float32 pump_speed
+float32 set_speed
+float32 motor_current
+float32 motor_voltage
+float32 press_value
+int8 up_flag
+int8 down_flag
+int8 wrn
+int8 enable

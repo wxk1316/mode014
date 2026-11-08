@@ -1,0 +1,39 @@
+{
+  "positive_closed_loop_passes": 9,
+  "scenarios": 12,
+  "report": "/Users/bytedance/Downloads/car_gpt/diagnostics/engineering_20261108/工程修改与验证.md",
+  "replay_summary": {
+    "frames": 200,
+    "perception_duration_p50_s": 0.047403479504282586,
+    "perception_duration_p95_s": 0.05263718474743655,
+    "last_detection_count": 52,
+    "last_track_count": 62,
+    "last_unknown_count": 6,
+    "selected_localization": {
+      "source": "latest_available",
+      "parent_frame": "map",
+      "child_frame": "body",
+      "reason": "latest_tf_valid",
+      "selected_source": "tf",
+      "source_stamp": 717425.404292199,
+      "source_age_s": 0.051682623103260994,
+      "receive_age_s": 0.051682623103260994,
+      "effective_pose_stamp": 191077.9881283769,
+      "pose_stamp_clock": "monotonic_receive"
+    },
+    "planning_reasons": {
+      "dynamic_yield": 92,
+      "blocked": 105,
+      "orientation_stall": 3
+    },
+    "forward_probe": {
+      "goal": [
+        2.6488433247055427,
+        0.06238954801669794
+      ],
+      "reason": "dynamic_yield",
+      "v": 0.0,
+      "reference_points": 0
+    }
+  }
+}

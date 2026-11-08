@@ -1,0 +1,31 @@
+{
+  "files": [
+    "src/rda_dwa/rda_dwa/local_route.py",
+    "src/rda_dwa/rda_dwa/realtime_ackermann.py",
+    "src/rda_dwa/rda_dwa/multimode_planner.py",
+    "src/rda_dwa/rda_dwa/motion_safety.py",
+    "src/rda_dwa/rda_dwa/signed_ack.py",
+    "src/rda_dwa/rda_dwa/reverse_tracking_forecast.py",
+    "src/rda_dwa/rda_dwa/crab_model.py",
+    "src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py",
+    "src/rda_dwa_real/rda_dwa_real/multimode_tracking.py",
+    "src/rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py",
+    "src/rda_dwa_real/rda_dwa_real/pose_velocity.py",
+    "src/rda_dwa_real/rda_dwa_real/traj_tracker_core.py",
+    "src/rda_dwa_real/rda_dwa_real/bridge_node.py",
+    "src/rda_dwa_real/rda_dwa_real/async_planner.py",
+    "src/rda_dwa_real/rda_dwa_real/multimode_supervisor.py",
+    "src/rda_dwa_real/test/test_engineering_behaviour.py",
+    "src/rda_dwa_real/test/test_localization_input.py",
+    "src/rda_dwa_real/test/test_multimode.py",
+    "src/rda_dwa_real/config/real_vehicle.yaml",
+    "src/rda_dwa_real/launch/rl_dwa_car.launch.py",
+    "src/control/car_ctr/CMakeLists.txt",
+    "src/control/car_ctr/src/car_ctr.cpp",
+    "src/control/car_ctr/src/mode_transaction.hpp",
+    "src/msg/control_msgs/msg/CarCtr.msg",
+    "src/msg/control_msgs/msg/CarState.msg"
+  ],
+  "base": "saved source directory; no Git repository",
+  "scope": "no localization publication/TF/perception implementation edits"
+}

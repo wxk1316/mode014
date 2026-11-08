@@ -1,0 +1,8 @@
+{
+  "backend": "codex",
+  "transport": "native",
+  "requested_model": "ferry-gpt-6-astra",
+  "requested_effort": "xhigh",
+  "review_independence": "same-family",
+  "acceptance_status": "provisional"
+}

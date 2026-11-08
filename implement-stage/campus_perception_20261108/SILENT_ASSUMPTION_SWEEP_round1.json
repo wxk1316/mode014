@@ -1,0 +1,76 @@
+{
+  "undeclared": [
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/pipeline.py:60; src/campus_lidar_perception/campus_lidar_perception/geometry.py:156",
+      "decision": "HARP contributes only a drivable-grid constraint. Only class 10, driveable_surface, can satisfy the semantic road mask; other_flat and sidewalk cannot make a cell free. HARP does not alter object detections or track semantic labels.",
+      "why_it_matters": "This defines what '+ HARP-NeXt' measures: the profiles share their object-detection and tracking algorithms, while the semantic difference is in a grid the existing planner does not consume. README explains the limitation, but A001/A012/A019 do not declare the class-selection and fusion policy in the ledger.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/node.py:119; src/campus_lidar_perception/campus_lidar_perception/node.py:134; src/campus_lidar_perception/campus_lidar_perception/coordinates.py:37",
+      "decision": "Localization orientation is reduced to yaw. Map transforms and historical-sweep compensation retain XYZ translation but discard changing vehicle roll and pitch.",
+      "why_it_matters": "A003 declares the localization source/reference and A007 declares ego-motion compensation, but neither states that compensation is planar. This limits the interpretation of map-aligned boxes and compensated sweeps during vehicle pitch or roll. Supporting roll/pitch in the static mounting transform does not restore the discarded vehicle attitude.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/centerpoint_backend.py:47; src/campus_lidar_perception/campus_lidar_perception/centerpoint_reference.py:82",
+      "decision": "The CenterPoint baseline uses local postprocessing: radial output cropping, same-class suppression at 0.5 m or rotated IoU above 0.1 within 10 m, and at most 500 retained objects. The downloaded detection_class_remapper.param.yaml is not applied.",
+      "why_it_matters": "These choices determine object counts, class labels, and retained neighboring detections. A005/A016/A023 describe inputs, execution, and yaw conventions without declaring this postprocessing definition. This is a baseline-description gap, not a claim that the chosen postprocessing is inherently incorrect.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/geometry.py:60; src/campus_lidar_perception/campus_lidar_perception/geometry.py:146; src/campus_lidar_perception/campus_lidar_perception/geometry.py:188",
+      "decision": "Geometry uses one fitted local ground plane. Ground-validation failure rejects the entire frame, including computed neural detections. Defaults classify relief of at least +0.06 m or at most -0.06 m as occupied; free cells require at least two returns, all within 0.035 m of the plane, with one-cell obstacle dilation.",
+      "why_it_matters": "These rules define obstacles, dropoffs, free-space coverage, and frame availability in both profiles. A006 requires geometry and A011 declares its reference height, but neither declares the plane model and occupancy policy. README documents stopping publication on unreliable ground, but the ledger does not capture the full consequential choice.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/tracker.py:56; src/campus_lidar_perception/campus_lidar_perception/tracker.py:75",
+      "decision": "An UNKNOWN geometry update indefinitely inherits an established semantic label while replacing score/source with the geometry observation's values. Unconfirmed tracks use planner type unknown; sufficiently stationary tracks become block or static_large regardless of their neural class.",
+      "why_it_matters": "Rich semantic_label and score are not necessarily a current semantic observation and its confidence. The first-pass reproduction initialized CAR at score 0.4, then supplied 20 UNKNOWN geometry observations, producing semantic_label=CAR, score=1.0, source=geometry, type=block. A009/A024 cover motion confirmation and moving-UNKNOWN transport but not these label, confidence, and stationary-class policies.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/comparison.py:11; src/campus_lidar_perception/campus_lidar_perception/comparison.py:21; src/campus_lidar_perception/campus_lidar_perception/pipeline.py:55",
+      "decision": "Detection comparison statistics are conditioned on received tracks messages. Throughput spans their first and last receipt; latency percentiles exclude failed or suppressed frames; tracks with obstacle_published=false still count. semantic_available_fraction measures existence of a fresh nonempty confident-label cache rather than current spatial semantic coverage.",
+      "why_it_matters": "A026 excludes accuracy claims but does not define these denominators. These metrics are not whole-run planner publication rate, failure-inclusive latency, or current-cloud semantic coverage. The first-pass reproduction returned semantic_available=true with zero current spatial matches. Independently recorded HARP timing now works, but these other metric definitions remain undeclared.",
+      "class": "semantic"
+    },
+    {
+      "site": "src/campus_lidar_perception/campus_lidar_perception/interfaces.py:4; src/campus_lidar_perception/campus_lidar_perception/interfaces.py:11; src/rda_dwa_real/rda_dwa_real/traj_tracker_node.py:244",
+      "decision": "Predicted tracks are published under the current cloud's array timestamp, while observation_stamp, observation_age, and predicted are omitted from the fixed planner message.",
+      "why_it_matters": "A009's preserved observation time is available in rich JSON only. Existing consumers use the array timestamp and cannot distinguish each track's last actual observation. The first-pass execution of the actual consumer callback produced planner age=0.02 s for a predicted row whose rich observation_age was 0.3 s. The array timestamp correctly describes the estimated state time, but its distinction from observation freshness needs an explicit interface assumption.",
+      "class": "interface"
+    }
+  ],
+  "stale_rows": [],
+  "semantic_undeclared": 6,
+  "verdict": "gaps",
+  "resolved": [
+    {
+      "finding": "A026: successful HARP inference timing was discarded",
+      "status": "resolved",
+      "sites": [
+        "src/campus_lidar_perception/campus_lidar_perception/node.py:92",
+        "src/campus_lidar_perception/campus_lidar_perception/node.py:159",
+        "src/campus_lidar_perception/campus_lidar_perception/node.py:192",
+        "src/campus_lidar_perception/campus_lidar_perception/comparison.py:13"
+      ],
+      "evidence": "Current code emits semantic_ok independently of detector output, including prediction and processing durations. The existing recorder subscribes to those diagnostics, and comparison.py summarizes them. A read-only execution of the actual _poll/_diag/_heartbeat methods and actual summarise function, using an in-memory event stream, produced one semantic frame with 71 ms prediction and 75 ms processing percentiles. Semantic diagnostics do not overwrite the main heartbeat state."
+    },
+    {
+      "finding": "Launch-created TF silently defeated configurable sensor extrinsics",
+      "status": "resolved",
+      "sites": [
+        "src/campus_lidar_perception/campus_lidar_perception/launch_support.py:28",
+        "src/campus_lidar_perception/campus_lidar_perception/launch_support.py:41",
+        "src/campus_lidar_perception/campus_lidar_perception/launch_support.py:83",
+        "implement-stage/campus_perception_20261108/ASSUMPTIONS.md:A027",
+        "src/campus_lidar_perception/README.md:138"
+      ],
+      "evidence": "All six sensor_x/y/z/roll/pitch/yaw launch arguments now feed both static TF and perception. A read-only inspection of instantiated launch actions verified the same LaunchConfiguration name reaches each corresponding field. A027 and README explicitly declare launch-argument precedence over YAML and existing-TF precedence in standalone detection."
+    }
+  ],
+  "review_assurance": "Provisional; no cross-family model-identity evidence was supplied to this reviewer.",
+  "validation_limits": "Current fixes were re-read and checked using CPU execution of actual methods, in-memory events, and launch stubs. No files were edited and no agents were spawned. ROS transport, CUDA compilation, GPU inference, and vehicle-runtime validation remain unexecuted on this host."
+}

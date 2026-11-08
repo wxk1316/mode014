@@ -1,0 +1,81 @@
+[
+  {
+    "case": "open",
+    "duration_s": 12.18,
+    "reached": true,
+    "distance_to_goal_m": 0.29619999999997315,
+    "minimum_conservative_circle_gap_m": null,
+    "mode_requests": [],
+    "steering_sign_flips_over_half_degree": 0,
+    "maximum_command_steer_rate_deg_s": 0.0,
+    "plan_p95_ms": 17.751833001966588,
+    "plan_max_ms": 18.283666999195702,
+    "stop_reasons": {
+      "motion": 121,
+      "reached": 1
+    }
+  },
+  {
+    "case": "static_block",
+    "duration_s": 18.54,
+    "reached": true,
+    "distance_to_goal_m": 0.2945277988043851,
+    "minimum_conservative_circle_gap_m": 0.6425008850640115,
+    "mode_requests": [],
+    "steering_sign_flips_over_half_degree": 1,
+    "maximum_command_steer_rate_deg_s": 45.000000000000014,
+    "plan_p95_ms": 30.168208002578467,
+    "plan_max_ms": 30.588125002395827,
+    "stop_reasons": {
+      "motion": 185,
+      "reached": 1
+    }
+  },
+  {
+    "case": "crossing",
+    "duration_s": 12.58,
+    "reached": true,
+    "distance_to_goal_m": 0.2961999999999776,
+    "minimum_conservative_circle_gap_m": 0.4087333008817901,
+    "mode_requests": [],
+    "steering_sign_flips_over_half_degree": 0,
+    "maximum_command_steer_rate_deg_s": 0.0,
+    "plan_p95_ms": 28.737000000546686,
+    "plan_max_ms": 29.125624998414423,
+    "stop_reasons": {
+      "motion": 125,
+      "reached": 1
+    }
+  },
+  {
+    "case": "reverse_goal",
+    "duration_s": 8.02,
+    "reached": true,
+    "distance_to_goal_m": 0.2940000000000127,
+    "minimum_conservative_circle_gap_m": null,
+    "mode_requests": [],
+    "steering_sign_flips_over_half_degree": 0,
+    "maximum_command_steer_rate_deg_s": 0.0,
+    "plan_p95_ms": 20.779375001438893,
+    "plan_max_ms": 21.80450000014389,
+    "stop_reasons": {
+      "motion": 80,
+      "reached": 1
+    }
+  },
+  {
+    "case": "rear_blocked",
+    "duration_s": 3.0,
+    "reached": false,
+    "distance_to_goal_m": 2.0,
+    "minimum_conservative_circle_gap_m": 0.11715728752538102,
+    "mode_requests": [],
+    "steering_sign_flips_over_half_degree": 0,
+    "maximum_command_steer_rate_deg_s": 0.0,
+    "plan_p95_ms": 9.904582999297418,
+    "plan_max_ms": 10.207166997133754,
+    "stop_reasons": {
+      "no_safe_trajectory": 30
+    }
+  }
+]

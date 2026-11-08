@@ -1,0 +1,295 @@
+{
+  "date": "2026-11-06",
+  "scope": "Compare single maneuver capabilities with full waiting/footprint risk.\n\nCRAB/TRANSLATE are explicit kinematic simulation hypotheses, disabled in the\nproduction protocol. These are capability comparisons, not optimized equal-goal\nnavigation trials. No ROS, DDS, wheel commands or UDP are emitted.\n",
+  "production_unknown_protocol_rejection": {
+    "CRAB": "protocol_unverified",
+    "TRANSLATE": "protocol_unverified"
+  },
+  "results": [
+    {
+      "scene": "open",
+      "action": "ACK_FORWARD",
+      "safe_model": true,
+      "status": "complete",
+      "terminal_pose_m_rad": [
+        0.7086303523584432,
+        0.46807511868678,
+        0.6695287430446349
+      ],
+      "path_m": 0.8705701160437082,
+      "duration_s": 3.1999999999999966,
+      "minimum_model_gap_m": null,
+      "waiting_s": 0.0,
+      "mode_switches_nominal": 0,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 0.7825158804257244
+    },
+    {
+      "scene": "open",
+      "action": "ACK_REVERSE",
+      "safe_model": true,
+      "status": "complete",
+      "terminal_pose_m_rad": [
+        -0.5905766328365375,
+        -0.03306138831809825,
+        -0.44896483263567316
+      ],
+      "path_m": 0.5955694151479372,
+      "duration_s": 3.149999999999997,
+      "minimum_model_gap_m": null,
+      "waiting_s": 0.0,
+      "mode_switches_nominal": 0,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 1.0211621007259424
+    },
+    {
+      "scene": "open",
+      "action": "SPIN_ALIGN",
+      "safe_model": true,
+      "status": "complete",
+      "terminal_pose_m_rad": [
+        0.0,
+        0.0,
+        1.59074276656308
+      ],
+      "path_m": 0.0,
+      "duration_s": 8.999999999999993,
+      "minimum_model_gap_m": null,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 0.8
+    },
+    {
+      "scene": "open",
+      "action": "CRAB",
+      "safe_model": true,
+      "status": "complete",
+      "terminal_pose_m_rad": [
+        0.5683370753786869,
+        0.5683370753786869,
+        0.0
+      ],
+      "path_m": 0.8037499999999991,
+      "duration_s": 10.300000000000011,
+      "minimum_model_gap_m": null,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": false,
+      "deployment_enabled": false,
+      "target_lateral_pose_error_m": 0.6137383334077312
+    },
+    {
+      "scene": "open",
+      "action": "TRANSLATE",
+      "safe_model": true,
+      "status": "complete",
+      "terminal_pose_m_rad": [
+        4.921549324073419e-17,
+        0.8037500000000005,
+        0.0
+      ],
+      "path_m": 0.8037500000000005,
+      "duration_s": 10.300000000000011,
+      "minimum_model_gap_m": null,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": false,
+      "deployment_enabled": false,
+      "target_lateral_pose_error_m": 0.003750000000000475
+    },
+    {
+      "scene": "narrow_corridor",
+      "action": "ACK_FORWARD",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        0.7086303523584432,
+        0.46807511868678,
+        0.6695287430446349
+      ],
+      "path_m": 0.8705701160437082,
+      "duration_s": 3.1999999999999966,
+      "minimum_model_gap_m": -0.4040907298162071,
+      "waiting_s": 0.0,
+      "mode_switches_nominal": 0,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 0.7825158804257244
+    },
+    {
+      "scene": "narrow_corridor",
+      "action": "ACK_REVERSE",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        -0.5905766328365375,
+        -0.03306138831809825,
+        -0.44896483263567316
+      ],
+      "path_m": 0.5955694151479372,
+      "duration_s": 3.149999999999997,
+      "minimum_model_gap_m": 0.09615994623601642,
+      "waiting_s": 0.0,
+      "mode_switches_nominal": 0,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 1.0211621007259424
+    },
+    {
+      "scene": "narrow_corridor",
+      "action": "SPIN_ALIGN",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        0.0,
+        0.0,
+        1.59074276656308
+      ],
+      "path_m": 0.0,
+      "duration_s": 8.999999999999993,
+      "minimum_model_gap_m": 0.028892558998330875,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 0.8
+    },
+    {
+      "scene": "narrow_corridor",
+      "action": "CRAB",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        0.5683370753786869,
+        0.5683370753786869,
+        0.0
+      ],
+      "path_m": 0.8037499999999991,
+      "duration_s": 10.300000000000011,
+      "minimum_model_gap_m": -0.21833707537868696,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": false,
+      "deployment_enabled": false,
+      "target_lateral_pose_error_m": 0.6137383334077312
+    },
+    {
+      "scene": "narrow_corridor",
+      "action": "TRANSLATE",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        4.921549324073419e-17,
+        0.8037500000000005,
+        0.0
+      ],
+      "path_m": 0.8037500000000005,
+      "duration_s": 10.300000000000011,
+      "minimum_model_gap_m": -0.45375000000000054,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": false,
+      "deployment_enabled": false,
+      "target_lateral_pose_error_m": 0.003750000000000475
+    },
+    {
+      "scene": "waiting_approach",
+      "action": "ACK_FORWARD",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        0.7086303523584432,
+        0.46807511868678,
+        0.6695287430446349
+      ],
+      "path_m": 0.8705701160437082,
+      "duration_s": 3.1999999999999966,
+      "minimum_model_gap_m": -0.5135533905932737,
+      "waiting_s": 0.0,
+      "mode_switches_nominal": 0,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 0.7825158804257244
+    },
+    {
+      "scene": "waiting_approach",
+      "action": "ACK_REVERSE",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        -0.5905766328365375,
+        -0.03306138831809825,
+        -0.44896483263567316
+      ],
+      "path_m": 0.5955694151479372,
+      "duration_s": 3.149999999999997,
+      "minimum_model_gap_m": 0.1636942889875897,
+      "waiting_s": 0.0,
+      "mode_switches_nominal": 0,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 1.0211621007259424
+    },
+    {
+      "scene": "waiting_approach",
+      "action": "SPIN_ALIGN",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        0.0,
+        0.0,
+        1.59074276656308
+      ],
+      "path_m": 0.0,
+      "duration_s": 8.999999999999993,
+      "minimum_model_gap_m": -0.5985533905932734,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": true,
+      "deployment_enabled": true,
+      "target_lateral_pose_error_m": 0.8
+    },
+    {
+      "scene": "waiting_approach",
+      "action": "CRAB",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        0.5683370753786869,
+        0.5683370753786869,
+        0.0
+      ],
+      "path_m": 0.8037499999999991,
+      "duration_s": 10.300000000000011,
+      "minimum_model_gap_m": -0.5935533905932733,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": false,
+      "deployment_enabled": false,
+      "target_lateral_pose_error_m": 0.6137383334077312
+    },
+    {
+      "scene": "waiting_approach",
+      "action": "TRANSLATE",
+      "safe_model": false,
+      "status": "unsafe_complete",
+      "terminal_pose_m_rad": [
+        4.921549324073419e-17,
+        0.8037500000000005,
+        0.0
+      ],
+      "path_m": 0.8037500000000005,
+      "duration_s": 10.300000000000011,
+      "minimum_model_gap_m": -0.6085533905932733,
+      "waiting_s": 6.0,
+      "mode_switches_nominal": 2,
+      "protocol_verified": false,
+      "deployment_enabled": false,
+      "target_lateral_pose_error_m": 0.003750000000000475
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+<launch>
+  <arg name="file_name" default="$(find-pkg-share map_loader)/data/simple.osm"/>
+  <arg name="lanelet2_map_topic" default="vector_map"/>
+  <arg name="lanelet2_map_marker_topic" default="vector_map_marker"/>
+
+  <!-- loader -->
+  <node pkg="map_loader"
+        exec="lanelet2_map_loader"
+        name="lanelet2_map_loader"
+        args="$(var file_name)">
+    <remap from="output/lanelet2_map" to="$(var lanelet2_map_topic)"/>
+  </node>
+
+  <!-- visualizer -->
+  <node pkg="map_loader"
+        exec="lanelet2_map_visualization"
+        name="lanelet2_map_visualization">
+    <remap from="input/lanelet2_map" to="$(var lanelet2_map_topic)"/>
+    <remap from="output/lanelet2_map_marker" to="$(var lanelet2_map_marker_topic)"/>
+  </node>
+</launch>

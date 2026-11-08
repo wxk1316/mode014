@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-06",
+  "new_diag_tests_passed": 44,
+  "recorder_tests": 24,
+  "telemetry_tests": 10,
+  "analyzer_tests": 10,
+  "full_python_tests_passed": 171,
+  "full_subtests_passed": 12,
+  "python_sources_parsed": 51,
+  "cpp_guard_passed": true,
+  "five_existing_closed_loop_scenarios_passed": true,
+  "existing_w_zero_spin_session_passed": true,
+  "typed_launch_parameter_contract_passed": true,
+  "synthetic_writer_to_analyzer_passed": true,
+  "localization_original_sources_verified": 32,
+  "ros2_build": false,
+  "dds_test": false,
+  "vehicle_connected": false,
+  "udp_sent": false,
+  "scope": "Offline regression, fake ROS constructors, original vehicle model scenarios, and synthetic file format smoke test; no vehicle test results."
+}

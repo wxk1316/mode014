@@ -1,0 +1,1516 @@
+
+ 
+ 
+ Easy-Poly: An Easy Polyhedral Framework For 3D Multi-Object Tracking 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Skip to main content 
+ 
+   
+     
+       Report GitHub Issue 
+       × 
+     
+
+     
+       Title: 
+       
+
+       Content selection saved. Describe the issue below: 
+
+       Description: 
+       
+     
+
+     
+       Submit without GitHub 
+       Submit in GitHub 
+     
+   
+ 
+ 
+ 
+ 
+ 
+   
+   
+     
+   
+   
+     
+       
+     
+   
+      Why HTML? 
+     
+       Report Issue 
+          
+       Back to Abstract 
+     
+     
+       Download PDF 
+          
+       Contents 
+     
+     
+       Reading mode 
+     
+     
+       Colour theme 
+     
+ 
+ 
+ 
+ 
+ Abstract. 
+ 1  Introduction 
+ 2  Related Work 
+ 
+ 2.1  3D Object Detection 
+ 2.2  3D Multiple Object Tracking 
+ 
+ 3  Methodology 
+ 
+ 3.1  Easy-Poly Framework 
+ 3.2  CNMSMM Framework 
+ 3.3  Dynamic Track-Oriented Data Association 
+ 3.4  Dynamic Motion Modeling 
+ 
+ 3.4.1  Confidence Weighted Kalman Filter 
+ 3.4.2  Adaptive Noise Covariances 
+ 
+ 3.5  Life-cycle Adjustment 
+ 
+ 4  Experiments 
+ 
+ 4.1  Implementation Details 
+ 4.2  Comparative Evaluations 
+ 4.3  Ablation Studies 
+ 4.4  Visualization 
+ 
+ 5  Conclusion 
+ References 
+ 
+ 
+ 
+ 
+   
+    License: arXiv.org perpetual non-exclusive license
+   
+   
+arXiv:2502.17822v3 [cs.CV] 13 Feb 2026 
+ 
+ 
+ Easy-Poly: An Easy Polyhedral Framework For 3D Multi-Object Tracking 
+ DOI:  XXXXXXX.XXXXXXX ISBN:  978-1-4503-XXXX-X/2018/06 CCS:  Computing methodologies Tracking 
+ 
+ 
+ Peng Zhang
+ 
+ Affiliation:  East China Normal University ,  Shanghai ,  China 
+ 
+ email:  52205901027@stu.ecnu.edu.cn 
+ 
+ ,  
+ Xin Li
+ 
+ Affiliation:  Shanghai Artificial Intelligence Laboratory ,  Shanghai ,  China 
+ 
+ email:  lixin@pjlab.org.cn 
+ 
+ ,  
+ Xin Lin  1 1 footnotemark:  
+           1 
+          
+          
+          
+         
+ 
+ Affiliation:  East China Normal University ,  Shanghai ,  China 
+ 
+ email:  xlin@cs.ecnu.edu.cn 
+ 
+  and  
+ Liang He
+ 
+ Affiliation:  East China Normal University ,  Shanghai ,  China 
+ 
+ email:  lhe@cs.ecnu.edu.cn 
+ 
+ 2018 
+
+ Abstract. 
+    
+ Recent 3D multi-object tracking (3D MOT) methods mainly follow tracking-by-detection pipelines, but often suffer from high false positives, missed detections, and identity switches, especially in crowded and small-object scenarios. To address these challenges, we propose Easy-Poly, a filter-based 3D MOT framework with four key innovations: (1) CNMSMM, a novel Camera-LiDAR fusion detection method combining multi-modal augmentation and an efficient NMS with a new loss function to improve small target detection; (2) Dynamic Track-Oriented (DTO) data association that robustly handles uncertainties and occlusions via class-aware optimal assignment and parallel processing strategies; (3) Dynamic Motion Modeling (DMM) using a confidence-weighted Kalman filter with adaptive noise covariance to enhance tracking accuracy; and (4) an extended life-cycle management system reducing identity switches and false terminations. Experimental results show that Easy-Poly outperforms state-of-the-art methods such as Poly-MOT and Fast-Poly, achieving notable gains in mAP (e.g., from 63.30% to 65.65% with LargeKernel3D) and AMOTA (e.g., from 73.1% to 75.6%), while also running in real-time. Our framework advances robustness and adaptability in complex driving environments, paving the way for safer autonomous driving perception. 
+  
+ 
+ 
+ Keywords:  Autonomous driving, 3D object detection, 3D multi object tracking, Deep learning, Kalman filter
+ 
+ 
+ 1.  Introduction 
+
+ 
+ Recent advances in 3D multi-object tracking (3D MOT), driven by autonomous driving, robotics, and mixed reality, emphasize multi-modal data fusion to enhance reliability and accuracy  ( 23 ,  7 ) . Traditional filtering and deep learning coexist, yet most methods prioritize tracking over improving 3D detection. For example, Poly-MOT and Fast-Poly  ( 17 )  utilize FocalsConv  ( 5 )  with CenterPoint  ( 32 )  and LargeKernel3D  ( 6 ) , but lack thorough multi-modal data augmentation, NMS, and loss optimization. They suffer from high identity switches (IDS), false negatives (FN), and false positives (FP), especially in crowded and small-object scenarios, highlighting the need for integrated detection and tracking enhancements. 
+ 
+ 
+ We propose  Easy-Poly , a real-time filter-based 3D MOT under the  tracking-by-detection  paradigm, supporting multiple categories with improved performance in complex settings. First, we develop a Combined NMS Framework for 3D Multi-Modal Small Object Detection ( CNMSMM ) based on FocalsConv, which significantly improves detection via refined multi-modal augmentation, efficient NMS, and a novel loss function, yielding superior results in dense traffic and small-object detection. Next, the optimized  Easy-Poly  pipeline (Figure  1 ) manages detection flow through pre-processing, association, matching, estimation, and life-cycle control. Key components include  Score Filtering (SF)  and NMS to remove low-confidence detections, a  Dynamic Track-Oriented (DTO)  module for ambiguous association, and a  Dynamic Motion Modeling (DMM)  strategy that incorporates confidence-weighted Kalman filter updates with adaptive noise covariance tuning. Collectively, these innovations reduce false positives, tracking failures, and enhance robustness. 
+ 
+ 
+ Extensive experiments on the nuScenes dataset validate the efficacy of Easy-Poly, demonstrating superior detection and tracking performance compared to Poly-MOT and Fast-Poly baselines. With the CNMSMM framework,  CenterPoint  achieves an mAP improvement from  63.86%  to  65.45% , while  LargeKernel3D  improves from  63.30%  to  65.65%  (See the Table  1 ). Moreover, in 3D MOT, Easy-Poly increases the AMOTA of CenterPoint from  73.1%  to  74.5% , and LargeKernel3D reaches  75.6%  AMOTA at  34.9  FPS—almost doubling the inference speed of the baseline. Our framework thereby offers an efficient, versatile, and more reliable solution for real-world autonomous driving, underscoring the importance of synergistic improvements in both detection and tracking modules. 
+ 
+ 
+ This paper makes the following key contributions: 
+ 
+ •  
+ 
+ We propose a novel CNMSMM 3D detection framework that integrates refined NMS/Loss methods and multi-modal data augmentation, significantly improving 3D detection quality in dense-traffic and small-object scenarios. 
+ 
+ •  
+ 
+ We introduce an  Easy-Poly  pipeline encompassing pre-processing, data association, and motion modeling. Notably, we design a class-aware DTO algorithm for robust association under ambiguous conditions and a DMM module that adaptively adjusts noise covariances. 
+ 
+ •  
+ 
+ We incorporate confidence-weighted Kalman filtering and dynamic threshold management into life-cycle management, enhancing tracking accuracy and robustness in small object and complex road conditions. 
+ 
+ •  
+ 
+ Extensive experiments on nuScenes show that Easy-Poly outperforms Poly-MOT and Fast-Poly baselines in both detection (mAP, NDS) and MOT metrics (AMOTA, MOTA, FPS), validating the effectiveness and efficiency of our design. 
+ 
+ 
+ 
+ 
+ Table 1.  Comparison of existing 3D object detection methods applied to the nuScenes validation set. Except for the method in line 2, which utilizes only LiDAR data, all other methods employ multi-modal inputs. 
+ 
+ 
+ 
+ Framework 
+ Method 
+ Fusion 
+ mAP 
+ NDS 
+ 
+ FocalsConv  ( 5 ) 
+ CenterPoint  ( 32 ) 
+ ✓ 
+ 63.86 
+ 69.41 
+ 
+ FocalsConv  ( 5 ) 
+ LargeKernel3D  ( 6 ) 
+ × \times 
+ 60.30 
+ 67.50 
+ 
+ FocalsConv  ( 5 ) 
+ LargeKernel3D  ( 6 ) 
+ ✓ 
+ 63.30 
+ 69.10 
+ 
+ Ours 
+ CenterPoint  ( 32 ) 
+ ✓ 
+ 65.45 
+ 70.29 
+ 
+ Ours 
+ LargeKernel3D  ( 6 ) 
+ ✓ 
+ 65.65 
+ 70.48 
+ 
+ 
+ 
+ 
+ 
+ 2.  Related Work 
+
+ 
+ 2.1.  3D Object Detection 
+
+ 
+ Recent advances in 3D object detection for autonomous driving are classified by sensor modality into  camera-based ,  point cloud-based , and  multi-modality-based  methods  ( 26 ) . Camera-based approaches include monocular, multi-camera, BEV, and pseudo-LIDAR techniques. Point cloud methods cover voxel, point-voxel hybrids, BEV, 4D radar, spatiotemporal modeling, and data augmentation. Multi-modal methods emphasize deep fusion and cross-modal interactions to improve detection accuracy and robustness. 
+ 
+ 
+ LIDAR-only Detectors  handle point clouds through (1) learning objectives such as anchor-based  ( 19 )  and anchor-free  ( 8 )  methods; (2) data representations including point-based, grid-based, point-voxel hybrid, range-based, and 4D radar; and (3) auxiliary techniques like data augmentation  ( 10 ) , spatiotemporal modeling, and pseudo-labeling. Although LIDAR offers superior speed and accuracy, point cloud sparsity causes missed detections, particularly for small or distant objects. Fusion with camera data effectively addresses these issues, enhancing detection completeness and reliability. 
+ 
+ 
+ Multi-Modal Fusion  includes camera-radar, camera-LIDAR  ( 17 ,  18 ) , camera-4D radar, LIDAR-4D radar, and LIDAR-radar combinations. Camera-LIDAR fusion is categorized into (1) early fusion merging raw data before feature extraction  ( 16 ,  25 ) ; (2) deep fusion integrating multi-level features  ( 17 ,  18 ) ; and (3) late fusion combining high-level features or detections  ( 21 ,  22 ) . Utilizing diverse modalities such as image, point cloud, millimeter-wave, depth, and 4D radar is essential for detection accuracy. We propose CNMSMM, a novel Camera-LIDAR fusion framework that employs advanced data augmentation and optimized Loss/NMS, achieving state-of-the-art 3D detection accuracy and robustness, especially in crowded and small-object scenarios. 
+ 
+ 
+ 
+ 2.2.  3D Multiple Object Tracking 
+
+ 
+ 3D MOT is essential for autonomous driving perception, with notable progress since AB3DMOT  ( 30 )  introduced a 3D extension of the  Tracking-by-Detection (TBD)  framework. Despite advances in occlusion handling, data association, and long-term tracking, methods such as Poly-MOT and Fast-Poly continue to face challenges in crowded scenes, small object tracking, and trajectory errors. Easy-Poly addresses these issues through innovations across the TBD pipeline, including pre-processing, estimation, association, and life-cycle management. 
+ 
+ 
+ In pre-processing, Easy-Poly improves detection by integrating multi-modal data augmentation for LargeKernel3D and optimizing Non-Maximum Suppression (NMS) thresholds, significantly enhancing performance on small objects and crowded scenes, which prior works  ( 24 ,  18 ,  28 )  have largely neglected. The estimation stage employs filters (Linear Kalman  ( 13 ,  28 ,  24 ,  31 ) , Extended Kalman  ( 18 ) , Point Filter  ( 2 ,  32 ) ) and motion models to predict and update tracklets. Easy-Poly advances AMOTA by optimizing BICYCLE parameters via grid search and Bayesian optimization, and incorporates detector confidence as a weighting factor in Kalman filtering (DMM), thereby enhancing tracking accuracy and robustness. 
+ 
+ 
+ Previous Association work Association depends on geometry-based affinities (IoU  ( 30 ,  29 ) , GIoU  ( 28 ,  18 ,  24 ) , Euclidean  ( 2 ,  31 ,  13 ) , NN distance  ( 7 ,  27 ,  33 ,  9 ) ) and appearance cues. Although progress has been made, occlusions and false positives remain challenging. Easy-Poly’s DTO algorithm effectively resolves these ambiguities. Life-cycle management controls tracklet initialization, termination, and merging through count- or confidence-based strategies  ( 13 ,  28 ,  18 ,  24 ,  29 ,  30 ,  2 ,  31 ) . Easy-Poly extends tracklet lifespan and dynamically adjusts thresholds, reducing premature termination and improving robustness for sustained tracking. 
+ 
+ 
+ Figure 1.  
+The pipeline of the Easy-Poly method is illustrated, with real-time enhancements over the baseline Fast-Poly highlighted using distinct colors.  Pink  indicates optimizations applied to the Fast-Poly method, while  Purple  represents newly introduced functional modules.
+ 
+ 
+ 
+ 
+ 
+ 3.  Methodology 
+
+ 
+ This work proposes  Easy-Poly , a real-time 3D MOT method leveraging efficient filter-based algorithms within the TBD paradigm. The approach robustly manages multiple object categories and achieves substantial performance gains in complex environments, providing a practical and scalable solution for autonomous driving. 
+ 
+ 
+ 3.1.  Easy-Poly Framework 
+
+ 
+ The Easy-Poly framework substantially improves upon the previous Fast-Poly method by introducing multiple optimizations and innovations, as depicted in Figure  1 . 
+ 
+ 
+ The pipeline consists of five main stages:  Pre-processing ,  Association ,  Matching ,  Estimation , and  Life-cycle . The procedure proceeds as follows: 
+ 
+ 
+ Pre-processing and Prediction:  Utilizes outputs from the CNMSMM detection framework, formatting the initial frame for tracking. For each frame, Easy-Poly applies parallel processing to filter 3D detections and predict existing trajectories. SF and NMS filters refine detections, while specialized filters estimate motion (time-variable), score, and time-invariant trajectory states. 
+ 
+ 
+ Association and Matching:  Construct cost matrices for two-stage association. Voxel mask and geometry-based metrics accelerate NMS and matching computations. The DTO algorithm  ( 15 )  determines matched pairs, unmatched detections, and unmatched tracklets. 
+ 
+ 
+ State Update:  Optimizes matrix dimensionality by updating time-invariant and time-variable states in matched tracklets using an optimized lightweight filter and Extended Kalman Filter (EKF), respectively. Scores are refined via a confidence-count mixed life-cycle approach. A novel DMM module is introduced to enhance robustness under varying environmental conditions. 
+ 
+ 
+ Initialization and Termination:  Initialize unmatched detections as new active tracklets. False positive agents are identified through soft termination based on max-age and online average refined scores. 
+ 
+ 
+ Frame Advancement:  Forwards remaining tracklets to downstream tasks and prepares them for subsequent frame tracking. 
+ 
+ 
+ Figure 2.  
+The detection performance of the CenterPoint and LargeKernel3D methods in multi-modal mode is compared between FocalsConv and CNMSMM. This comparison illustrates the performance improvements obtained by CNMSMM in 3D object detection, particularly for small objects. Figures  (a)  and  (c)  present results using the baseline FocalsConv model, whereas Figures  (b)  and  (d)  show results obtained with the CNMSMM framework. The results emphasize the superiority of CNMSMM over the original methods, especially in detecting small objects and handling crowded scenes. 
+ 
+ 
+ 
+ 3.2.  CNMSMM Framework 
+
+ 
+ We propose CNMSMM, a novel camera-LiDAR fusion detection framework that jointly optimizes efficient NMS and loss functions to enhance detection performance, particularly for small objects in complex scenes. Fig  2  illustrates the superior 3D detection performance of CNMSMM compared to FocalsConv for CenterPoint and LargeKernel3D, with notable improvements in small object detection. CNMSMM reconstructs FocalsConv by integrating advanced augmentation techniques and a hybrid NMS/loss strategy to achieve effective fusion of image and point cloud data, while robustly handling erroneous and empty frames. As a scalable platform, it supports multiple modalities and models, including PointPillars, CenterPoint, and LargeKernel, enabling seamless integration. Key innovations include a dynamic adaptive NMS that combines Circle NMS and Gaussian Soft-NMS, a composite loss function (CIOU combined with Quality Focal Loss) tailored for small objects, and a robust, scalable network design. This framework improves indexing efficiency and detection accuracy during training, evaluation, and subsequent stages, significantly enhancing metrics such as mAP and NDS (Table  1 ). On the nuScenes dataset, the integration of LargeKernel3D within CNMSMM increases mAP by 2.35% and NDS by 1.38%, with substantial gains in small object detection.
+Implemented using Det3D, CNMSMM incorporates a multimodal LargeKernel3D module and a novel VoxelSpecial module for efficient voxelization. The preprocessing stage employs a 3D ResNet backbone for voxelized LiDAR data and a ResNet50 backbone for RGB images. Multi-modal augmentation methods—including  db sampler ,  flip ,  rotate ,  rescale , and  translate —were analyzed, revealing that the combination of  double flip  and  rotation  significantly improves accuracy in crowded and small-object scenarios. The Point2ImageProjection module projects LiDAR voxels onto image coordinates, while the VoxelWithPointProjection module samples and fuses image features with LiDAR voxels. A region proposal network (RPN) generates 3D bounding boxes that are refined by the ROI Head. A hierarchical NMS, combining Circle NMS and Gaussian Soft-NMS, suppresses redundancies, followed by score threshold filtering. The loss optimization within this pipeline substantially enhances small object detection and overall system robustness. 
+ 
+ 
+ 
+ 3.3.  Dynamic Track-Oriented Data Association 
+
+ 
+ In the data association stage, we present the  DTO  algorithm, a novel method that complements traditional  Hungarian ,  Greedy , and  Mutual Nearest Neighbor (MNN)  approaches. DTO, an enhanced variant of Multiple Hypothesis Tracking (MHT)  ( 14 ) , mitigates uncertainties in object-tracking assignment by maintaining and updating multiple association hypotheses between detections and tracks over time. This method facilitates robust management of complex scenarios as new observations are incorporated. The Dynamic Track-Oriented (DTO) data association algorithm is formally defined as follows: 
+ 
+ 
+ 
+
+ 
+ (1) 
+ 
+ 𝐦 det , 𝐦 tra , 𝐮 det , 𝐮 tra = DTO ⁡ ( 𝐂 , 𝝉 ) \mathbf{m}_{\mathrm{det}},\mathbf{m}_{\mathrm{tra}},\mathbf{u}_{\mathrm{det}},\mathbf{u}_{\mathrm{tra}}=\mathrm{DTO}(\mathbf{C},\boldsymbol{\tau}) 
+ 
+ 
+ 
+ 
+ 𝐂 ∈ ℝ N cls × N det × N tra \mathbf{C}\in\mathbb{R}^{N_{\mathrm{cls}}\times N_{\mathrm{det}}\times N_{\mathrm{tra}}}  is the cost matrix between classes, detections, and tracks. If the cost matrix has a size of  N det × N tra N_{\mathrm{det}}\times N_{\mathrm{tra}} , then  𝐂 ∈ ℝ N det × N tra \mathbf{C}\in\mathbb{R}^{N_{\mathrm{det}}\times N_{\mathrm{tra}}} .  𝝉 ∈ ℝ N cls \boldsymbol{\tau}\in\mathbb{R}^{N_{\mathrm{cls}}}  is the matching threshold for each class.  𝐦 det ∈ ℕ | 𝐦 det | \mathbf{m}_{\mathrm{det}}\in\mathbb{N}^{|\mathbf{m}_{\mathrm{det}}|}  is the list of matched detection indices.  𝐦 tra ∈ ℕ | 𝐦 tra | \mathbf{m}_{\mathrm{tra}}\in\mathbb{N}^{|\mathbf{m}_{\mathrm{tra}}|}  is the list of matched track indices.  𝐮 det ∈ ℕ | 𝐮 det | \mathbf{u}_{\mathrm{det}}\in\mathbb{N}^{|\mathbf{u}_{\mathrm{det}}|}  is the list of unmatched detection indices.  𝐮 tra ∈ ℕ | 𝐮 tra | \mathbf{u}_{\mathrm{tra}}\in\mathbb{N}^{|\mathbf{u}_{\mathrm{tra}}|}  is the list of unmatched track indices. 
+ 
+ 
+ Equation ( 1 ) describes the main function of the DTO algorithm, which is to take the cost matrix  𝐂 \mathbf{C}  and the matching thresholds  𝝉 \boldsymbol{\tau}  as inputs, and output the lists of matched detection and track indices  𝐦 det \mathbf{m}_{\mathrm{det}}  and  𝐦 tra \mathbf{m}_{\mathrm{tra}} , as well as the lists of unmatched detection and track indices  𝐮 det \mathbf{u}_{\mathrm{det}}  and  𝐮 tra \mathbf{u}_{\mathrm{tra}} . 
+ 
+ 
+ The algorithm proceeds as follows: 
+ 
+ 
+ 
+ (1)  
+ 
+ For each class  c ∈ { 1 , … , N cls } c\in\{1,\ldots,N_{\mathrm{cls}}\} , extract the corresponding cost matrix slice: 
+ 
+ 
+ 
+
+ 
+ (2) 
+ 
+ 𝐂 c = 𝐂 [ c , : , : ] ∈ ℝ N det × N tra \mathbf{C}_{c}=\mathbf{C}[c,:,:]\in\mathbb{R}^{N_{\mathrm{det}}\times N_{\mathrm{tra}}} 
+ 
+ 
+ 
+ (2)  
+ 
+ Solve the optimal assignment using the Hungarian algorithm: 
+ 
+ 
+ 
+
+ 
+ (3) 
+ 
+ 𝐌 c = Hungarian ⁡ ( 𝐂 c ) \mathbf{M}_{c}=\mathrm{Hungarian}(\mathbf{C}_{c}) 
+ 
+ 
+ 
+ 
+ where  𝐌 c = { ( i , j ) ∣ i ∈ [ 0 , N det − 1 ] , j ∈ [ 0 , N tra − 1 ] } \mathbf{M}_{c}=\{(i,j)\mid i\in[0,N_{\mathrm{det}}-1],j\in[0,N_{\mathrm{tra}}-1]\}  denotes matched detection-track pairs. 
+ 
+ (3)  
+ 
+ Filter matches by the class-specific threshold  τ c \tau_{c} : 
+ 
+ 
+ 
+
+ 
+ (4) 
+ 
+ 𝐌 c valid = { ( i , j ) ∈ 𝐌 c ∣ 𝐂 c ​ [ i , j ] ≤ τ c } \mathbf{M}_{c}^{\mathrm{valid}}=\{(i,j)\in\mathbf{M}_{c}\mid\mathbf{C}_{c}[i,j]\leq\tau_{c}\} 
+ 
+ 
+ 
+ (4)  
+ 
+ Combine valid matches from all classes: 
+ 
+ 
+ 
+
+ 
+ (5) 
+ 
+ 𝐌 = ⋃ c = 1 N cls 𝐌 c valid \mathbf{M}=\bigcup_{c=1}^{N_{\mathrm{cls}}}\mathbf{M}_{c}^{\mathrm{valid}} 
+ 
+ 
+ 
+ (5)  
+ 
+ Define the final matched and unmatched sets: 
+ 
+ 
+ 
+ 
+ 
+ (6) 
+ 
+ 𝐦 det \displaystyle\mathbf{m}_{\mathrm{det}} 
+ = { i ∣ ∃ j , ( i , j ) ∈ 𝐌 } \displaystyle=\{i\mid\exists j,(i,j)\in\mathbf{M}\} 
+ 
+ 
+ 
+ 𝐦 tra \displaystyle\mathbf{m}_{\mathrm{tra}} 
+ = { j ∣ ∃ i , ( i , j ) ∈ 𝐌 } \displaystyle=\{j\mid\exists i,(i,j)\in\mathbf{M}\} 
+ 
+ 
+ 
+ 𝐮 det \displaystyle\mathbf{u}_{\mathrm{det}} 
+ = { 0 , … , N det − 1 } ∖ 𝐦 det \displaystyle=\{0,\ldots,N_{\mathrm{det}}-1\}\setminus\mathbf{m}_{\mathrm{det}} 
+ 
+ 
+ 
+ 𝐮 tra \displaystyle\mathbf{u}_{\mathrm{tra}} 
+ = { 0 , … , N tra − 1 } ∖ 𝐦 tra \displaystyle=\{0,\ldots,N_{\mathrm{tra}}-1\}\setminus\mathbf{m}_{\mathrm{tra}} 
+ 
+ 
+ 
+ 
+ 
+ •  
+ 
+ 𝐦 det = { i ∣ ∃ j , ( i , j ) ∈ 𝐌 } \mathbf{m}_{\mathrm{det}}=\{i\mid\exists j,(i,j)\in\mathbf{M}\} 
+Represents the set of all matched detection indices, i.e., there exists a track  j j  matched with detection  i i 
+ 
+ •  
+ 
+ 𝐦 tra = { j ∣ ∃ i , ( i , j ) ∈ 𝐌 } \mathbf{m}_{\mathrm{tra}}=\{j\mid\exists i,(i,j)\in\mathbf{M}\} 
+Represents the set of all matched track indices, i.e., there exists a detection  i i  matched with track  j j 
+ 
+ •  
+ 
+ 𝐮 det = { 0 , … , N det − 1 } ∖ 𝐦 det \mathbf{u}_{\mathrm{det}}=\{0,\ldots,N_{\mathrm{det}}-1\}\setminus\mathbf{m}_{\mathrm{det}} 
+Represents the set of all unmatched detection indices, which is the full detection set minus the matched detection set. 
+ 
+ •  
+ 
+ 𝐮 tra = { 0 , … , N tra − 1 } ∖ 𝐦 tra \mathbf{u}_{\mathrm{tra}}=\{0,\ldots,N_{\mathrm{tra}}-1\}\setminus\mathbf{m}_{\mathrm{tra}} 
+Represents the set of all unmatched track indices, which is the full track set minus the matched track set. 
+ 
+ 
+ 
+ 
+ 
+ 
+ DTO enhances the classical Hungarian algorithm by incorporating class-aware matching and parallel processing. It independently computes the optimal assignment for each class-specific cost matrix slice, thereby ensuring precise associations at the class level. The matches are subsequently filtered using class-specific thresholds to effectively eliminate erroneous high-cost associations, which improves robustness in complex, cluttered, and occluded environments. The independent matching for each class also facilitates parallel computation, enabling real-time deployment. By aggregating valid matches across all classes, DTO generates comprehensive sets of matched and unmatched detections and tracks, where the unmatched tracks provide information for subsequent trajectory initialization and termination. This method achieves more accurate, efficient, and robust trajectory association in the challenging multi-class, multi-object scenarios commonly encountered in autonomous driving applications. 
+ 
+ 
+ 
+ 3.4.  Dynamic Motion Modeling 
+
+ 
+ 3.4.1.  Confidence Weighted Kalman Filter 
+
+ 
+ In our motion model, we introduce the confidence score from the object detector as a weighting factor in the update steps of both the  Linear Kalman Filter  and  Extended Kalman Filter   ( 12 ) . This approach assigns higher weights to detections with greater confidence during state and covariance matrix updates. Consequently, this enhancement improves the accuracy (MOTA and AMOTA) and robustness of 3D object tracking. The modified update equation for the state estimate can be expressed as 
+ 
+ 
+ 
+
+ 
+ (7) 
+ 
+ x ^ ​ _ ​ k = x ^ ​ _ ​ k | k − 1 + w k ​ K k ​ ( z k − H k ​ x ^ ​ _ ​ k | k − 1 ) \hat{x}\_k=\hat{x}\_{k|k-1}+w_{k}K_{k}(z_{k}-H_{k}\hat{x}\_{k|k-1}) 
+ 
+ 
+ 
+ 
+ Where  w k w_{k}  is the confidence score of the detection at the time step  k k  and  K k K_{k}  is the Kalman gain. 
+ 
+ 
+ Similarly, the covariance update is adjusted to: 
+ 
+ 
+ 
+
+ 
+ (8) 
+ 
+ P k = ( I − w k ​ K k ​ H k ) ​ P k | k − 1 ​ ( I − w k ​ K k ​ H k ) T + w k 2 ​ K k ​ R k ​ K k T P_{k}=(I-w_{k}K_{k}H_{k})P_{k|k-1}(I-w_{k}K_{k}H_{k})^{T}+w_{k}^{2}K_{k}R_{k}K_{k}^{T} 
+ 
+ 
+ 
+ 
+ This weighted approach effectively incorporates the reliability of detections into the filtering process, leading to more accurate and robust 3D object tracking performance. 
+ 
+ 
+ Table 2.  
+A comparison between our method and other methods on the nuScenes test set.
+ ‡ \ddagger  means the GPU device.
+ 
+ 
+ 
+ 
+ Method 
+ Device 
+ Detector 
+ Input 
+ AMOTA ↑ \uparrow 
+ MOTA ↑ \uparrow 
+ FPS ↑ \uparrow 
+ IDS ↓ \downarrow 
+ FN ↓ \downarrow 
+ FP ↓ \downarrow 
+ 
+ 
+ 
+ EagerMOT  ( 13 ) 
+ – 
+ CenterPoint  ( 32 ) &Cascade R-CNN  ( 4 ) 
+ 2D+3D 
+ 67.7 
+ 56.8 
+ 4 
+ 1156 
+ 24925 
+ 17705 
+ 
+ CBMOT  ( 2 ) 
+ I7-9700 
+ CenterPoint  ( 32 ) &CenterTrack  ( 35 ) 
+ 2D+3D 
+ 67.6 
+ 53.9 
+ 80.5 
+ 709 
+ 22828 
+ 21604 
+ 
+ Minkowski  ( 9 ) 
+ TITAN ‡ \ddagger 
+ Minkowski  ( 9 ) 
+ 3D 
+ 69.8 
+ 57.8 
+ 3.5 
+ 325 
+ 21200 
+ 19340 
+ 
+ ByteTrackv2  ( 34 ) 
+ – 
+ TransFusion-L  ( 1 ) 
+ 3D 
+ 70.1 
+ 58 
+ – 
+ 488 
+ 21836 
+ 18682 
+ 
+ 3DMOTFormer  ( 7 ) 
+ 2080Ti ‡ \ddagger 
+ BEVFuison  ( 20 ) 
+ 2D+3D 
+ 72.5 
+ 60.9 
+ 54.7 
+ 593 
+ 20996 
+ 17530 
+ 
+ Poly-MOT  ( 18 ) 
+ 9940X 
+ LargeKernel3D  ( 6 ) 
+ 2D+3D 
+ 75.4 
+ 62.1 
+ 3 
+ 292 
+ 17956 
+ 19673 
+ 
+ Fast-Poly  ( 17 ) 
+ 7945HX 
+ LargeKernel3D  ( 6 ) 
+ 2D+3D 
+ 75.8 
+ 62.8 
+ 34.2 
+ 326 
+ 18415 
+ 17098 
+ 
+ Easy-Poly (Ours) 
+ 4090 ‡ \ddagger 
+ LargeKernel3D  ( 6 ) 
+ 2D+3D 
+ 76.3 
+ 63.5 
+ 34.8 
+ 270 
+ 16602 
+ 16319 
+ 
+ 
+ 
+ 
+ 
+ 3.4.2.  Adaptive Noise Covariances 
+
+ 
+ We have introduced novel dynamic adjustments to the noise covariance matrices, specifically the measurement noise covariance  R R  and the process noise covariance  Q Q . These adjustments are implemented in both the  Linear Kalman Filter  and the  Extended Kalman Filter . The dynamic parameter tuning enhances the adaptability and robustness of the system while optimizing the balance between accuracy and response speed. Experimental results indicate that an adjustment range of 10% for  R R  and  Q Q , corresponding to scaling factors of 0.9 and 1.1, yields optimal performance. This calibrated strategy preserves system stability through moderate parameter modulation. In contrast, more aggressive adjustments, such as scaling factors of 0.8 or 1.2, may cause system instability or excessive response, despite potentially enabling faster adaptation to significant changes. 
+ 
+ 
+ The dynamic adjustment of the measurement noise covariance is based on the magnitude of the measurement residual, which is used to adaptively modify the value of  R R . Specifically, when the measurement residual is small, the value of  R R  is decreased; conversely, when the measurement residual is large, the value of  R R  is increased. The specific formula is as follows: 
+ 
+ 
+ 
+
+ 
+ (9) 
+ 
+ R n ​ e ​ w = { 0.9 ⋅ R , if  ​ ‖ r ​ e ​ s ‖ < 1.0 1.1 ⋅ R , if  ​ ‖ r ​ e ​ s ‖ > 5.0 R , otherwise R_{new}=\begin{cases}0.9\cdot R,&\text{if }\|res\|<1.0\\
+1.1\cdot R,&\text{if }\|res\|>5.0\\
+R,&\text{otherwise}\end{cases} 
+ 
+ 
+ 
+ 
+ R n ​ e ​ w R_{new}  is the adjusted measurement noise covariance,  R R  is the original measurement noise covariance,  ‖ r ​ e ​ s ‖ \|res\|  represents the Euclidean norm (L2 norm) of the measurement residual,  ‖ r ​ e ​ s ‖ = ∑ i = 1 n r ​ e ​ s i 2 \|res\|=\sqrt{\sum_{i=1}^{n}res_{i}^{2}} , where  r ​ e ​ s i res_{i}  is the i-th component of the residual vector. This formula expresses the following logic:
+If the residual norm is less than 1.0, the value of  R R  is decreased by 10%. If the residual norm exceeds 5.0, the value of  R R  is increased by 10%. When the residual norm lies between 1.0 and 5.0, the value of  R R  remains unchanged. This dynamic adjustment strategy is designed to modulate the behavior of the Kalman filter according to the reliability of the measurements. Specifically, a small measurement residual leads to increased confidence in the measurement by reducing  R R , whereas a large measurement residual results in decreased confidence by increasing  R R . 
+ 
+ 
+ The dynamic adjustment of the process noise covariance is based on the current state, allowing adaptive modification of the process noise covariance  Q Q . For instance, the value of  Q Q  is adjusted according to the magnitude of velocity. The formula is as follows: 
+ 
+ 
+ 
+
+ 
+ (10) 
+ 
+ Q n ​ e ​ w = { 0.9 ⋅ Q , if  ​ ‖ 𝐯 ‖ < 1.0 1.1 ⋅ Q , if  ​ ‖ 𝐯 ‖ > 10.0 Q , otherwise Q_{new}=\begin{cases}0.9\cdot Q,&\text{if }\|\mathbf{v}\|<1.0\\
+1.1\cdot Q,&\text{if }\|\mathbf{v}\|>10.0\\
+Q,&\text{otherwise}\end{cases} 
+ 
+ 
+ 
+ 
+ The  Q n ​ e ​ w Q_{new}  is the noise covariance,  Q Q  is the original process noise covariance,  𝐯 = [ s ​ t ​ a ​ t ​ e 1 , s ​ t ​ a ​ t ​ e 2 ] \mathbf{v}=[state_{1},state_{2}]  represents the first two components of the state vector (assumed to be velocity components),  ‖ 𝐯 ‖ = s ​ t ​ a ​ t ​ e 1 2 + s ​ t ​ a ​ t ​ e 2 2 \|\mathbf{v}\|=\sqrt{state_{1}^{2}+state_{2}^{2}}  is the Euclidean norm (L2 norm) of the velocity vector.
+This formula expresses the following logic: If the velocity norm is less than 1.0, Q is reduced by 10%. If the velocity norm is greater than 10.0, Q increases by 10%. If the velocity norm is between 1.0 and 10.0, Q remains unchanged. 
+ 
+ 
+ This dynamic adjustment strategy is designed to modify the process model of the Kalman filter based on the current state, specifically the velocity. When the velocity is low, the process noise covariance  Q Q  is decreased, reflecting increased confidence in the system dynamics; conversely, when the velocity is high,  Q Q  is increased, indicating reduced confidence in the system dynamics. 
+ 
+ 
+ In complex autonomous driving scenarios with dense traffic, frequent occlusions, and small or fast-moving objects, velocity-dependent adjustment of the process noise covariance aligns noise characteristics with target dynamics, improving tracking accuracy. Adaptive tuning of the measurement noise covariance addresses sensor noise variability from vibration and partial visibility, ensuring robust sensor fusion. Range-dependent modulation of both measurement and process noise covariances further refines precision for nearby targets while accommodating greater uncertainty for distant ones. These adaptive strategies collectively enhance filter robustness in tracking multiple targets amid cluttered, occluded, and dynamic environments. 
+ 
+ 
+ Table 3.  
+A comparison of existing methods applied to the nuScenes val set. 
+ 
+ 
+ 
+ Method 
+ Detector 
+ Input Data 
+ MOTA ↑ \uparrow 
+ AMOTA ↑ \uparrow 
+ AMOTP ↓ \downarrow 
+ FPS ↑ \uparrow 
+ IDS ↓ \downarrow 
+ 
+ 
+ 
+ CBMOT  ( 2 ) 
+ CenterPoint  ( 32 )  & CenterTrack  ( 35 ) 
+ 2D + 3D 
+ - 
+ 72.0 
+ 48.7 
+ 80 
+ 479 
+ 
+ EagerMOT  ( 13 ) 
+ CenterPoint  ( 32 )  & Cascade R-CNN  ( 4 ) 
+ 2D + 3D 
+ – 
+ 71.2 
+ 56.9 
+ 13 
+ 899 
+ 
+ SimpleTrack  ( 24 ) 
+ CenterPoint  ( 32 ) 
+ 3D 
+ 60.2 
+ 69.6 
+ 54.7 
+ 0.5 
+ 405 
+ 
+ CenterPoint  ( 32 ) 
+ CenterPoint  ( 32 ) 
+ 3D 
+ – 
+ 66.5 
+ 56.7 
+ – 
+ 562 
+ 
+ OGR3MOT  ( 33 ) 
+ CenterPoint  ( 32 ) 
+ 3D 
+ 60.2 
+ 69.3 
+ 62.7 
+ 12.3 
+ 262 
+ 
+ Poly-MOT   ( 18 ) 
+ CenterPoint  ( 32 ) 
+ 3D 
+ 61.9 
+ 73.1 
+ 52.1 
+ 5.6 
+ 281 
+ 
+ Poly-MOT   ( 18 ) 
+ LargeKernel3D-L  ( 6 ) 
+ 3D 
+ 54.1 
+ 75.2 
+ 54.1 
+ 8.6 
+ 354 
+ 
+ Fast-Poly   ( 17 ) 
+ CenterPoint  ( 32 ) 
+ 3D 
+ 63.2 
+ 73.7 
+ – 
+ 28.9 
+ 414 
+ 
+ Easy-Poly (Ours) 
+ CenterPoint  ( 32 ) 
+ 2D + 3D 
+ 64.4 
+ 74.5 
+ 54.9 
+ 34.6 
+ 272 
+ 
+ Easy-Poly (Ours) 
+ LargeKernel3D  ( 6 ) 
+ 2D + 3D 
+ 65.5 
+ 75.6 
+ 53.6 
+ 34.9 
+ 242 
+ 
+ 
+ 
+ 
+ 
+ 
+ 3.5.  Life-cycle Adjustment 
+
+ 
+ Threshold adjustment plays a critical role in the performance of object detection and tracking. The  Intersection over Union (IoU)  threshold governs the balance between precision and recall. A higher threshold promotes more accurate detections but may fail to identify objects with slightly lower IoU values. In contrast, a lower threshold increases sensitivity, potentially detecting a greater number of objects at the expense of a higher false positive rate. Through extensive experimentation, this threshold is iteratively optimized to achieve an optimal trade-off between detection accuracy and false alarm rate, thereby improving overall system performance in autonomous driving contexts. 
+ 
+ 
+ During the life-cycle management stage, Easy-Poly demonstrates improvements over the baseline Fast-Poly with respect to the motion model. Specifically, the wheelbase ratio and rear tire ratio parameters were adjusted, with optimal values identified via grid search or Bayesian optimization, changing from the original 0.8 and 0.5 to 0.6 and 0.3, respectively. These modifications enhance tracking performance and robustness. Furthermore, the maximum age parameter was increased to 20 across all detection and tracking categories. This adjustment substantially prolongs the duration of object tracking while preserving high tracking accuracy and computational efficiency. As a result, a significant reduction in frame loss during life-cycle management was observed, yielding more complete and robust tracking trajectories for each object of interest. 
+ 
+ 
+ 
+ 
+ 4.  Experiments 
+
+ 
+ A series of experiments were conducted to validate the effectiveness of Easy-Poly. 
+ 
+ 
+ 4.1.  Implementation Details 
+
+ 
+ The tracking framework is implemented in Python and runs on an NVIDIA RTX 4090 GPU. The hyperparameters were optimized to maximize AMOTA in the nuScenes dataset  ( 3 )  test set. The Category-specific and SF thresholds for nuScenes are set as follows:  Bic  0.14,  Car  0.16,  Moto  0.16,  Bus  0.12,  Tra  0.13,  Tru  0, and  Ped  0.13. The NMS threshold is uniformly fixed at 0.08 across all categories and datasets. Scale-NMS  ( 11 )  is applied to the  Bic  and  Ped  categories on nuScenes. In addition to the default NMS, a novel similarity metric is introduced for the  Bic ,  Ped ,  Bus , and  Tru  categories. The confidence-based decay rates for nuScenes are:  Ped  0.18,  Car  0.26,  Tru  and  Moto  0.28,  Tra  0.22, and  Bic  and  Bus  0.24. 
+ 
+ 
+ Table 4.  A comparison of different data association algorithms is conducted using the CenterPoint method (lines 1–7) and the LargeKernel3D method (lines 8–11) on the nuScenes validation set. Among these, lines 1–3 correspond to the Fast-Poly framework, while lines 4–11 represent the latest version of the Easy-Poly framework. 
+ 
+ 
+ 
+ Algorithms 
+ MOTA ↑ \uparrow 
+ AMOTA ↑ \uparrow 
+ AMOTP ↓ \downarrow 
+ IDS ↓ \downarrow 
+ FN ↓ \downarrow 
+ 
+ MNN 
+ 62.2 
+ 72.5 
+ 52.4 
+ 433 
+ 16644 
+ 
+ Greedy 
+ 62.3 
+ 72.7 
+ 53.4 
+ 428 
+ 17647 
+ 
+ Hungarian 
+ 63.2 
+ 73.7 
+ 52.1 
+ 414 
+ 15996 
+ 
+ MNN 
+ 63.7 
+ 73.6 
+ 54.8 
+ 406 
+ 15873 
+ 
+ Greedy 
+ 64.0 
+ 73.7 
+ 54.6 
+ 368 
+ 16736 
+ 
+ Hungarian 
+ 64.3 
+ 74.3 
+ 54.3 
+ 335 
+ 16892 
+ 
+ DTO 
+ 64.4 
+ 74.5 
+ 54.9 
+ 272 
+ 16982 
+ 
+ MNN 
+ 64.1 
+ 73.9 
+ 54.0 
+ 370 
+ 15865 
+ 
+ Greedy 
+ 64.5 
+ 74.3 
+ 53.7 
+ 307 
+ 16014 
+ 
+ Hungarian 
+ 64.7 
+ 74.8 
+ 53.9 
+ 291 
+ 15923 
+ 
+ DTO 
+ 65.5 
+ 75.6 
+ 53.6 
+ 242 
+ 15481 
+ 
+ 
+ 
+ 
+ 
+ 4.2.  Comparative Evaluations 
+
+ 
+ Easy-Poly achieves a  76.3%  AMOTA on the test set, outperforming most existing 3D MOT methods. As shown in Table  2 , it attains a low IDS count of  270  while maintaining the highest AMOTA ( 76.3% ) among all modal methods, demonstrating stable tracking without recall loss. With minimal computational overhead, Easy-Poly delivers strong results suitable for real-world autonomous driving applications. Its False Negative and False Positive rates further confirm robust continuous tracking and high recall. The reduced IDS and FP values highlight its effectiveness in tracking small objects and maintaining performance under complex scenarios and adverse weather. These results collectively demonstrate the algorithm’s robustness across diverse challenging environments. 
+ 
+ 
+ On the nuScenes validation set (Table  3 ), Easy-Poly attains  75.6%  AMOTA at  34.9  FPS, surpassing existing methods. Using the same detector, it outperforms Fast-Poly  ( 17 )  on nearly all key metrics, with notable improvements in accuracy ( +1.8%  AMOTA,  +2.3%  MOTA) and speed ( +6.0  FPS). Although slightly slower than CBMOT  ( 2 )  and 3DMOTFormer  ( 7 ) , Easy-Poly achieves substantially higher accuracy while preserving real-time capability. Its open-source implementation provides a robust baseline for future 3D MOT research. 
+ 
+ 
+ Table  4  evaluates association algorithms, showing Easy-Poly outperforms Fast-Poly and LargeKernel3D exceeds CenterPoint across all metrics. DTO achieves the highest performance within LargeKernel3D, improving AMOTA by 0.8 points (75.6% vs. 74.8%), reducing AMOTP to 53.6, IDS by 49 (242 vs. 291), and FN by 442 (15,481 vs. 15,923) compared to the Hungarian algorithm. These gains demonstrate DTO’s robustness against occlusions, false positives, and complex dynamics, effectively preserving tracking continuity and accuracy in dense, small-object scenarios. Moderate AMOTP improvement suggests potential for enhanced localization via advanced spatiotemporal fusion. 
+ 
+ 
+ Table  5  shows Easy-Poly attains  75.6%  AMOTA, a  1.3%  gain over Count & Max-age, with MOTA at  65.5%  and FN at  15,481 , the lowest among methods, while maintaining  34.9 FPS . Integrating confidence scores with count-based life-cycle management optimizes object existence and tracklet termination, reducing missed detections. The model exhibits robustness to occlusions and appearance changes, enhancing small object detection through fine-grained confidence evaluation and multi-frame fusion, thereby stabilizing continuous tracking. 
+ 
+ 
+ 
+ 4.3.  Ablation Studies 
+
+ 
+ Table 5.  Comparison of life-cycle modules on the nuScenes validation set.
+ Average  indicates deletion based on the online average score.
+ Latest  indicates deletion based on the most recent score.
+ Max-age  indicates deletion based on the duration of continuous mismatches.
+All other settings are under the best performance.
+ 
+ 
+ 
+ 
+ Strategy 
+ AMOTA ↑ \uparrow 
+ MOTA ↑ \uparrow 
+ FPS ↑ \uparrow 
+ FN ↓ \downarrow 
+ 
+ 
+ 
+ Count & Max-age 
+ 74.3 
+ 63.8 
+ 34.3 
+ 16024 
+ 
+ Confidence & Latest 
+ 71.8 
+ 63.7 
+ 50.2 
+ 17907 
+ 
+ Confidence & Average 
+ 74.6 
+ 64.2 
+ 35.6 
+ 16063 
+ 
+ Confidence(Ours) & Average 
+ 75.6 
+ 65.5 
+ 34.9 
+ 15481 
+ 
+ 
+ 
+ 
+ Table 6.  The results of the ablation study of each module on the NuScenes val set.  OS  means original state.  CNMSMM  means 3D Detection Module.  DTO  means Dynamic Track-Oriented Data Association Module.  DMM  means Dynamic Motion Modeling Module.  LM  means Life-cycle Management Module. 
+ 
+ 
+ 
+ Module 
+ AMOTA ↑ \uparrow 
+ IDS ↑ \uparrow 
+ FN ↑ \uparrow 
+ FP ↓ \downarrow 
+ 
+ 
+ 
+ Os 
+ 73.2 
+ 413 
+ 18042 
+ 18009 
+ 
+ Os + CNMSMM 
+ 73.8 
+ 324 
+ 17293 
+ 17498 
+ 
+ Os + CNMSMM + DTO 
+ 74.2 
+ 276 
+ 16816 
+ 17140 
+ 
+ Os + CNMSMM + DTO + DMM 
+ 74.9 
+ 288 
+ 16171 
+ 16532 
+ 
+ Os + CNMSMM + DTO + DMM + LM 
+ 75.6 
+ 242 
+ 15481 
+ 13270 
+ 
+ 
+ 
+ 
+ Figure 3.  
+This ablation study evaluates the effects of incorporating the Score Filter and Non-Maximum Suppression on performance, with run-time measured as the execution duration of the pre-processing module. The analysis compares the baseline Poly-MOT method with the proposed Easy-Poly approach.
+ 
+ 
+ 
+ Figure 4.  
+Visualization of the Easy-Poly framework for 3D detection and multi-object tracking performance at a traffic intersection is presented. A 20-frame tracking sequence is used to evaluate the robustness of detection and tracking under challenging conditions, including small objects, distant targets, and crowded scenes. The tracked object categories include bicycles, buses, cars, pedestrians, and trucks.
+ 
+ 
+ 
+ The ablation experiment presented in Fig  3  validates the integration of the Score Filter (SF) with Non-Maximum Suppression (NMS) within Easy-Poly, achieving an AMOTA of  75%  under the combined NMS + SF setting. This performance surpasses that of NMS-only and SF-only configurations by  1.4%  and  3.8% , respectively, indicating enhanced detection precision and tracklet reliability. Easy-Poly reduces identity switches (IDS) to  242  with NMS + SF, outperforming Poly-MOT’s  281  IDS, which reflects improved robustness against occlusion and appearance variations. Runtime efficiency is also improved, with Easy-Poly processing frames in  0.037 s  compared to Poly-MOT’s  0.055 s , achieving a favorable balance between speed and accuracy suitable for real-time deployment. These results confirm the superiority of Easy-Poly in detection accuracy, identity consistency, and computational efficiency, advancing multi-object tracking in autonomous driving through the synergistic application of SF and NMS. 
+ 
+ 
+ Table  6  demonstrates the incremental improvements resulting from the integration of CNMSMM, DTO, DMM, and LM modules within Easy-Poly on the NuScenes dataset. The complete model increases AMOTA from 73.2% to  75.6%  (+2.4%) and reduces IDS from 413 to  242 , evidencing enhanced identity preservation and tracking stability. False negatives and false positives decrease by  2,561  and  4,739 , respectively, underscoring improved detection precision and robustness, particularly for small and occluded objects. This modular synergy enhances detection accuracy, association reliability, and temporal consistency, confirming Easy-Poly’s advancement in precision and robustness for multi-object tracking in autonomous driving. 
+ 
+ 
+ 
+ 4.4.  Visualization 
+
+ 
+ Fig  4  illustrates qualitative tracking results of Easy-Poly in a complex urban intersection, highlighting its robust 3D multi-modal detection and tracking capabilities under safety-critical scenarios. The framework consistently achieves precise detection and continuous tracking of both near-field and distant small objects; pedestrians with IDs 115, 166, and 185 are tracked uninterruptedly from Frame 1 to Frame 20 without missed detections or identity switches, while the distant vehicle Car:259 is reliably tracked from Frame 1 to Frame 13, demonstrating effective long-term association for far-field targets. Easy-Poly further demonstrates robustness in crowded environments by accurately detecting and preserving identities amid pedestrian congestion and partial occlusions at Frame 20, addressing a key challenge in multi-object tracking. Additionally, it maintains stable tracking performance under occlusions and complex vehicle interactions, as exemplified by bus ID 428, which is tracked from Frame 10 to Frame 15 despite partial occlusions. These results confirm the superiority of Easy-Poly over prior approaches, such as Fast-Poly, in continuous and accurate multi-object tracking of small, distant, and densely clustered targets in real-world urban driving scenarios. 
+ 
+ 
+ 
+ 
+ 5.  Conclusion 
+
+ 
+ This paper introduces Easy-Poly, a filter-based 3D multi-object tracking framework that substantially enhances detection and tracking accuracy and robustness through the integration of innovative Camera-LiDAR fusion detection (CNMSMM), DTO, and DMM strategies. Easy-Poly achieves superior performance, particularly in small object detection, occlusion handling, and complex dynamic environments. Experimental results demonstrate that it outperforms current state-of-the-art methods on both mAP and AMOTA metrics while maintaining real-time operation. Although Easy-Poly makes significant advances in multi-modal fusion and motion modeling, opportunities remain to improve sustained tracking under extreme weather conditions and prolonged occlusions. Future work will concentrate on enhancing the model’s environmental adaptability and the deep integration of temporal information from multiple sensors to advance 3D multi-object tracking toward greater intelligence and stability, thereby facilitating safer and more reliable perception and decision-making in autonomous driving systems. 
+ 
+ 
+ 
+ References 
+
+ 
+      
+ [1] 
+ 
+Xuyang Bai, Zeyu Hu, Xinge Zhu, Qingqiu Huang, Yilun Chen, Hongbo Fu, and Chiew-Lan Tai.
+
+ 
+ Transfusion: Robust lidar-camera fusion for 3d object detection with transformers.
+
+ 
+ In  CVPR , pages 1090–1099, 2022.
+
+ 
+      
+ [2] 
+ 
+Nuri Benbarka, Jona Schröder, and Andreas Zell.
+
+ 
+ Score refinement for confidence-based 3d multi-object tracking.
+
+ 
+ In  IROS , pages 8083–8090. IEEE, 2021.
+
+ 
+      
+ [3] 
+ 
+Holger Caesar, Varun Bankiti, Alex H Lang, Sourabh Vora, Venice Erin Liong, Qiang Xu, Anush Krishnan, Yu Pan, Giancarlo Baldan, and Oscar Beijbom.
+
+ 
+ nuscenes: A multimodal dataset for autonomous driving.
+
+ 
+ In  Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11621–11631, 2020.
+
+ 
+      
+ [4] 
+ 
+Zhaowei Cai and Nuno Vasconcelos.
+
+ 
+ Cascade r-cnn: Delving into high quality object detection.
+
+ 
+ In  CVPR , pages 6154–6162, 2018.
+
+ 
+      
+ [5] 
+ 
+Yukang Chen, Yanwei Li, Xiangyu Zhang, Jian Sun, and Jiaya Jia.
+
+ 
+ Focal sparse convolutional networks for 3d object detection.
+
+ 
+ In  CVPR , pages 5428–5437, 2022.
+
+ 
+      
+ [6] 
+ 
+Yukang Chen, Jianhui Liu, Xiaojuan Qi, Xiangyu Zhang, Jian Sun, and Jiaya Jia.
+
+ 
+ Scaling up kernels in 3d cnns.
+
+ 
+ arXiv preprint arXiv:2206.10555 , 2022.
+
+ 
+      
+ [7] 
+ 
+Shuxiao Ding, Eike Rehder, Lukas Schneider, Marius Cordts, and Juergen Gall.
+
+ 
+ 3dmotformer: Graph transformer for online 3d multi-object tracking.
+
+ 
+ In  ICCV , pages 9784–9794, 2023.
+
+ 
+      
+ [8] 
+ 
+Runzhou Ge, Zhuangzhuang Ding, Yihan Hu, Yu Wang, Sijia Chen, Li Huang, and Yuan Li.
+
+ 
+ Afdet: Anchor free one stage 3d object detection.
+
+ 
+ arXiv preprint arXiv:2006.12671 , 2020.
+
+ 
+      
+ [9] 
+ 
+JunYoung Gwak, Silvio Savarese, and Jeannette Bohg.
+
+ 
+ Minkowski tracker: A sparse spatio-temporal r-cnn for joint object detection and tracking.
+
+ 
+ arXiv preprint arXiv:2208.10056 , 2022.
+
+ 
+      
+ [10] 
+ 
+Martin Hahner, Dengxin Dai, Alexander Liniger, and Luc Van Gool.
+
+ 
+ Quantifying data augmentation for lidar based 3d object detection.
+
+ 
+ arXiv preprint arXiv:2004.01643 , 2020.
+
+ 
+      
+ [11] 
+ 
+Junjie Huang, Guan Huang, Zheng Zhu, Yun Ye, and Dalong Du.
+
+ 
+ Bevdet: High-performance multi-camera 3d object detection in bird-eye-view.
+
+ 
+ arXiv preprint arXiv:2112.11790 , 2021.
+
+ 
+      
+ [12] 
+ 
+Masoud Khodarahmi and Vafa Maihami.
+
+ 
+ A review on kalman filter models.
+
+ 
+ Archives of Computational Methods in Engineering , 30(1):727–747, 2023.
+
+ 
+      
+ [13] 
+ 
+Aleksandr Kim, Aljoša Ošep, and Laura Leal-Taixé.
+
+ 
+ Eagermot: 3d multi-object tracking via sensor fusion.
+
+ 
+ In  ICRA , pages 11315–11321. IEEE, 2021.
+
+ 
+      
+ [14] 
+ 
+Chanho Kim, Fuxin Li, Arridhana Ciptadi, and James M Rehg.
+
+ 
+ Multiple hypothesis tracking revisited.
+
+ 
+ In  Proceedings of the IEEE international conference on computer vision , pages 4696–4704, 2015.
+
+ 
+      
+ [15] 
+ 
+Harold W Kuhn.
+
+ 
+ The hungarian method for the assignment problem.
+
+ 
+ Naval research logistics quarterly , 2(1-2):83–97, 1955.
+
+ 
+      
+ [16] 
+ 
+Alex H Lang, Sourabh Vora, Holger Caesar, Lubing Zhou, Jiong Yang, and Oscar Beijbom.
+
+ 
+ Pointpillars: Fast encoders for object detection from point clouds.
+
+ 
+ In  Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 12697–12705, 2019.
+
+ 
+      
+ [17] 
+ 
+Xiaoyu Li, Dedong Liu, Yitao Wu, Xian Wu, Lijun Zhao, and Jinghan Gao.
+
+ 
+ Fast-poly: A fast polyhedral framework for 3d multi-object tracking.
+
+ 
+ arXiv preprint arXiv:2403.13443 , 2024.
+
+ 
+      
+ [18] 
+ 
+Xiaoyu Li, Tao Xie, Dedong Liu, Jinghan Gao, Kun Dai, Zhiqiang Jiang, Lijun Zhao, and Ke Wang.
+
+ 
+ Poly-mot: A polyhedral framework for 3d multi-object tracking.
+
+ 
+ In  2023 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 9391–9398. IEEE, 2023.
+
+ 
+      
+ [19] 
+ 
+Yen-Cheng Liu, Chih-Yao Ma, and Zsolt Kira.
+
+ 
+ Unbiased teacher v2: Semi-supervised object detection for anchor-free and anchor-based detectors.
+
+ 
+ In  CVPR , pages 9819–9828, 2022.
+
+ 
+      
+ [20] 
+ 
+Zhijian Liu, Haotian Tang, Alexander Amini, Xinyu Yang, Huizi Mao, Daniela L Rus, and Song Han.
+
+ 
+ Bevfusion: Multi-task multi-sensor fusion with unified bird’s-eye view representation.
+
+ 
+ In  ICRA , pages 2774–2781. IEEE, 2023.
+
+ 
+      
+ [21] 
+ 
+Su Pang, Daniel Morris, and Hayder Radha.
+
+ 
+ Clocs: Camera-lidar object candidates fusion for 3d object detection.
+
+ 
+ In  IROS , pages 10386–10393. IEEE, 2020.
+
+ 
+      
+ [22] 
+ 
+Su Pang, Daniel Morris, and Hayder Radha.
+
+ 
+ Fast-clocs: Fast camera-lidar object candidates fusion for 3d object detection.
+
+ 
+ In  Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pages 187–196, 2022.
+
+ 
+      
+ [23] 
+ 
+Ziqi Pang, Jie Li, Pavel Tokmakov, Dian Chen, Sergey Zagoruyko, and Yu-Xiong Wang.
+
+ 
+ Standing between past and future: Spatio-temporal modeling for multi-camera 3d multi-object tracking.
+
+ 
+ In  CVPR , pages 17928–17938, 2023.
+
+ 
+      
+ [24] 
+ 
+Ziqi Pang, Zhichao Li, and Naiyan Wang.
+
+ 
+ Simpletrack: Understanding and rethinking 3d multi-object tracking.
+
+ 
+ In  ECCVW , pages 680–696. Springer, 2022.
+
+ 
+      
+ [25] 
+ 
+Charles R Qi, Wei Liu, Chenxia Wu, Hao Su, and Leonidas J Guibas.
+
+ 
+ Frustum pointnets for 3d object detection from rgb-d data.
+
+ 
+ In  CVPR , pages 918–927, 2018.
+
+ 
+      
+ [26] 
+ 
+Rui Qian, Xin Lai, and Xirong Li.
+
+ 
+ 3d object detection for autonomous driving: a survey.
+
+ 
+ Pattern Recognition , 130:108796, 2022.
+
+ 
+      
+ [27] 
+ 
+Tara Sadjadpour, Jie Li, Rares Ambrus, and Jeannette Bohg.
+
+ 
+ Shasta: Modeling shape and spatio-temporal affinities for 3d multi-object tracking.
+
+ 
+ RA-L , 2023.
+
+ 
+      
+ [28] 
+ 
+Li Wang, Xinyu Zhang, Wenyuan Qin, Xiaoyu Li, Jinghan Gao, Lei Yang, Zhiwei Li, Jun Li, Lei Zhu, Hong Wang, et al.
+
+ 
+ Camo-mot: Combined appearance-motion optimization for 3d multi-object tracking with camera-lidar fusion.
+
+ 
+ T-ITS , 2023.
+
+ 
+      
+ [29] 
+ 
+Xiyang Wang, Chunyun Fu, Zhankun Li, Ying Lai, and Jiawei He.
+
+ 
+ Deepfusionmot: A 3d multi-object tracking framework based on camera-lidar fusion with deep association.
+
+ 
+ RA-L , 7(3):8260–8267, 2022.
+
+ 
+      
+ [30] 
+ 
+Xinshuo Weng, Jianren Wang, David Held, and Kris Kitani.
+
+ 
+ 3d multi-object tracking: A baseline and new evaluation metrics.
+
+ 
+ In  IROS , pages 10359–10366. IEEE, 2020.
+
+ 
+      
+ [31] 
+ 
+Hai Wu, Wenkai Han, Chenglu Wen, Xin Li, and Cheng Wang.
+
+ 
+ 3d multi-object tracking in point clouds based on prediction confidence-guided data association.
+
+ 
+ T-ITS , 23(6):5668–5677, 2021.
+
+ 
+      
+ [32] 
+ 
+Tianwei Yin, Xingyi Zhou, and Philipp Krahenbuhl.
+
+ 
+ Center-based 3d object detection and tracking.
+
+ 
+ In  CVPR , pages 11784–11793, 2021.
+
+ 
+      
+ [33] 
+ 
+Jan-Nico Zaech, Alexander Liniger, Dengxin Dai, Martin Danelljan, and Luc Van Gool.
+
+ 
+ Learnable online graph representations for 3d multi-object tracking.
+
+ 
+ RA-L , 7(2):5103–5110, 2022.
+
+ 
+      
+ [34] 
+ 
+Yifu Zhang, Xinggang Wang, Xiaoqing Ye, Wei Zhang, Jincheng Lu, Xiao Tan, Errui Ding, Peize Sun, and Jingdong Wang.
+
+ 
+ Bytetrackv2: 2d and 3d multi-object tracking by associating every detection box, 2023.
+
+ 
+      
+ [35] 
+ 
+Xingyi Zhou, Vladlen Koltun, and Philipp Krähenbühl.
+
+ 
+ Tracking objects as points.
+
+ 
+ In  ECCV , pages 474–490. Springer, 2020.
+
+ 
+    
+ 
+ 
+ 
+ 
+ 
+ 
+   
+    Experimental support, please
+     view the build logs 
+    for errors. Generated by
+     
+       
+        L
+         A 
+        T
+         E 
+       
+       xml 
+       
+     .
+   
+   
+     Instructions for reporting errors 
+     We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below: 
+     
+       Click the "Report Issue"  ( 
+             
+           )  button, located in the page header. 
+     
+     Tip:  You can select the relevant text first, to include it in your report. 
+     Our team has already identified  the following issues . We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all. 
+     Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a  list of packages that need conversion , and welcome  developer contributions . 
+   
+ 
+   
+     
+       
+        We gratefully acknowledge support from our  major funders ,
+         member institutions ,  ,
+        and all contributors.
+       
+       
+         About   · 
+         Help   · 
+         Contact   · 
+         Subscribe   · 
+         Copyright   · 
+         Privacy   · 
+         Accessibility   · 
+         Operational Status  (opens in new tab) 
+       
+     
+   
+ 
+   
+     
+       
+     
+   
+ 
+ 

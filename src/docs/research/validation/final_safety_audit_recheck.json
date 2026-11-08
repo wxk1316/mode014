@@ -1,0 +1,6 @@
+{
+  "tests": 10,
+  "passed": true,
+  "test_sha256": "417db9c5c881a7a46abf27fdc69de6f8f118819113645d52851543a386b6da18",
+  "scope": "root strengthened two noise probes: experiment explicitly enabled, confinement true, observation remains false; full suite rerun passed"
+}

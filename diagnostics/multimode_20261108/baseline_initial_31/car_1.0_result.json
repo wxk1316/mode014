@@ -1,0 +1,24 @@
+{
+  "case": "car_1.0",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 2.8,
+  "goal_distance_m": 5.0,
+  "min_gap_m": -2.220446049250313e-16,
+  "collision": true,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "dynamic_yield": 28
+  },
+  "final_reason": "dynamic_yield",
+  "plan_p95_ms": 7.802927207376342,
+  "plan_max_ms": 7.824165979400277,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

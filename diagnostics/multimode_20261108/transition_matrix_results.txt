@@ -1,0 +1,7 @@
+0->1 PASS first_ready=4.76 echo=1.68
+0->4 PASS first_ready=4.76 echo=1.68
+1->0 PASS first_ready=6.72 echo=3.68
+1->4 PASS first_ready=6.72 echo=3.68
+4->0 PASS first_ready=3.76 echo=0.72
+4->1 PASS first_ready=3.76 echo=0.72
+renewed-motion-stop-hold PASS

@@ -1,0 +1,808 @@
+[
+  {
+    "case": "open",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 10.12,
+    "goal_distance_m": 0.1640910203870467,
+    "min_gap_m": 1.5999999999999996,
+    "collision": false,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 98,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.347768454113975,
+    "plan_max_ms": 22.88754197070375,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "pedestrian_0.4",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 3.92,
+    "goal_distance_m": 4.494131518013103,
+    "min_gap_m": -0.003295352651286887,
+    "collision": true,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.34680158911318965,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 12,
+      "dynamic_yield": 21,
+      "planning_result_stale": 4
+    },
+    "final_reason": "dynamic_yield",
+    "plan_p95_ms": 8.603295861394145,
+    "plan_max_ms": 8.896749990526587,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "pedestrian_0.45",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 4.84,
+    "goal_distance_m": 5.0,
+    "min_gap_m": -0.0029999999999998916,
+    "collision": true,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "dynamic_yield": 46
+    },
+    "final_reason": "dynamic_yield",
+    "plan_p95_ms": 8.611975412350148,
+    "plan_max_ms": 8.74300004215911,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "pedestrian_0.5",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 4.36,
+    "goal_distance_m": 5.0,
+    "min_gap_m": -0.004999999999999671,
+    "collision": true,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "dynamic_yield": 41
+    },
+    "final_reason": "dynamic_yield",
+    "plan_p95_ms": 8.389974967576563,
+    "plan_max_ms": 8.65495903417468,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "car_0.5",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 4.94,
+    "goal_distance_m": 4.716460853088341,
+    "min_gap_m": -0.0006641637832954794,
+    "collision": true,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.1298414838261682,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 9,
+      "dynamic_yield": 37,
+      "planning_result_stale": 1
+    },
+    "final_reason": "dynamic_yield",
+    "plan_p95_ms": 8.868114388315007,
+    "plan_max_ms": 9.077082970179617,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "car_0.75",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 3.74,
+    "goal_distance_m": 5.0,
+    "min_gap_m": -0.0050000000000001155,
+    "collision": true,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "dynamic_yield": 35
+    },
+    "final_reason": "dynamic_yield",
+    "plan_p95_ms": 8.757489299750887,
+    "plan_max_ms": 8.792000007815659,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "car_1.0",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 2.8,
+    "goal_distance_m": 5.0,
+    "min_gap_m": -2.220446049250313e-16,
+    "collision": true,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "dynamic_yield": 25
+    },
+    "final_reason": "dynamic_yield",
+    "plan_p95_ms": 8.62944606342353,
+    "plan_max_ms": 8.772665983997285,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "single_barrier",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 15.18,
+    "goal_distance_m": 0.16658515883219874,
+    "min_gap_m": 0.29606022156300016,
+    "collision": false,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.7443812436240802,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 148,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.358180934446864,
+    "plan_max_ms": 4.636291007045656,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "staggered_barriers",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 2.8240456992870646,
+    "min_gap_m": 0.2411434507844461,
+    "collision": false,
+    "switches": [
+      {
+        "t": 8.92,
+        "mode": 4
+      },
+      {
+        "t": 15.32,
+        "mode": 0
+      }
+    ],
+    "spin_count": 1,
+    "crab_count": 0,
+    "trap_ticks": 150,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.671641026690143,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 150,
+      "execution_collision_guard": 41,
+      "spin_requested": 1,
+      "spin_active": 66,
+      "spin_reached": 1,
+      "mode_return_wait": 30,
+      "planning_result_stale": 8,
+      "goal_braking": 9,
+      "blocked": 17,
+      "recovery_no_safe_heading": 1,
+      "recovery_exhausted": 573
+    },
+    "final_reason": "recovery_exhausted",
+    "plan_p95_ms": 3.2283104170346633,
+    "plan_max_ms": 3.673208993859589,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "u_window",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 4.6947781961157675,
+    "min_gap_m": 0.15109897320127189,
+    "collision": false,
+    "switches": [
+      {
+        "t": 2.12,
+        "mode": 4
+      },
+      {
+        "t": 12.8,
+        "mode": 0
+      },
+      {
+        "t": 29.0,
+        "mode": 4
+      },
+      {
+        "t": 39.6,
+        "mode": 0
+      }
+    ],
+    "spin_count": 2,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": 18.900000000000002,
+    "max_abs_yaw_rad": 3.041763079823016,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 28,
+      "spin_requested": 2,
+      "spin_active": 217,
+      "spin_reached": 2,
+      "mode_return_wait": 60,
+      "planning_result_stale": 6,
+      "motion": 251,
+      "goal_braking": 27,
+      "execution_collision_guard": 1,
+      "blocked": 17,
+      "recovery_exhausted": 286
+    },
+    "final_reason": "recovery_exhausted",
+    "plan_p95_ms": 3.666649741353467,
+    "plan_max_ms": 3.942916984669864,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "u_exit_only",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 21.32,
+    "goal_distance_m": 0.162813519344526,
+    "min_gap_m": 0.17889057106794526,
+    "collision": false,
+    "switches": [
+      {
+        "t": 0.72,
+        "mode": 4
+      },
+      {
+        "t": 11.4,
+        "mode": 0
+      }
+    ],
+    "spin_count": 1,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": 20.68,
+    "max_abs_yaw_rad": 3.168915652855387,
+    "reasons": {
+      "planning_pending": 3,
+      "spin_requested": 1,
+      "spin_active": 109,
+      "spin_reached": 1,
+      "mode_return_wait": 30,
+      "planning_result_stale": 3,
+      "motion": 66,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.480091993696987,
+    "plan_max_ms": 3.8517500506713986,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "u_spin_blocked",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 2.0,
+    "min_gap_m": 0.2499999999999999,
+    "collision": false,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 897
+    },
+    "final_reason": "orientation_stall",
+    "plan_p95_ms": 4.054299992276356,
+    "plan_max_ms": 4.398999968543649,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "staggered_tight",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 2.886967207231887,
+    "min_gap_m": 0.1297674773936612,
+    "collision": false,
+    "switches": [
+      {
+        "t": 2.12,
+        "mode": 4
+      },
+      {
+        "t": 12.8,
+        "mode": 0
+      },
+      {
+        "t": 28.12,
+        "mode": 4
+      },
+      {
+        "t": 38.72,
+        "mode": 0
+      }
+    ],
+    "spin_count": 2,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 3.041763079823016,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 28,
+      "spin_requested": 2,
+      "spin_active": 217,
+      "spin_reached": 2,
+      "mode_return_wait": 60,
+      "planning_result_stale": 6,
+      "motion": 250,
+      "goal_braking": 27,
+      "execution_collision_guard": 2,
+      "blocked": 17,
+      "recovery_exhausted": 286
+    },
+    "final_reason": "recovery_exhausted",
+    "plan_p95_ms": 3.53942917427048,
+    "plan_max_ms": 3.8490419974550605,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_bollards",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 2.737650029523173,
+    "min_gap_m": 0.12572251178900554,
+    "collision": false,
+    "switches": [
+      {
+        "t": 2.12,
+        "mode": 4
+      },
+      {
+        "t": 12.8,
+        "mode": 0
+      },
+      {
+        "t": 28.12,
+        "mode": 4
+      },
+      {
+        "t": 38.72,
+        "mode": 0
+      }
+    ],
+    "spin_count": 2,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 3.041763079823016,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 28,
+      "spin_requested": 2,
+      "spin_active": 217,
+      "spin_reached": 2,
+      "mode_return_wait": 60,
+      "planning_result_stale": 6,
+      "motion": 348,
+      "goal_braking": 24,
+      "blocked": 3,
+      "execution_collision_guard": 41,
+      "recovery_exhausted": 166
+    },
+    "final_reason": "recovery_exhausted",
+    "plan_p95_ms": 3.6590663599781688,
+    "plan_max_ms": 4.087082983460277,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_bench",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 13.52,
+    "goal_distance_m": 0.16553287064538913,
+    "min_gap_m": 0.2475814044149631,
+    "collision": false,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.3219230097882606,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 132,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.352896004798822,
+    "plan_max_ms": 3.643499978352338,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_bins",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 61.52,
+    "goal_distance_m": 0.1661283746442514,
+    "min_gap_m": 0.14658460966243014,
+    "collision": false,
+    "switches": [
+      {
+        "t": 2.12,
+        "mode": 4
+      },
+      {
+        "t": 12.8,
+        "mode": 0
+      },
+      {
+        "t": 28.12,
+        "mode": 4
+      },
+      {
+        "t": 38.72,
+        "mode": 0
+      }
+    ],
+    "spin_count": 2,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 3.041763079823016,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 28,
+      "spin_requested": 2,
+      "spin_active": 217,
+      "spin_reached": 2,
+      "mode_return_wait": 60,
+      "planning_result_stale": 6,
+      "motion": 275,
+      "goal_braking": 18,
+      "execution_collision_guard": 4,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.5683642636286095,
+    "plan_max_ms": 5.680917005520314,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_planter",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 15.34,
+    "goal_distance_m": 0.17069887139769055,
+    "min_gap_m": 0.16565620543270354,
+    "collision": false,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.9634818278199051,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 150,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.3566853147931397,
+    "plan_max_ms": 3.545875020790845,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_chicane",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 2.7869275310000403,
+    "min_gap_m": 0.13719157805045915,
+    "collision": false,
+    "switches": [
+      {
+        "t": 2.12,
+        "mode": 4
+      },
+      {
+        "t": 12.8,
+        "mode": 0
+      },
+      {
+        "t": 28.12,
+        "mode": 4
+      },
+      {
+        "t": 38.72,
+        "mode": 0
+      }
+    ],
+    "spin_count": 2,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 3.041763079823016,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 28,
+      "spin_requested": 2,
+      "spin_active": 217,
+      "spin_reached": 2,
+      "mode_return_wait": 60,
+      "planning_result_stale": 6,
+      "motion": 255,
+      "goal_braking": 27,
+      "execution_collision_guard": 6,
+      "blocked": 17,
+      "recovery_exhausted": 277
+    },
+    "final_reason": "recovery_exhausted",
+    "plan_p95_ms": 3.515968774445355,
+    "plan_max_ms": 4.146083956584334,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_wall_gap",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 10.12,
+    "goal_distance_m": 0.1640910203870467,
+    "min_gap_m": 0.3999999999999999,
+    "collision": false,
+    "switches": [],
+    "spin_count": 0,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 0.0,
+    "reasons": {
+      "planning_pending": 3,
+      "motion": 98,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 3.584997259895317,
+    "plan_max_ms": 3.7224169936962426,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "campus_full_block",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": false,
+    "duration_s": 90.0,
+    "goal_distance_m": 3.488747158780654,
+    "min_gap_m": 0.3204898491802233,
+    "collision": false,
+    "switches": [
+      {
+        "t": 2.12,
+        "mode": 4
+      },
+      {
+        "t": 12.8,
+        "mode": 0
+      },
+      {
+        "t": 28.12,
+        "mode": 4
+      },
+      {
+        "t": 38.72,
+        "mode": 0
+      }
+    ],
+    "spin_count": 2,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 3.041763079823016,
+    "reasons": {
+      "planning_pending": 3,
+      "orientation_stall": 28,
+      "spin_requested": 2,
+      "spin_active": 217,
+      "spin_reached": 2,
+      "mode_return_wait": 60,
+      "planning_result_stale": 6,
+      "motion": 237,
+      "goal_braking": 27,
+      "blocked": 14,
+      "recovery_exhausted": 304
+    },
+    "final_reason": "recovery_exhausted",
+    "plan_p95_ms": 3.321974683785811,
+    "plan_max_ms": 3.891874977853149,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  },
+  {
+    "case": "lateral_goal",
+    "baseline": true,
+    "noise": false,
+    "seed": 31,
+    "reached": true,
+    "duration_s": 17.38,
+    "goal_distance_m": 0.16229270279410107,
+    "min_gap_m": 0.3601631651146757,
+    "collision": false,
+    "switches": [
+      {
+        "t": 0.72,
+        "mode": 4
+      },
+      {
+        "t": 8.8,
+        "mode": 0
+      }
+    ],
+    "spin_count": 1,
+    "crab_count": 0,
+    "trap_ticks": 0,
+    "exit_at_s": null,
+    "max_abs_yaw_rad": 1.5759765184040322,
+    "reasons": {
+      "planning_pending": 3,
+      "spin_requested": 1,
+      "spin_active": 83,
+      "spin_reached": 1,
+      "mode_return_wait": 30,
+      "planning_result_stale": 3,
+      "motion": 52,
+      "reached": 1
+    },
+    "final_reason": "reached",
+    "plan_p95_ms": 2.9965395980980247,
+    "plan_max_ms": 3.2581249834038317,
+    "worker_delay_s": 0.25,
+    "time_model": "virtual time with delayed AsyncPlanner result delivery",
+    "driver_model": "legacy modeled 3s with truth stop gate",
+    "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+  }
+]

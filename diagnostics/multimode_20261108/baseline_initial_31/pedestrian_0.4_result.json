@@ -1,0 +1,25 @@
+{
+  "case": "pedestrian_0.4",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 5.42,
+  "goal_distance_m": 4.985160010393806,
+  "min_gap_m": -0.00789287554632545,
+  "collision": true,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.00023488617571653094,
+  "reasons": {
+    "motion": 4,
+    "dynamic_yield": 51
+  },
+  "final_reason": "dynamic_yield",
+  "plan_p95_ms": 8.061245703720488,
+  "plan_max_ms": 8.380041981581599,
+  "scope": "production Python cores + independent actuator/geometry simulation; no ROS or real lidar"
+}

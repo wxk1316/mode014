@@ -1,0 +1,78 @@
+{
+  "dense_80k": {
+    "observation_radius_m": 12,
+    "input_points": 80000,
+    "kept_points": 62298,
+    "scenario": "dense_80k",
+    "parents": 1,
+    "output_obstacles": 1,
+    "stats": {
+      "parent_count": 1,
+      "output_count": 1,
+      "tiled_parents": 0
+    },
+    "filter_seconds": 0.034603291998791974,
+    "world_transform_seconds": 0.004492167005082592,
+    "cluster_seconds": 0.14516374999948312,
+    "representation_and_kf_seconds": 0.04999599999428028,
+    "total_seconds": 0.23425520899763796,
+    "scope": "macOS pure Python; includes filtering/world transform/clustering/parent KF/world tiles; excludes ROS PointCloud2 decoding, markers, DDS and vehicle CPU contention"
+  },
+  "dense_100k": {
+    "observation_radius_m": 12,
+    "input_points": 100000,
+    "kept_points": 78330,
+    "scenario": "dense_100k",
+    "parents": 1,
+    "output_obstacles": 1,
+    "stats": {
+      "parent_count": 1,
+      "output_count": 1,
+      "tiled_parents": 0
+    },
+    "filter_seconds": 0.038948125002207235,
+    "world_transform_seconds": 0.005150417004188057,
+    "cluster_seconds": 0.16486887499922886,
+    "representation_and_kf_seconds": 0.041376041001058184,
+    "total_seconds": 0.25034345800668234,
+    "scope": "macOS pure Python; includes filtering/world transform/clustering/parent KF/world tiles; excludes ROS PointCloud2 decoding, markers, DDS and vehicle CPU contention"
+  },
+  "long_wall": {
+    "observation_radius_m": 12,
+    "input_points": 80000,
+    "kept_points": 80000,
+    "scenario": "long_wall",
+    "parents": 1,
+    "output_obstacles": 49,
+    "stats": {
+      "parent_count": 1,
+      "output_count": 49,
+      "tiled_parents": 1
+    },
+    "filter_seconds": 0.028196291998028755,
+    "world_transform_seconds": 0.004772915999637917,
+    "cluster_seconds": 0.049545624999154825,
+    "representation_and_kf_seconds": 0.000410084001487121,
+    "total_seconds": 0.08292491699830862,
+    "scope": "macOS pure Python; includes filtering/world transform/clustering/parent KF/world tiles; excludes ROS PointCloud2 decoding, markers, DDS and vehicle CPU contention"
+  },
+  "raw_u": {
+    "observation_radius_m": 12,
+    "input_points": 247,
+    "kept_points": 247,
+    "scenario": "raw_u",
+    "parents": 1,
+    "output_obstacles": 31,
+    "stats": {
+      "parent_count": 1,
+      "output_count": 31,
+      "tiled_parents": 1
+    },
+    "filter_seconds": 8.70000003487803e-05,
+    "world_transform_seconds": 1.3292003131937236e-05,
+    "cluster_seconds": 0.0003608330007409677,
+    "representation_and_kf_seconds": 0.0002172499953303486,
+    "total_seconds": 0.0006783749995520338,
+    "scope": "macOS pure Python; includes filtering/world transform/clustering/parent KF/world tiles; excludes ROS PointCloud2 decoding, markers, DDS and vehicle CPU contention"
+  }
+}

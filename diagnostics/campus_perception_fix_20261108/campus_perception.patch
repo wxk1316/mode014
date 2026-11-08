@@ -1,0 +1,586 @@
+--- a/src/rda_dwa_real/rda_dwa_real/perception_core.py
++++ b/src/rda_dwa_real/rda_dwa_real/perception_core.py
+@@ -1,4 +1,4 @@
+-"""Vectorized lidar parsing, adaptive ground removal, and supported clusters.
++"""Campus road surfaces, exact XY connectivity, and occupied envelopes.
+ 
+ Coordinates are sensor -> base_link, then heights above the observed ground.
+ Shape labels remain geometric hints, not semantic pedestrian classifications.
+@@ -55,61 +55,112 @@
+     ground_min_points: int=50
+     ground_max_tilt_deg: float=15.
+     ground_reuse_s: float=1.
+-    height_min: float=.12
++    ground_cell_size: float=.5
++    ground_min_cells: int=12
++    ground_min_span: float=1.
++    ground_reference_z: float=-.36
++    ground_reference_tolerance: float=.05
++    ground_max_jump: float=.06
++    ground_max_residual: float=.025
++    height_min: float=.06
+     height_max: float=2.2
++    dropoff_height: float=.06
+     voxel_size: float=.10
+     cluster_gate: float=.30
+     cluster_min_points: int=10
+     cluster_min_extent: float=.15
++    boundary_min_points: int=3
++    boundary_min_extent: float=.30
++    boundary_max_height: float=.20
+     max_cluster_points: int=8000
++    max_distance_tests: int=2000000
+     structural_length: float=3.5
+     structure_tile_size: float=1.2
++    cavity_tile_size: float=.4
++    cavity_min_extent: float=.8
++    cavity_fill_ratio: float=.35
++    drivable_resolution: float=.2
++    drivable_max_height: float=.035
++    drivable_min_points: int=2
+ 
+ 
+ class LidarPerceptionCore:
+     def __init__(self,params=None):
+         self.p=params or PerceptionParams()
+         p=self.p
+-        positive=(p.voxel_size,p.cluster_gate,p.max_range,p.structure_tile_size,p.structural_length)
+-        if not all(math.isfinite(v) and v>0 for v in positive) or math.sqrt(2.)*p.voxel_size>p.cluster_gate or p.height_min>=p.height_max or p.cluster_min_points<1 or p.ground_min_points<3:
++        positive=(p.voxel_size,p.cluster_gate,p.max_range,p.structure_tile_size,
++                  p.structural_length,p.cavity_tile_size,p.cavity_min_extent,
++                  p.ground_cell_size,p.ground_min_span,p.ground_reference_tolerance,
++                  p.ground_max_jump,p.ground_max_residual,p.ground_reuse_s,
++                  p.drivable_resolution,p.drivable_max_height,p.dropoff_height,
++                  p.boundary_min_extent,p.boundary_max_height)
++        if (not all(math.isfinite(v) and v>0 for v in positive)
++                or math.sqrt(2.)*p.voxel_size>p.cluster_gate
++                or not 0<p.cavity_fill_ratio<=1 or p.cavity_tile_size>p.structure_tile_size
++                or not math.isfinite(p.ground_reference_z)
++                or not 0<p.drivable_max_height<p.height_min<p.height_max
++                or p.cluster_min_points<1 or p.boundary_min_points<3
++                or p.ground_min_points<3 or p.ground_min_cells<3
++                or p.max_cluster_points<1 or p.max_distance_tests<1 or p.drivable_min_points<1
++                or math.ceil(2*p.max_range/p.drivable_resolution)>512
++                or not 0<=p.ground_roi_min<p.ground_roi_max
++                or not 0<p.ground_max_tilt_deg<90
++                or not all(math.isfinite(v) for v in (p.sensor_x,p.sensor_y,p.sensor_yaw,p.lidar_height,
++                    p.vehicle_length,p.vehicle_width,p.vehicle_outside,p.x_min,p.x_max,p.y_min,p.y_max))
++                or p.vehicle_length<=0 or p.vehicle_width<=0 or p.vehicle_outside<0
++                or p.x_min>=p.x_max or p.y_min>=p.y_max):
+             raise ValueError('invalid perception geometry or support parameters')
+-        self.plane=None;self.plane_at=-math.inf
+-
+-
+-    def _ground(self,pts,stamp):
++        self.plane=None;self.plane_at=-math.inf;self.plane_yaw=0.
++
++
++    def _ground(self,pts,stamp,yaw=0.):
++        """Fit spatially balanced road returns with a vehicle-height anchor.
++
++        The reference is the road height at the vehicle origin in base_link.
++        It prevents raised/depressed sidewalks and platform tops becoming the
++        driving plane merely because their returns are denser than the road.
++        """
+         p=self.p;r=np.linalg.norm(pts[:,:2],axis=1)
+         roi=pts[(r>=p.ground_roi_min)&(r<=p.ground_roi_max)&(pts[:,2]>=-1.6)&(pts[:,2]<=.2)]
+-        fit=None;count=0;residual=None
++        if stamp<self.plane_at:
++            self.plane=None;self.plane_at=-math.inf
++        prior=None
++        if self.plane is not None:
++            angle=yaw-self.plane_yaw;c,s=math.cos(angle),math.sin(angle)
++            prior=np.array([c*self.plane[0]+s*self.plane[1],-s*self.plane[0]+c*self.plane[1],self.plane[2]])
++        fit=None;count=0;residual=None;cells=0;reason='insufficient_support'
+         if len(roi)>=p.ground_min_points:
+-            hist,edges=np.histogram(roi[:,2],bins=np.arange(-1.6,.251,.05))
+-            k=int(np.argmax(hist));mode=(edges[k]+edges[k+1])/2
+-            seed=roi[np.abs(roi[:,2]-mode)<.20]
+-            if len(seed)>=p.ground_min_points and np.ptp(seed[:,0])>=.6 and np.ptp(seed[:,1])>=.6:
+-                mask=np.ones(len(seed),dtype=bool);rank=0
+-                for _ in range(4):
+-                    if np.count_nonzero(mask)<p.ground_min_points:break
+-                    values=seed[mask];mean=values.mean(axis=0);d=values-mean
+-                    xx=float(np.mean(d[:,0]**2));yy=float(np.mean(d[:,1]**2));xy=float(np.mean(d[:,0]*d[:,1]))
+-                    xz=float(np.mean(d[:,0]*d[:,2]));yz=float(np.mean(d[:,1]*d[:,2]));det=xx*yy-xy*xy
+-                    if det<=max(1e-10,1e-5*(xx+yy)**2):break
+-                    a=(xz*yy-yz*xy)/det;b=(yz*xx-xz*xy)/det
+-                    coeff=np.array([a,b,mean[2]-a*mean[0]-b*mean[1]]);rank=3
+-                    error=seed[:,2]-(a*seed[:,0]+b*seed[:,1]+coeff[2]);median=np.median(error[mask])
+-                    mad=np.median(np.abs(error[mask]-median))
+-                    limit=max(.025,min(.08,3.*1.4826*mad));mask=np.abs(error-median)<=limit
+-                if np.count_nonzero(mask)>=p.ground_min_points and rank==3 and np.isfinite(coeff).all() and math.hypot(coeff[0],coeff[1])<=math.tan(math.radians(p.ground_max_tilt_deg)):
+-                    fit=coeff;count=int(np.count_nonzero(mask));residual=float(np.median(np.abs(error[mask])))
++            seed=balanced_ground_returns(roi,p.ground_cell_size)
++            fit,mask=fit_road_plane(seed,p,prior)
++            if fit is None:
++                reason='ground_geometry_or_reference'
++            else:
++                errors=roi[:,2]-(roi[:,:2]@fit[:2]+fit[2])
++                count=int(np.count_nonzero(np.abs(errors)<=.035))
++                cells=int(np.count_nonzero(mask))
++                residual=float(np.median(np.abs(errors[np.abs(errors)<=.035]))) if count else None
++                if count<p.ground_min_points or residual is None or residual>p.ground_max_residual:
++                    fit=None;reason='ground_residual_or_support'
++                elif prior is not None and stamp-self.plane_at<=p.ground_reuse_s and abs(fit[2]-prior[2])>p.ground_max_jump:
++                    fit=None;reason='ground_jump_rejected'
++                else:
++                    reason='observed_road_surface'
+         if fit is not None:
+-            # A large plane change is re-observed directly; small noise is smoothed.
+-            self.plane=fit if self.plane is None or abs(fit[2]-self.plane[2])>.15 else .7*self.plane+.3*fit
+-            self.plane_at=stamp
+-        valid=self.plane is not None and stamp-self.plane_at<=p.ground_reuse_s
++            self.plane=fit;self.plane_at=stamp
++        elif prior is not None:
++            self.plane=prior
++        self.plane_yaw=yaw
++        valid=self.plane is not None and 0<=stamp-self.plane_at<=p.ground_reuse_s
+         return valid,dict(ground_plane=self.plane.tolist() if self.plane is not None else None,
+-                          ground_inliers=count,ground_residual_m=residual,ground_age_s=stamp-self.plane_at if self.plane is not None else None)
++                          ground_inliers=count,ground_cells=cells,ground_fit_reason=reason,
++                          ground_reused=fit is None and valid,ground_residual_m=residual,
++                          ground_age_s=stamp-self.plane_at if self.plane is not None else None)
+ 
+     def process(self,xyz,stamp,pose=(0.,0.,0.)):
+         begin=time.monotonic();p=self.p;points=np.asarray(xyz,dtype=float)
+         if points.ndim!=2 or points.shape[1]!=3:raise ValueError('XYZ array required')
++        if not math.isfinite(stamp) or len(pose)!=3 or not all(math.isfinite(v) for v in pose):
++            raise ValueError('finite source time and planar pose required')
+         finite=np.isfinite(points).all(axis=1);points=points[finite].copy()
+         c,s=math.cos(p.sensor_yaw),math.sin(p.sensor_yaw)
+         x=points[:,0].copy();y=points[:,1].copy()
+@@ -121,11 +172,14 @@
+         points=points[keep&~self_box]
+         metrics=dict(finite_points=int(np.count_nonzero(finite)),roi_points=len(points))
+         if p.ground_enabled:
+-            phase=time.monotonic();valid,ground=self._ground(points,stamp);metrics.update(ground,ground_duration_s=time.monotonic()-phase)
++            phase=time.monotonic();valid,ground=self._ground(points,stamp,pose[2]);metrics.update(ground,ground_duration_s=time.monotonic()-phase)
+             if not valid:return [],dict(metrics,valid=False,reason='ground_unavailable')
+             heights=points[:,2]-(points[:,0]*self.plane[0]+points[:,1]*self.plane[1]+self.plane[2])
+-            keep=(heights>=p.height_min)&(heights<=p.height_max)
+-            metrics['ground_removed_points']=int(np.count_nonzero(heights<p.height_min))
++            keep=((heights>=p.height_min)&(heights<=p.height_max))|(heights<=-p.dropoff_height)
++            metrics['ground_removed_points']=int(np.count_nonzero(~keep))
++            metrics['raised_boundary_points']=int(np.count_nonzero((heights>=p.height_min)&(heights<=p.boundary_max_height)))
++            metrics['dropoff_points']=int(np.count_nonzero(heights<=-p.dropoff_height))
++            metrics['drivable_grid']=observed_drivable_grid(points[:,:2],heights,p)
+         else:
+             heights=points[:,2];keep=(heights>=p.z_min)&(heights<=p.z_max)
+         points=points[keep];heights=heights[keep];metrics['filtered_points']=len(points)
+@@ -141,40 +195,45 @@
+         selected_count=len(np.unique(np.concatenate(extrema)))
+         metrics.update(cluster_input_points=selected_count,occupied_voxels=len(cells),voxel_duration_s=time.monotonic()-phase)
+         if selected_count>p.max_cluster_points:return [],dict(metrics,valid=False,reason='cluster_capacity')
+-        phase=time.monotonic();labels,edges=voxel_components(cells,representatives,p.voxel_size,p.cluster_gate)
++        phase=time.monotonic();distance_metrics={}
++        try:
++            labels,edges=voxel_components(cells,representatives,p.voxel_size,p.cluster_gate,
++                                         points=points[:,:2],point_cells=inverse,
++                                         max_distance_tests=p.max_distance_tests,metrics=distance_metrics)
++        except DistanceBudgetExceeded:
++            return [],dict(metrics,**distance_metrics,valid=False,reason='cluster_distance_capacity')
+         raw_labels=labels[inverse];order=np.argsort(raw_labels,kind='stable')
+         cuts=np.flatnonzero(np.diff(raw_labels[order]))+1;groups=np.split(order,cuts)
+-        metrics.update(cluster_count=len(groups),component_edges=edges,component_duration_s=time.monotonic()-phase)
++        metrics.update(distance_metrics,cluster_count=len(groups),component_edges=edges,component_duration_s=time.monotonic()-phase)
+         phase=time.monotonic();detections=[];rejected=tiles=0;supports=[]
+         pc,ps=math.cos(pose[2]),math.sin(pose[2])
+         for indices in groups:
+             raw_xy=points[indices,:2];support=len(indices);height=float(max(heights[indices]))
+             cx,cy,L,W,heading=bounding_box_xy(raw_xy)
+-            if support<p.cluster_min_points or max(L,W)<p.cluster_min_extent-1e-8:
++            boundary=bool(np.max(np.abs(heights[indices]))<=p.boundary_max_height)
++            ordinary=support>=p.cluster_min_points and max(L,W)>=p.cluster_min_extent-1e-8
++            supported_boundary=boundary and support>=p.boundary_min_points and max(L,W)>=p.boundary_min_extent-1e-8
++            if not (ordinary or supported_boundary):
+                 rejected+=1;continue
+             box_groups=[(raw_xy,(cx,cy,L,W,heading))]
+-            if max(L,W)>p.structural_length:
++            cavity=has_empty_box_area(raw_xy,(cx,cy,L,W,heading),p)
++            if max(L,W)>p.structural_length or cavity:
+                 # Group raw supports by fixed world cells in one native sort.
+                 world=np.column_stack((pose[0]+pc*raw_xy[:,0]-ps*raw_xy[:,1],pose[1]+ps*raw_xy[:,0]+pc*raw_xy[:,1]))
+-                _,ids,_=cell_index(np.floor(world/p.structure_tile_size).astype(np.int32))
++                # Use finer cells around the car. Away from the car, ordinary
++                # structural cells already avoid filling the entire cavity and
++                # keep scene/tracker cost bounded for long campus boundaries.
++                tile_size=p.cavity_tile_size if box_intersects_car((cx,cy,L,W,heading),p) else p.structure_tile_size
++                _,ids,_=cell_index(np.floor(world/tile_size).astype(np.int32))
+                 tile_order=np.argsort(ids,kind='stable');splits=np.flatnonzero(np.diff(ids[tile_order]))+1
+                 box_groups=[(raw_xy[idx],bounding_box_xy(raw_xy[idx])) for idx in np.split(tile_order,splits)];tiles+=len(box_groups)
+-                strong=[];weak=[]
+-                for group,box in box_groups:
+-                    _,_,gl,gw,_=box
+-                    (strong if len(group)>=p.cluster_min_points and max(gl,gw)>=p.cluster_min_extent-1e-8 else weak).append((group,box))
+-                for group,_ in weak:
+-                    distances=[float(np.min((group[:,None,0]-g[None,:,0])**2+(group[:,None,1]-g[None,:,1])**2)) for g,_ in strong]
+-                    if distances and min(distances)<=p.cluster_gate**2:
+-                        k=int(np.argmin(distances));joined=np.concatenate((strong[k][0],group));strong[k]=(joined,None)
+-                    else:rejected+=1
+-                box_groups=strong
++                # Reliability belongs to the accepted parent. Even a one-point
++                # terminal tile must preserve that parent's observed envelope.
+             for group,box in box_groups:
+                 cx,cy,L,W,heading=box if box is not None else bounding_box_xy(group)
+-                if len(group)<p.cluster_min_points or max(L,W)<p.cluster_min_extent-1e-8:
+-                    rejected+=1;continue
+                 detections.append((cx,cy,infer_type(L,W),max(L,.10),max(W,.10),heading))
+-                supports.append(dict(points=len(group),height_m=height,structural=len(box_groups)>1))
++                supports.append(dict(points=len(group),parent_points=support,height_m=height,
++                                     structural=len(box_groups)>1,cavity=cavity,boundary=boundary))
+         metrics.update(box_duration_s=time.monotonic()-phase,processing_duration_s=time.monotonic()-begin)
+         metrics.update(weak_clusters_removed=rejected,structural_tiles=tiles,detection_support=supports,detection_count=len(detections))
+         return detections,dict(metrics,valid=True,reason='published')
+@@ -192,16 +251,53 @@
+     return c*um-s*vm,s*um+c*vm,max(.05,uhi-ulo),max(.05,vhi-vlo),theta
+ 
+ 
+-def voxel_components(cells,representatives,voxel_size,gate):
+-    """Exact connectivity of the four extrema, grouped by occupied XY voxel.
++class DistanceBudgetExceeded(RuntimeError):
++    """An exact graph could not be completed within its pair-test budget."""
++
++
++def voxel_components(cells,representatives,voxel_size,gate,*,points=None,
++                     point_cells=None,max_distance_tests=2000000,metrics=None):
++    """Connect occupied voxels using extrema first and raw points when needed.
+ 
+     Within a voxel all extrema are connected (diagonal <= gate). Pairwise
+     distances across nearby occupied voxels run in bounded native arrays,
+     instead of Python loops over every point and every dense neighbour.
+-    Raw support points are never dropped from the subsequent fitted boxes.
++    A failed extrema test is not evidence that the raw voxels are disconnected.
++    For ambiguous voxel pairs, check all distinct XY supports in small bounded
++    blocks. Exhausting the work budget invalidates the observation; no partial
++    graph is returned as an empty or fragmented free scene.
+     """
+     n=len(cells);parent=np.arange(n);left=[];right=[];edge_count=0
++    stats=metrics if metrics is not None else {}
++    stats.update(exact_distance_tests=0,exact_voxel_queries=0)
+     if not n:return parent,0
++    raw_cache={};raw_order=raw_starts=raw_counts=None
++    if points is not None:
++        points=np.asarray(points);point_cells=np.asarray(point_cells)
++        if points.ndim!=2 or points.shape[1]!=2 or point_cells.shape!=(len(points),):
++            raise ValueError('raw XY points and their voxel ids required')
++        raw_order=np.argsort(point_cells,kind='stable')
++        raw_counts=np.bincount(point_cells,minlength=n);raw_starts=np.r_[0,np.cumsum(raw_counts)[:-1]]
++    bounds_min=representatives.min(axis=1);bounds_max=representatives.max(axis=1)
++
++    def supports(cell):
++        if cell not in raw_cache:
++            start=raw_starts[cell]
++            raw_cache[cell]=np.unique(points[raw_order[start:start+raw_counts[cell]]],axis=0)
++        return raw_cache[cell]
++
++    def raw_link(i,j,gate2):
++        a,b=supports(i),supports(j);stats['exact_voxel_queries']+=1
++        for first in range(0,len(a),128):
++            aa=a[first:first+128]
++            for second in range(0,len(b),128):
++                bb=b[second:second+128];tests=len(aa)*len(bb)
++                if stats['exact_distance_tests']+tests>max_distance_tests:
++                    raise DistanceBudgetExceeded('exact XY connectivity budget exceeded')
++                stats['exact_distance_tests']+=tests
++                distance=(aa[:,None,0]-bb[None,:,0])**2+(aa[:,None,1]-bb[None,:,1])**2
++                if np.any(distance<=gate2+1e-12):return True
++        return False
+     origin=cells.min(axis=0);span=cells.max(axis=0)-origin+1
+     code=(cells[:,0].astype(np.int64)-origin[0])*int(span[1])+cells[:,1]-origin[1]
+     extent=int(math.ceil(gate/voxel_size))+1;gate2=gate*gate
+@@ -217,7 +313,12 @@
+             if not len(i):continue
+             a=representatives[i];b=representatives[j]
+             distance=(a[:,:,None,0]-b[:,None,:,0])**2+(a[:,:,None,1]-b[:,None,:,1])**2
+-            linked=np.min(distance,axis=(1,2))<=gate2+1e-12;i=i[linked];j=j[linked];edge_count+=len(i)
++            linked=np.min(distance,axis=(1,2))<=gate2+1e-12
++            if points is not None:
++                gap=np.maximum(np.maximum(bounds_min[i]-bounds_max[j],bounds_min[j]-bounds_max[i]),0.)
++                ambiguous=np.flatnonzero(~linked&(np.sum(gap*gap,axis=1)<=gate2+1e-12))
++                for k in ambiguous:linked[k]=raw_link(int(i[k]),int(j[k]),gate2)
++            i=i[linked];j=j[linked];edge_count+=len(i)
+             left.append(i);right.append(j)
+     if edge_count:
+         left=np.concatenate(left);right=np.concatenate(right)
+@@ -237,3 +338,111 @@
+     unique,inverse,counts=np.unique(code,return_inverse=True,return_counts=True)
+     cells=np.column_stack((unique//stride+origin[0],unique%stride+origin[1])).astype(np.int32)
+     return cells,inverse,counts
++
++
++def balanced_ground_returns(points,cell_size):
++    """One low and one median return per cell, independent of return density."""
++    _,ids,counts=cell_index(np.floor(points[:,:2]/cell_size).astype(np.int32))
++    starts=np.r_[0,np.cumsum(counts)[:-1]]
++    order=np.lexsort((points[:,1],points[:,0],points[:,2],ids))
++    chosen=np.unique(np.r_[order[starts+counts//10],order[starts+counts//2]])
++    seed=points[chosen]
++    return seed[np.lexsort((seed[:,2],seed[:,1],seed[:,0]))]
++
++
++def least_squares_plane(points,weights=None):
++    weights=np.ones(len(points)) if weights is None else np.asarray(weights)
++    weights=weights/weights.sum();mean=np.sum(points*weights[:,None],axis=0)
++    centred=points-mean
++    xx=np.sum(weights*centred[:,0]**2);yy=np.sum(weights*centred[:,1]**2);xy=np.sum(weights*centred[:,0]*centred[:,1])
++    xz=np.sum(weights*centred[:,0]*centred[:,2]);yz=np.sum(weights*centred[:,1]*centred[:,2]);det=xx*yy-xy*xy
++    if det<=max(1e-10,1e-5*(xx+yy)**2):return None
++    a=(xz*yy-yz*xy)/det;b=(yz*xx-xz*xy)/det
++    return np.array([a,b,mean[2]-a*mean[0]-b*mean[1]])
++
++
++def fit_road_plane(seed,p,prior=None):
++    """Bounded deterministic plane hypotheses with an origin-height constraint.
++
++    Local supports have more weight than remote sidewalks. Models are scored
++    on spatially balanced samples; accepted inliers must cover two dimensions.
++    """
++    if len(seed)<p.ground_min_cells:return None,None
++    candidates=[np.array([0.,0.,p.ground_reference_z])]
++    if prior is not None:candidates.append(prior)
++    whole=least_squares_plane(seed)
++    if whole is not None:candidates.append(whole)
++    triples=np.random.default_rng(0).integers(0,len(seed),size=(192,3))
++    a=seed[triples[:,0]];u=seed[triples[:,1]]-a;v=seed[triples[:,2]]-a
++    det=u[:,0]*v[:,1]-u[:,1]*v[:,0];usable=np.abs(det)>.05
++    a,u,v,det=a[usable],u[usable],v[usable],det[usable]
++    ax=(u[:,2]*v[:,1]-v[:,2]*u[:,1])/det
++    ay=(u[:,0]*v[:,2]-v[:,0]*u[:,2])/det
++    candidates.extend(np.column_stack((ax,ay,a[:,2]-ax*a[:,0]-ay*a[:,1])))
++    candidates=np.asarray(candidates)
++    allowed=(np.abs(candidates[:,2]-p.ground_reference_z)<=p.ground_reference_tolerance)&(np.linalg.norm(candidates[:,:2],axis=1)<=math.tan(math.radians(p.ground_max_tilt_deg)))
++    candidates=candidates[allowed]
++    if not len(candidates):return None,None
++    error=seed[:,2,None]-(seed[:,:2]@candidates[:,:2].T+candidates[None,:,2])
++    inliers=np.abs(error)<=.035
++    anchors=(np.linalg.norm(seed[:,:2],axis=1)<=1.8)&(np.abs(seed[:,1])<=p.vehicle_width/2+p.vehicle_outside)
++    # The surface continuing immediately ahead/behind the car defines the
++    # road level. A much larger sidewalk must not tilt the fit toward itself.
++    weights=np.where(anchors,20.,1.)
++    score=np.sum(weights[:,None]*inliers*(1.-np.minimum(np.abs(error),.035)/.035),axis=0)
++    best=int(np.argmax(score));fit=candidates[best];mask=inliers[:,best]
++    for _ in range(3):
++        values=seed[mask]
++        if len(values)<p.ground_min_cells or np.any(np.ptp(values[:,:2],axis=0)<p.ground_min_span):return None,None
++        candidate=least_squares_plane(values,weights[mask])
++        if candidate is None:return None,None
++        if abs(candidate[2]-p.ground_reference_z)>p.ground_reference_tolerance or math.hypot(*candidate[:2])>math.tan(math.radians(p.ground_max_tilt_deg)):
++            return None,None
++        fit=candidate;mask=np.abs(seed[:,2]-(seed[:,:2]@fit[:2]+fit[2]))<=.035
++    values=seed[mask]
++    if len(values)<p.ground_min_cells or np.any(np.ptp(values[:,:2],axis=0)<p.ground_min_span):return None,None
++    cells,_,_=cell_index(np.floor(values[:,:2]/p.ground_cell_size).astype(np.int32))
++    if len(cells)<p.ground_min_cells:return None,None
++    return fit,mask
++
++
++def box_intersects_car(box,p):
++    cx,cy,length,width,angle=box;c,s=math.cos(angle),math.sin(angle)
++    # SAT intersection against the actual vehicle, including its outside pad.
++    hx=p.vehicle_length/2+p.vehicle_outside;hy=p.vehicle_width/2+p.vehicle_outside
++    return (abs(cx)<=hx+abs(c)*length/2+abs(s)*width/2
++                and abs(cy)<=hy+abs(s)*length/2+abs(c)*width/2
++                and abs(c*cx+s*cy)<=length/2+abs(c)*hx+abs(s)*hy
++                and abs(-s*cx+c*cy)<=width/2+abs(s)*hx+abs(c)*hy)
++
++
++def has_empty_box_area(points,box,p):
++    cx,cy,length,width,angle=box;c,s=math.cos(angle),math.sin(angle)
++    if box_intersects_car(box,p):return True
++    if min(length,width)<p.cavity_min_extent:return False
++    local=np.column_stack((c*(points[:,0]-cx)+s*(points[:,1]-cy),
++                           -s*(points[:,0]-cx)+c*(points[:,1]-cy)))
++    cells,_,_=cell_index(np.floor((local-local.min(axis=0))/p.voxel_size).astype(np.int32))
++    span=np.ptp(cells,axis=0)+1;fill=len(cells)/float(span[0]*span[1])
++    return fill<p.cavity_fill_ratio
++
++
++def observed_drivable_grid(xy,heights,p):
++    """Observed road=0, elevated/depressed supports=100, unseen cells=-1.
++
++    No ray casting, extrapolation, or fill through occluded/unsupported space.
++    These values describe surface evidence, not vehicle-footprint clearance.
++    """
++    size=int(math.ceil(2*p.max_range/p.drivable_resolution));origin=-size*p.drivable_resolution/2
++    keys=np.floor((xy-origin)/p.drivable_resolution).astype(np.int32)
++    inside=(keys[:,0]>=0)&(keys[:,0]<size)&(keys[:,1]>=0)&(keys[:,1]<size)
++    keys=keys[inside];heights=heights[inside];ids=keys[:,1]*size+keys[:,0]
++    road=np.abs(heights)<=p.drivable_max_height
++    blocked=((heights>=p.height_min)&(heights<=p.height_max))|(heights<=-p.dropoff_height)
++    counts=np.bincount(ids[road],minlength=size*size)
++    grid=np.full(size*size,-1,dtype=np.int8);grid[counts>=p.drivable_min_points]=0
++    grid[ids[blocked]]=100
++    return dict(resolution=p.drivable_resolution,width=size,height=size,
++                origin_x=origin,origin_y=origin,data=grid.tolist(),
++                free_cells=int(np.count_nonzero(grid==0)),blocked_cells=int(np.count_nonzero(grid==100)),
++                unknown_cells=int(np.count_nonzero(grid==-1)))
+--- a/src/rda_dwa_real/rda_dwa_real/lidar_track_node.py
++++ b/src/rda_dwa_real/rda_dwa_real/lidar_track_node.py
+@@ -7,13 +7,14 @@
+   1) PointCloud2 → 二维点 (x, y)（rslidar 系 z 范围过滤 + 车体矩形盒自剔除）
+      注：rslidar 系 (x,y) 与 base_link 系 (x,y) 完全相同（雷达在 base_link 正上方 0.45m，
+      x/y 投影对齐），故车体剔除盒在 rslidar/base_link 系下语义一致。
+-  2) 距离聚类（复用 obstacle_fusion.Clusterer）→ 矩形包围盒 → 类型推断
++  2) 精确原始点连通聚类 → 保留空腔的局部包围框 → 类型提示
+   3) 用 /localization 位姿（body→base_link 补偿后）把检测从车体系(base_link)转到全局系(map)
+   4) 全局系卡尔曼滤波(CV) + 匈牙利匹配（kf_tracker.GlobalKFTracker）→ 稳定 id
+   5) 发布 /rda/obstacles（frame_id='map'，id/type/x/y/length/width/heading/speed）
+ 
+ 下游：bridge_node 直接消费已跟踪的 map 障碍；不再次估计速度。
+-完整周围点云经体素极值保留和连通聚类；形状朝向与运动方向分别发布。
++完整周围点云经过道路平面估计；约10cm上下台阶保留为障碍。
++另发布观测支持的 /rda/drivable_area；未知区域保持 -1。
+ 
+ 依赖：sensor_msgs_py（ROS2 Humble 自带）解析点云；numpy；无其他第三方。
+ """
+@@ -39,7 +40,7 @@
+ import numpy as np
+ 
+ from sensor_msgs.msg import PointCloud2
+-from nav_msgs.msg import Odometry
++from nav_msgs.msg import Odometry, OccupancyGrid
+ 
+ try:
+     from sensor_msgs_py import point_cloud2 as _pc2
+@@ -120,9 +121,19 @@
+         self.declare_parameter('max_cluster_points',8000)
+         self.declare_parameter('max_obstacle_range', 6.0)   # 只检测车周围 5m 内的障碍物
+         for name,default in {'ground_filter_enable':True,'ground_min_points':50,
+-                             'obstacle_height_min':.12,'obstacle_height_max':2.2,
++                             'obstacle_height_min':.06,'obstacle_height_max':2.2,
+                              'cluster_min_extent':.15,'structural_length':3.5,
+-                             'structure_tile_size':1.2,'sensor_x':0.,'sensor_y':0.,'sensor_yaw':0.}.items():
++                             'structure_tile_size':1.2,'sensor_x':0.,'sensor_y':0.,'sensor_yaw':0.,
++                             'ground_cell_size':.5,'ground_min_cells':12,'ground_min_span':1.,
++                             'ground_reference_z':-.36,'ground_reference_tolerance':.05,
++                             'ground_max_jump':.06,'ground_max_residual':.025,
++                             'dropoff_height':.06,'boundary_min_points':3,
++                             'boundary_min_extent':.30,'boundary_max_height':.20,
++                             'max_distance_tests':2000000,'cavity_tile_size':.4,
++                             'cavity_min_extent':.8,'cavity_fill_ratio':.35,
++                             'drivable_resolution':.2,'drivable_max_height':.035,
++                             'drivable_min_points':2,'drivable_area_enable':True,
++                             'drivable_area_topic':'/rda/drivable_area'}.items():
+             self.declare_parameter(name,default)
+ 
+         self._points_topic = str(self.get_parameter('points_topic').value)
+@@ -192,7 +203,17 @@
+             structural_length=float(self.get_parameter('structural_length').value),
+             structure_tile_size=float(self.get_parameter('structure_tile_size').value),
+             sensor_x=float(self.get_parameter('sensor_x').value),sensor_y=float(self.get_parameter('sensor_y').value),
+-            sensor_yaw=float(self.get_parameter('sensor_yaw').value)))
++            sensor_yaw=float(self.get_parameter('sensor_yaw').value),
++            **{name:type(default)(self.get_parameter(name).value) for name,default in {
++                'ground_cell_size':.5,'ground_min_cells':12,'ground_min_span':1.,
++                'ground_reference_z':-.36,'ground_reference_tolerance':.05,
++                'ground_max_jump':.06,'ground_max_residual':.025,
++                'dropoff_height':.06,'boundary_min_points':3,'boundary_min_extent':.30,
++                'boundary_max_height':.20,'max_distance_tests':2000000,
++                'cavity_tile_size':.4,'cavity_min_extent':.8,'cavity_fill_ratio':.35,
++                'drivable_resolution':.2,'drivable_max_height':.035,'drivable_min_points':2}.items()}))
++        self._drivable_enabled=bool(self.get_parameter('drivable_area_enable').value)
++        self._drivable_topic=str(self.get_parameter('drivable_area_topic').value)
+ 
+         self._max_source_age=float(self.get_parameter('perception_max_source_age_s').value)
+         self._track_reset_gap=float(self.get_parameter('track_reset_gap_s').value)
+@@ -220,6 +241,7 @@
+                 'rda_dwa_real_msgs 未找到（未 source car_ros 的 install/setup.bash），'
+                 '/rda/obstacles 发布被禁用')
+         self._pub_perception_diag=self.create_publisher(String,'/rda/perception_diag',10)
++        self._pub_drivable=self.create_publisher(OccupancyGrid,self._drivable_topic,1)
+         self._perception_seq=0
+         self._pub_markers = self.create_publisher(
+             MarkerArray, '/rda/obstacles_markers', 10)
+@@ -280,7 +302,7 @@
+             self._perception_metrics['reason']='exception';self._perception_metrics['exception']=type(exc).__name__;raise
+         finally:
+             self._perception_metrics.update(producer_monotonic_ns=time.monotonic_ns(),producer_ros_ns=self.get_clock().now().nanoseconds,duration_s=time.monotonic()-begin,source_dt_s=getattr(self,'_cloud_dt',None))
+-            self._pub_perception_diag.publish(String(data=json.dumps(safe_data(self._perception_metrics),allow_nan=False)))
++            self._emit_perception_diag(self._perception_metrics)
+ 
+     def _submit_cloud(self,msg):
+         """Fast callback: snapshot pose and replace the waiting observation."""
+@@ -320,6 +342,7 @@
+         if tracks is not None and age<=self._max_source_age:
+             header=self.get_clock().now().to_msg();header.sec=sec;header.nanosec=nanosec
+             self._cloud_source_stamp=header;self._publish_obstacles(tracks)
++            self._publish_drivable_grid(metrics,header)
+             metrics['obstacle_published']=True
+         else:
+             metrics['obstacle_published']=False
+@@ -327,9 +350,22 @@
+         self._emit_perception_diag(metrics)
+ 
+     def _emit_perception_diag(self,metrics):
++        grid=metrics.pop('drivable_grid',None)
++        if grid is not None:
++            metrics['drivable_grid_summary']={k:v for k,v in grid.items() if k!='data'}
+         metrics.update(producer_monotonic_ns=time.monotonic_ns(),producer_ros_ns=self.get_clock().now().nanoseconds)
+         self._perception_metrics=metrics
+         self._pub_perception_diag.publish(String(data=json.dumps(safe_data(metrics),allow_nan=False)))
++
++    def _publish_drivable_grid(self,metrics,stamp):
++        grid=metrics.get('drivable_grid');metrics['drivable_published']=False
++        if not self._drivable_enabled or grid is None or not metrics.get('valid',False):return
++        msg=OccupancyGrid();msg.header.stamp=stamp;msg.header.frame_id='base_link'
++        msg.info.map_load_time=stamp;msg.info.resolution=float(grid['resolution'])
++        msg.info.width=int(grid['width']);msg.info.height=int(grid['height'])
++        msg.info.origin.position.x=float(grid['origin_x']);msg.info.origin.position.y=float(grid['origin_y'])
++        msg.info.origin.orientation.w=1.;msg.data=grid['data']
++        self._pub_drivable.publish(msg);metrics['drivable_published']=True
+ 
+     def destroy_node(self):
+         if self._async_perception is not None:self._async_perception.close()
+@@ -366,6 +402,7 @@
+         self._perception_metrics.update(track_reset=reset,tracking_dt_s=tracking_dt)
+         if not dets_body:
+             self._publish_obstacles(self._tracker.step([],dt=max(.005,tracking_dt)))
++            self._publish_drivable_grid(self._perception_metrics,self._cloud_source_stamp)
+             return 'empty_cloud_predicted_tracks'
+         # ⑦ 转到全局系（map），供全局匹配
+         rx, ry, rth = self._loc
+@@ -380,6 +417,7 @@
+ 
+         # ⑨ 发布（frame_id='map'）
+         self._publish_obstacles(tracks)
++        self._publish_drivable_grid(self._perception_metrics,self._cloud_source_stamp)
+         self._perception_metrics.update(track_outputs=tracks,track_count=len(tracks),unknown_count=sum(t[5]=='unknown' for t in tracks),kf_duration_s=time.monotonic()-phase)
+         return 'published'
+ 
+--- a/src/rda_dwa_real/config/real_vehicle.yaml
++++ b/src/rda_dwa_real/config/real_vehicle.yaml
+@@ -258,10 +258,32 @@
+     cluster_min_extent: 0.15
+     ground_filter_enable: true
+     ground_min_points: 50
+-    obstacle_height_min: 0.12
++    ground_cell_size: 0.5
++    ground_min_cells: 12
++    ground_min_span: 1.0
++    # base_link 原点处路面高度，取自现有录制；安装/车体参考变更后需重标定。
++    ground_reference_z: -0.36
++    ground_reference_tolerance: 0.05
++    ground_max_jump: 0.06
++    ground_max_residual: 0.025
++    # 校园约10cm路沿：保留 >=6cm 凸起和 <=-6cm 下台阶，地面起伏单独筛选。
++    obstacle_height_min: 0.06
+     obstacle_height_max: 2.2
++    dropoff_height: 0.06
++    boundary_min_points: 3
++    boundary_min_extent: 0.30
++    boundary_max_height: 0.20
++    max_distance_tests: 2000000
+     structural_length: 3.5
+     structure_tile_size: 1.2
++    cavity_tile_size: 0.4
++    cavity_min_extent: 0.8
++    cavity_fill_ratio: 0.35
++    drivable_area_enable: true
++    drivable_area_topic: /rda/drivable_area
++    drivable_resolution: 0.2
++    drivable_max_height: 0.035
++    drivable_min_points: 2
+     cluster_max_radius: 30.0
+     track_dt: 0.05
+     track_gate: 0.5

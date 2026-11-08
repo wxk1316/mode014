@@ -1,0 +1,536 @@
+{
+  "date": "2026-11-07",
+  "packages": {
+    "rda_dwa": "rda_dwa",
+    "rda_dwa_real": "rda_dwa_real",
+    "rda_dwa_real_msgs": "rda_dwa_real_msgs",
+    "car_ctr": "control/car_ctr",
+    "common": "msg/common",
+    "car_launch": "car_launch"
+  },
+  "files": {
+    "rda_dwa/package.xml": {
+      "sha256": "30da964dcfeb0663b6dc7237da067ba97b5b5998f34d4e81b74d24d4d51b3595",
+      "size_bytes": 592
+    },
+    "rda_dwa/setup.py": {
+      "sha256": "0750043a45c107fe1cb62ebc8efae86e16aaa7464d63f9d95a384a3f50d62891",
+      "size_bytes": 571
+    },
+    "rda_dwa/setup.cfg": {
+      "sha256": "43eabf68cc514c7d5ef94cb32dce8726dfd746368cfe673a32d9e9bceb310df2",
+      "size_bytes": 83
+    },
+    "rda_dwa/rda_dwa/predictor.py": {
+      "sha256": "82c20f50cedb5ebf1d7614aa2e7ee8efa6dde7f842cdf61f5b524cd37c35f181",
+      "size_bytes": 17054
+    },
+    "rda_dwa/rda_dwa/collision_checker.py": {
+      "sha256": "c69780dd086beafaed94755fde6e2bc96d6fa22a193135ff1586eea7408b76c3",
+      "size_bytes": 25350
+    },
+    "rda_dwa/rda_dwa/params.py": {
+      "sha256": "36f519fe9fd71f32d5ebfd1e98ee5d0a1bdb1807e067add8c53c9c66059e1899",
+      "size_bytes": 43437
+    },
+    "rda_dwa/rda_dwa/escape.py": {
+      "sha256": "b8b929f6700e31c2ef3876050bbdb36f0c89faebbe7be62ab24c556a0f44ff05",
+      "size_bytes": 44200
+    },
+    "rda_dwa/rda_dwa/trial.py": {
+      "sha256": "4075803f5337b316d3259fecfefaa171e2ee6f3ad4ddd069a12b2ec822ca3054",
+      "size_bytes": 856
+    },
+    "rda_dwa/rda_dwa/enhanced_dwa.py": {
+      "sha256": "91b24fcb3636641ea0f36b558174615415e0281e0bf746fa7fea850478ace347",
+      "size_bytes": 94293
+    },
+    "rda_dwa/rda_dwa/realtime_ackermann.py": {
+      "sha256": "ef544699713e0a0b70ffe3600ddadbffcc4de2d4345f8804e17750eca9bd992f",
+      "size_bytes": 9357
+    },
+    "rda_dwa/rda_dwa/trial_runner.py": {
+      "sha256": "478d4b811891f2ea5030c925c8fb6e85651e54ce622b464b7a9d39cd3052375e",
+      "size_bytes": 95288
+    },
+    "rda_dwa/rda_dwa/module_config.py": {
+      "sha256": "1ef44aefd18e8083710f32d1131b7201fbcd306e290e8a77859edddd0221b433",
+      "size_bytes": 5108
+    },
+    "rda_dwa/rda_dwa/local_guide.py": {
+      "sha256": "da1f7d22c8875ac9a6c5459a9de469adb6ada6e522dce9c38a29373fc08238a7",
+      "size_bytes": 7483
+    },
+    "rda_dwa/rda_dwa/__init__.py": {
+      "sha256": "39d2c7ef26b1573936b703c50c525a6b69f0919092c8df78ca32008e66eaa182",
+      "size_bytes": 1829
+    },
+    "rda_dwa/rda_dwa/ackermann_model.py": {
+      "sha256": "e769b369a6981431754120524a0d70e8023aa5dc63b35365311b43fc1c098548",
+      "size_bytes": 8144
+    },
+    "rda_dwa/rda_dwa/global_guide.py": {
+      "sha256": "582a3d8e12a0df8a0ac6ab1d33da8f09d1bd055a4d25835dccbf0f9de8e51ea8",
+      "size_bytes": 5955
+    },
+    "rda_dwa/rda_dwa/dqn_state.py": {
+      "sha256": "eaaae9bee8779bb6444faf61a569f6a5003ecb48ab02e94dce424d31dde48ccc",
+      "size_bytes": 7181
+    },
+    "rda_dwa/rda_dwa/four_wheel_trial.py": {
+      "sha256": "fd165e9d66ae0fb1fe1e68d5eff39675deffd250a9a65cb75e37ba1d88d9e0f7",
+      "size_bytes": 1122
+    },
+    "rda_dwa/rda_dwa/obstacle.py": {
+      "sha256": "968dc7be667f2bdf672b61398150cc17d462d0041ba86bb5843d4e4ff5b751df",
+      "size_bytes": 4650
+    },
+    "rda_dwa/rda_dwa/motion_safety.py": {
+      "sha256": "8091117da1263afb2129a44036451f2b74b57282d92b10730ddc3c9f9806a777",
+      "size_bytes": 6472
+    },
+    "rda_dwa/rda_dwa/scenario.py": {
+      "sha256": "2e43c9480f1ee5882089ac7339a78d01339e35ecbf2543b4f95938a81655d9eb",
+      "size_bytes": 47347
+    },
+    "rda_dwa/rda_dwa/hybrid_primitives.py": {
+      "sha256": "c180d037ccd8e96b0593bf4593b514c2953a6d97e73bb3f106c2ea670ce33dfa",
+      "size_bytes": 7564
+    },
+    "rda_dwa/rda_dwa/ackermann_trial.py": {
+      "sha256": "9c0155458a50b79ccfbb1ac492eaacfdf9d92143e352961742c4b39dba53ee0c",
+      "size_bytes": 983
+    },
+    "rda_dwa/rda_dwa/four_wheel_steer_model.py": {
+      "sha256": "1bd7e8d2dd708fbe0b90a235e6a811fc84db7d953149c21650dd1e0675814f93",
+      "size_bytes": 10512
+    },
+    "rda_dwa/rda_dwa/robot_model.py": {
+      "sha256": "c0c6ed4350e069ffc96b6b05d0e6a697ef71c0caf022486fc197799c520330b3",
+      "size_bytes": 2268
+    },
+    "rda_dwa/resource/rda_dwa": {
+      "sha256": "f1945cd6c19e56b3c1c78943ef5ec18116907a4ca1efc40a57d48ab1db7adfc5",
+      "size_bytes": 3
+    },
+    "rda_dwa_real/package.xml": {
+      "sha256": "073a6d91ddf28c009bbc01786d8bda0ac6d5f54f1e9cd5509553374496b9327b",
+      "size_bytes": 1146
+    },
+    "rda_dwa_real/setup.py": {
+      "sha256": "d59c80cb83eacb4780d270dd8d5c8d405b9b1e881551e0a2c24da358de7a41c6",
+      "size_bytes": 1129
+    },
+    "rda_dwa_real/setup.cfg": {
+      "sha256": "5a4e73c39c869743b6474d7d49a8d096b28ec8cfee935d10303f9b3e2fd29986",
+      "size_bytes": 93
+    },
+    "rda_dwa_real/rda_dwa_real/lidar_track_node.py": {
+      "sha256": "f52527174a446bb9ed5c433013b68f9ca5a46f9b06175291b1c37baee03781fc",
+      "size_bytes": 24416
+    },
+    "rda_dwa_real/rda_dwa_real/traj_tracker_node.py": {
+      "sha256": "36a631d079d2dac46f81a3ffe089901834fafa199d36867a28d6f70acf0c3bde",
+      "size_bytes": 15646
+    },
+    "rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py": {
+      "sha256": "0e2177b4d9f20add77ced18c301a8a7c5d62b53c486e3f7c4c036bcd66dddc52",
+      "size_bytes": 14755
+    },
+    "rda_dwa_real/rda_dwa_real/traj_cache.py": {
+      "sha256": "047fd9651c0a0f072a086a7429eea5b86569f50c5da8b195bb4ab9b1e1d179d9",
+      "size_bytes": 5990
+    },
+    "rda_dwa_real/rda_dwa_real/__init__.py": {
+      "sha256": "12800e28b514f3148e8a57b1f4411cf2c8646ffe744db61521504a942eee5ad8",
+      "size_bytes": 68
+    },
+    "rda_dwa_real/rda_dwa_real/traj_predict.py": {
+      "sha256": "951393bc012b4211882a49cab2a68983deb2e66a415be899689134a26966f5e8",
+      "size_bytes": 4328
+    },
+    "rda_dwa_real/rda_dwa_real/telemetry_recording.py": {
+      "sha256": "8642b9552c978ec60feab900bb1641f676180399fd1f35ae823b3ea970b1e4c6",
+      "size_bytes": 11615
+    },
+    "rda_dwa_real/rda_dwa_real/vehicle_bridge.py": {
+      "sha256": "c6e00bb1bc01063d1bf8cc42e68a78bbab88ede074671e6ae1ce87643be8cc84",
+      "size_bytes": 57822
+    },
+    "rda_dwa_real/rda_dwa_real/kf_tracker.py": {
+      "sha256": "fd802263e5781915da1b203c2f4acf68ef78259aed9e097dad2f4ff764bcccb7",
+      "size_bytes": 15948
+    },
+    "rda_dwa_real/rda_dwa_real/obstacle_fusion.py": {
+      "sha256": "894e35f8e4160ac3a8be9726b79343391c3ff35357f255b097bbd5cd4965f3e5",
+      "size_bytes": 11788
+    },
+    "rda_dwa_real/rda_dwa_real/traj_tracker_core.py": {
+      "sha256": "58e061d0a7be6b9eaaaa7305ba7eb3bcc0eefe877d351f1f790cb7154308087b",
+      "size_bytes": 21351
+    },
+    "rda_dwa_real/rda_dwa_real/dqn_infer.py": {
+      "sha256": "f8394d8b03ab47d4dc734dd839098572d9cfd1899e935b280d8fa83d8f7a0aaa",
+      "size_bytes": 3036
+    },
+    "rda_dwa_real/rda_dwa_real/adaptive_preview.py": {
+      "sha256": "2944b3111fb73d7e4c2bd53c5eff9fff6952bbe865bab77a516f95dd14811e78",
+      "size_bytes": 6079
+    },
+    "rda_dwa_real/rda_dwa_real/analyze_diag.py": {
+      "sha256": "746784b837950f4ec0c1d13470e9e5e8cedc2ded0a44dea299d026f33872cb43",
+      "size_bytes": 24099
+    },
+    "rda_dwa_real/rda_dwa_real/diag_recorder_node.py": {
+      "sha256": "8921b54fa809e7b8836bf730335c7c25e11cae7015b228da06ee36c789d98177",
+      "size_bytes": 55914
+    },
+    "rda_dwa_real/rda_dwa_real/bridge_node.py": {
+      "sha256": "549b69ca781583b5dad86be72a9a5f2c3d452cfdf2733a00ce5a30555f7f65a0",
+      "size_bytes": 50209
+    },
+    "rda_dwa_real/rda_dwa_real/async_planner.py": {
+      "sha256": "6933abc82ed1e6939042ce26ff700bbe2468c8d7e7c6bf1a5f6ee826e1e17a25",
+      "size_bytes": 3403
+    },
+    "rda_dwa_real/rda_dwa_real/frame_utils.py": {
+      "sha256": "8669acd163a6ee06ff9bf9fdcc41126996207e90d328e39d10afa04ea69a236e",
+      "size_bytes": 6200
+    },
+    "rda_dwa_real/config/real_vehicle.yaml": {
+      "sha256": "dbbe882add412e53107a1cfc7141cdc5d1d2caa845c520122c239dc4e9f1b828",
+      "size_bytes": 6353
+    },
+    "rda_dwa_real/launch/rl_dwa_car.launch.py": {
+      "sha256": "febd7a9ad03c2d14f1333909e35a3cbf2706ba767c80a03957d9564eaef18d3f",
+      "size_bytes": 3558
+    },
+    "rda_dwa_real/launch/diag_recorder.launch.py": {
+      "sha256": "dac19d0a0335f8d13ff833280bfb939c66fa6aa83962f6e1636a3865ea5e4952",
+      "size_bytes": 2146
+    },
+    "rda_dwa_real/resource/rda_dwa_real": {
+      "sha256": "795b896be88b9bd64fec29c06027b268afedfc8c65f597fa37afaad7df84f4ba",
+      "size_bytes": 13
+    },
+    "rda_dwa_real_msgs/CMakeLists.txt": {
+      "sha256": "74365cc44cbcfd29e696a1db602f8e60a25490f3160d6e29189bb32ed3b03f28",
+      "size_bytes": 492
+    },
+    "rda_dwa_real_msgs/package.xml": {
+      "sha256": "6a0e4037a6ea5ffbace1910d6f3da1c0e40c01c53f6ac46feaac5a96ed8adfc2",
+      "size_bytes": 748
+    },
+    "rda_dwa_real_msgs/msg/ObstacleArray.msg": {
+      "sha256": "3294c9e228c725a57fee2ef62414a019069efe67143016be0f4cd5c88dc38de7",
+      "size_bytes": 136
+    },
+    "rda_dwa_real_msgs/msg/Obstacle.msg": {
+      "sha256": "6359cb1cf902a4fbe1e7040adaa84636d2783c1c41dad70e11771fc9fa064143",
+      "size_bytes": 898
+    },
+    "control/car_ctr/CMakeLists.txt": {
+      "sha256": "ba6af3de8bfc4a4c2b94eee65a5cc41fa7ad003606395a5591097d043c4d8686",
+      "size_bytes": 1071
+    },
+    "control/car_ctr/package.xml": {
+      "sha256": "6c44170cc4256bcfa91e73d23dcdd8d465281e02f8e0a4197306e35a6548d810",
+      "size_bytes": 640
+    },
+    "control/car_ctr/src/car_ctr.cpp": {
+      "sha256": "3afd594542ee760b0ab30465b177f40e7ed1327df9a09c62aad90d6e9f308d64",
+      "size_bytes": 20870
+    },
+    "control/car_ctr/src/mode_switch_guard.hpp": {
+      "sha256": "e0be037919cc4b4e9a0af09eb39993da518dade09f7b283f5447ee16a812b720",
+      "size_bytes": 2971
+    },
+    "msg/common/CMakeLists.txt": {
+      "sha256": "42e117e6a1f33d6ac7ddf05785b401d620c62ddd0b41935038dc7166dc2c6980",
+      "size_bytes": 1112
+    },
+    "msg/common/package.xml": {
+      "sha256": "eff38c30f9a05fa05c020cc1a24e6bc025455c93b81e4e1e34f70c83eb5fbacb",
+      "size_bytes": 584
+    },
+    "msg/common/src/public.cpp": {
+      "sha256": "d2dab872fb8c1b68ccc9648077e7dcb79263d3d91e118fd899953ec1e61b5c33",
+      "size_bytes": 11642
+    },
+    "msg/common/src/can.cpp": {
+      "sha256": "4f7ce3fe79510f8cc44e9672e28eb3454e9cf77615e842c9bd4c59d540e7d58b",
+      "size_bytes": 3572
+    },
+    "msg/common/include/common/udp_diagnostics.hpp": {
+      "sha256": "9835095124b969aff3d55c850bda5e2e145a29144b4ba0f774b228cc1615cee0",
+      "size_bytes": 2023
+    },
+    "msg/common/include/common/mydisplay.hpp": {
+      "sha256": "c2cafba8667568a6cce2f1f66207f403f1e60170bf1d9445dae09095100db7d9",
+      "size_bytes": 10013
+    },
+    "msg/common/include/common/myudp.hpp": {
+      "sha256": "1fc9ab1d49a3baa5701e72e8adeb77ae10b6ef103f5c9c41330645809b4c0719",
+      "size_bytes": 5267
+    },
+    "msg/common/include/common/public.hpp": {
+      "sha256": "d4747dc4f9cb1702626132d2e0e1c3e29ccf057f14037df16217eff41efe3627",
+      "size_bytes": 4760
+    },
+    "msg/common/include/common/can.hpp": {
+      "sha256": "d4d995b605b636f995946a204920c8b40e5067739e2452f16f0b7c8b016eb027",
+      "size_bytes": 4306
+    },
+    "msg/common/include/common/pudp.hpp": {
+      "sha256": "27c92c691b178c40b0ffa716dd09c78b2772c5ad9cbd7e68ca1e5f453d679782",
+      "size_bytes": 2785
+    },
+    "msg/common/include/common/motordrv.hpp": {
+      "sha256": "0699e9c45d3dfe59c04f4b24ac60addef53d5ec5139108c65d40624a2669c0d5",
+      "size_bytes": 5614
+    },
+    "car_launch/CMakeLists.txt": {
+      "sha256": "8f1fb1a1d86f3ae6fd84b25c5698055edf845ca28addd516ad60f6dbcbdae397",
+      "size_bytes": 967
+    },
+    "car_launch/package.xml": {
+      "sha256": "0efccc8387b605a354250fa5fe80d36e736027c086e068bf4f9c86e4fc36a4bf",
+      "size_bytes": 672
+    },
+    "car_launch/launch/run_sensor.launch.py": {
+      "sha256": "cfd3d642ef0bec5af2e9a215268c803421d70d6a2f019665e6c9191c65340931",
+      "size_bytes": 1991
+    },
+    "car_launch/launch/run_fastlio.launch.py": {
+      "sha256": "4fb0cba42222e391d544164be2cec4206b72df6110941fc19778212e36da9e5c",
+      "size_bytes": 3746
+    },
+    "car_launch/launch/run_rda_dwa.launch.py": {
+      "sha256": "fc15fb69fdfb750eb729e3fdf285b9b761995d9e7a2102fea08b04e1fe176b05",
+      "size_bytes": 4856
+    }
+  },
+  "changed_files": {
+    "car_launch/launch/run_rda_dwa.launch.py": {
+      "before_sha256": "9580552258e083f693100a8514163a3030e40a156ce3eec8df93dde028b5c0c0",
+      "after_sha256": "fc15fb69fdfb750eb729e3fdf285b9b761995d9e7a2102fea08b04e1fe176b05",
+      "accepted_before_sha256": [
+        "9580552258e083f693100a8514163a3030e40a156ce3eec8df93dde028b5c0c0",
+        "f5679e97163a0319efc98b90ab12c23d4773b6d44ab60021279d999020a7b776",
+        "fc15fb69fdfb750eb729e3fdf285b9b761995d9e7a2102fea08b04e1fe176b05"
+      ]
+    },
+    "car_launch/package.xml": {
+      "before_sha256": "c47b0058fd2bb1dcd11f43b689a155fd32f1d7e004748bb438fde736bcce1733",
+      "after_sha256": "0efccc8387b605a354250fa5fe80d36e736027c086e068bf4f9c86e4fc36a4bf",
+      "accepted_before_sha256": [
+        "c47b0058fd2bb1dcd11f43b689a155fd32f1d7e004748bb438fde736bcce1733",
+        "0efccc8387b605a354250fa5fe80d36e736027c086e068bf4f9c86e4fc36a4bf"
+      ]
+    },
+    "control/car_ctr/CMakeLists.txt": {
+      "before_sha256": "769436453349b6bf4b7f2132d295bc2ffff6b09adfe7dce3146342186028a576",
+      "after_sha256": "ba6af3de8bfc4a4c2b94eee65a5cc41fa7ad003606395a5591097d043c4d8686",
+      "accepted_before_sha256": [
+        "769436453349b6bf4b7f2132d295bc2ffff6b09adfe7dce3146342186028a576",
+        "ba6af3de8bfc4a4c2b94eee65a5cc41fa7ad003606395a5591097d043c4d8686"
+      ]
+    },
+    "control/car_ctr/package.xml": {
+      "before_sha256": "489d3e79e25753223eb1c2cc9a114e1220c5f208955e5286ec1e052d66eb6571",
+      "after_sha256": "6c44170cc4256bcfa91e73d23dcdd8d465281e02f8e0a4197306e35a6548d810",
+      "accepted_before_sha256": [
+        "489d3e79e25753223eb1c2cc9a114e1220c5f208955e5286ec1e052d66eb6571",
+        "6c44170cc4256bcfa91e73d23dcdd8d465281e02f8e0a4197306e35a6548d810"
+      ]
+    },
+    "control/car_ctr/src/car_ctr.cpp": {
+      "before_sha256": "304e39b96bee220f6e7c4b1b763247b4ede3b75ff9bca737e23a0571f3d67776",
+      "after_sha256": "3afd594542ee760b0ab30465b177f40e7ed1327df9a09c62aad90d6e9f308d64",
+      "accepted_before_sha256": [
+        "304e39b96bee220f6e7c4b1b763247b4ede3b75ff9bca737e23a0571f3d67776",
+        "facf0e92c459817019bd9b2e33d5b99da976f7537eff4cbb94853f981e594835",
+        "7a83f9847e4f880092e54972ce7372263d62b81c1b47c7b6c6a5f90712fb7783",
+        "3afd594542ee760b0ab30465b177f40e7ed1327df9a09c62aad90d6e9f308d64"
+      ]
+    },
+    "msg/common/include/common/myudp.hpp": {
+      "before_sha256": "601a423c31880c2c8a8cb3d6dc198073e8d807e754bc62cf139c5f75a5b25c88",
+      "after_sha256": "1fc9ab1d49a3baa5701e72e8adeb77ae10b6ef103f5c9c41330645809b4c0719",
+      "accepted_before_sha256": [
+        "601a423c31880c2c8a8cb3d6dc198073e8d807e754bc62cf139c5f75a5b25c88",
+        "1fc9ab1d49a3baa5701e72e8adeb77ae10b6ef103f5c9c41330645809b4c0719"
+      ]
+    },
+    "msg/common/include/common/udp_diagnostics.hpp": {
+      "before_sha256": null,
+      "after_sha256": "9835095124b969aff3d55c850bda5e2e145a29144b4ba0f774b228cc1615cee0",
+      "accepted_before_sha256": [
+        null,
+        "9835095124b969aff3d55c850bda5e2e145a29144b4ba0f774b228cc1615cee0"
+      ]
+    },
+    "rda_dwa/rda_dwa/motion_safety.py": {
+      "before_sha256": null,
+      "after_sha256": "8091117da1263afb2129a44036451f2b74b57282d92b10730ddc3c9f9806a777",
+      "accepted_before_sha256": [
+        null,
+        "9dabb48d9b85504e4093d06d7c1666733706efdfb0a52a88ba15d954122576db",
+        "8091117da1263afb2129a44036451f2b74b57282d92b10730ddc3c9f9806a777"
+      ]
+    },
+    "rda_dwa/rda_dwa/realtime_ackermann.py": {
+      "before_sha256": null,
+      "after_sha256": "ef544699713e0a0b70ffe3600ddadbffcc4de2d4345f8804e17750eca9bd992f",
+      "accepted_before_sha256": [
+        null,
+        "6ce53f85d8d9a745cd5553f90625ca2529bf00d7c0603ce964c2b7524bd4f13a",
+        "ef544699713e0a0b70ffe3600ddadbffcc4de2d4345f8804e17750eca9bd992f"
+      ]
+    },
+    "rda_dwa_real/config/real_vehicle.yaml": {
+      "before_sha256": "7e7ab4723e88fd49333c4045ab7f09c0e7935e28f849eeff4dbaaa32119b17f2",
+      "after_sha256": "dbbe882add412e53107a1cfc7141cdc5d1d2caa845c520122c239dc4e9f1b828",
+      "accepted_before_sha256": [
+        "7e7ab4723e88fd49333c4045ab7f09c0e7935e28f849eeff4dbaaa32119b17f2",
+        "29e117a741b288e9646d0fe4410f226247d6293d4ccb22d4c07782a16c544133",
+        "6501138156b4c4ec5eac17391bd135ab49969e37df6811bf6569587d73672160"
+      ]
+    },
+    "rda_dwa_real/launch/diag_recorder.launch.py": {
+      "before_sha256": "ee5ebc4ad7df45a4fcd8e4319d0ebae259f06a72f0cb1ddc7a83030270fcb258",
+      "after_sha256": "dac19d0a0335f8d13ff833280bfb939c66fa6aa83962f6e1636a3865ea5e4952",
+      "accepted_before_sha256": [
+        "ee5ebc4ad7df45a4fcd8e4319d0ebae259f06a72f0cb1ddc7a83030270fcb258",
+        "dac19d0a0335f8d13ff833280bfb939c66fa6aa83962f6e1636a3865ea5e4952"
+      ]
+    },
+    "rda_dwa_real/launch/rl_dwa_car.launch.py": {
+      "before_sha256": "abe14602d41def67b84aa99d6a209b9110dd81241d499460b108a0852cb6178e",
+      "after_sha256": "febd7a9ad03c2d14f1333909e35a3cbf2706ba767c80a03957d9564eaef18d3f",
+      "accepted_before_sha256": [
+        "abe14602d41def67b84aa99d6a209b9110dd81241d499460b108a0852cb6178e",
+        "cebcd4dcde56d9764bc195b5062bde9978e65a81dd68860e741da2d9bfff50e3",
+        "febd7a9ad03c2d14f1333909e35a3cbf2706ba767c80a03957d9564eaef18d3f"
+      ]
+    },
+    "rda_dwa_real/package.xml": {
+      "before_sha256": "11cb81f315968c7c3d1fb149af470db976b4fc2ba1025cd1135a5c364061f887",
+      "after_sha256": "073a6d91ddf28c009bbc01786d8bda0ac6d5f54f1e9cd5509553374496b9327b",
+      "accepted_before_sha256": [
+        "11cb81f315968c7c3d1fb149af470db976b4fc2ba1025cd1135a5c364061f887",
+        "cc7a89d07fd691431e4ad151e7c453b6cf219c1f9326478f1de56bc218ddee4e",
+        "073a6d91ddf28c009bbc01786d8bda0ac6d5f54f1e9cd5509553374496b9327b"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/adaptive_preview.py": {
+      "before_sha256": null,
+      "after_sha256": "2944b3111fb73d7e4c2bd53c5eff9fff6952bbe865bab77a516f95dd14811e78",
+      "accepted_before_sha256": [
+        null
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/async_planner.py": {
+      "before_sha256": null,
+      "after_sha256": "6933abc82ed1e6939042ce26ff700bbe2468c8d7e7c6bf1a5f6ee826e1e17a25",
+      "accepted_before_sha256": [
+        null,
+        "46abdec2e398b5762d524bf962c1b402dadbfefa226ccf3370b66d77fc85507f",
+        "fcf634bfd0db302f965aa89ce1e7e7ee8957aaaea8dae5fd3c3c13c293dd8615",
+        "6933abc82ed1e6939042ce26ff700bbe2468c8d7e7c6bf1a5f6ee826e1e17a25"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/bridge_node.py": {
+      "before_sha256": "f10694a28d4c16483225d6b116f6b25376f2eeda49c39680046d337b2fe5b891",
+      "after_sha256": "549b69ca781583b5dad86be72a9a5f2c3d452cfdf2733a00ce5a30555f7f65a0",
+      "accepted_before_sha256": [
+        "f10694a28d4c16483225d6b116f6b25376f2eeda49c39680046d337b2fe5b891",
+        "2c686110e60fef8ffb62bf25ce14c5e5118671ce9b1b6e00dd3bade0a6c4eb1a",
+        "dee626f1f9000e7f991d9f6a49b300d7ce07747e36d8d8951361c3dfe3f4b144",
+        "549b69ca781583b5dad86be72a9a5f2c3d452cfdf2733a00ce5a30555f7f65a0"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/diag_recorder_node.py": {
+      "before_sha256": "a69e7e9cb0347238b0cd982cfa2a5d3bb8e145e39763700c4b51c34d02b3cbdf",
+      "after_sha256": "8921b54fa809e7b8836bf730335c7c25e11cae7015b228da06ee36c789d98177",
+      "accepted_before_sha256": [
+        "a69e7e9cb0347238b0cd982cfa2a5d3bb8e145e39763700c4b51c34d02b3cbdf",
+        "2bfacf4cd7c1e8d8ee9cb72683aa2123bd4f040513e981d9ba6db2bb23862e9b",
+        "363d2bfa19f0f1660251009fc6d6b909364073de9bcad62c292a991f90223c57",
+        "7b1885c65695c0b1c2c448254e332455594805a43940fb4c94aad44bf5825320"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/kf_tracker.py": {
+      "before_sha256": "36c701846f0fae1b30bfa98414f7ac9c7d5c2737cb6afb7735ba6fc7f53acc01",
+      "after_sha256": "fd802263e5781915da1b203c2f4acf68ef78259aed9e097dad2f4ff764bcccb7",
+      "accepted_before_sha256": [
+        "36c701846f0fae1b30bfa98414f7ac9c7d5c2737cb6afb7735ba6fc7f53acc01",
+        "77b5ca901a6d672de530efcdf786695fd4eb87a12cfb291608b31b7b09daffdb",
+        "fd802263e5781915da1b203c2f4acf68ef78259aed9e097dad2f4ff764bcccb7"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/lidar_track_node.py": {
+      "before_sha256": "082845cbab79683a84c9be906b5460d5116e201064c08345007ab890d874ba7c",
+      "after_sha256": "f52527174a446bb9ed5c433013b68f9ca5a46f9b06175291b1c37baee03781fc",
+      "accepted_before_sha256": [
+        "082845cbab79683a84c9be906b5460d5116e201064c08345007ab890d874ba7c",
+        "d9f867b85efb3976585d55bff5c5459b8330ebed5675176868b7179ca7a2f7a9",
+        "88952fdc0246328a90f7b545bd265ee45ad020ea3df0da08a4409c9fb275e498",
+        "f52527174a446bb9ed5c433013b68f9ca5a46f9b06175291b1c37baee03781fc"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/obstacle_fusion.py": {
+      "before_sha256": "469910792722dc50fa7f31c5ab54523d686fee3c4ecc2757e82a66f797960d9a",
+      "after_sha256": "894e35f8e4160ac3a8be9726b79343391c3ff35357f255b097bbd5cd4965f3e5",
+      "accepted_before_sha256": [
+        "469910792722dc50fa7f31c5ab54523d686fee3c4ecc2757e82a66f797960d9a",
+        "894e35f8e4160ac3a8be9726b79343391c3ff35357f255b097bbd5cd4965f3e5"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/realtime_vehicle_core.py": {
+      "before_sha256": null,
+      "after_sha256": "0e2177b4d9f20add77ced18c301a8a7c5d62b53c486e3f7c4c036bcd66dddc52",
+      "accepted_before_sha256": [
+        null,
+        "28ed3fe9b76062e7852e3979299ec16c695b6539fd196d03be2bf08d2b9bf3c7",
+        "0e2177b4d9f20add77ced18c301a8a7c5d62b53c486e3f7c4c036bcd66dddc52"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/telemetry_recording.py": {
+      "before_sha256": null,
+      "after_sha256": "8642b9552c978ec60feab900bb1641f676180399fd1f35ae823b3ea970b1e4c6",
+      "accepted_before_sha256": [
+        null,
+        "8642b9552c978ec60feab900bb1641f676180399fd1f35ae823b3ea970b1e4c6"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/traj_tracker_core.py": {
+      "before_sha256": "61a73413ed3f35893f3c3ada58beb0bd49a6dbaa567e8a084bc0712ef7f2a4a9",
+      "after_sha256": "58e061d0a7be6b9eaaaa7305ba7eb3bcc0eefe877d351f1f790cb7154308087b",
+      "accepted_before_sha256": [
+        "61a73413ed3f35893f3c3ada58beb0bd49a6dbaa567e8a084bc0712ef7f2a4a9",
+        "479c2ab0515992855da2ce80afc6f4ede10b498188032e4d4f85ec21ea0380f3",
+        "63d71b698cea8088376a76c2856af5ea45c0223ec3d87d7e980fe7668c826a45",
+        "7a031ae54f3080f9e4c7c4418ec9b8152bf3393fe8652fecfcd3544ddaef47c6"
+      ]
+    },
+    "rda_dwa_real/rda_dwa_real/traj_tracker_node.py": {
+      "before_sha256": "5ab31d1f01615989e5d6888d08a4bc608f974d58ffea7e479a0334694f46822e",
+      "after_sha256": "36a631d079d2dac46f81a3ffe089901834fafa199d36867a28d6f70acf0c3bde",
+      "accepted_before_sha256": [
+        "5ab31d1f01615989e5d6888d08a4bc608f974d58ffea7e479a0334694f46822e",
+        "83bcf4f8f78f9040cfe1f1d6e9825638f7c6985a426f4b3e44885ba2960a0b8f",
+        "51fb3609f7d2c8734be5919c8065020083dcd9ac570c866a170647053cc047fa",
+        "36a631d079d2dac46f81a3ffe089901834fafa199d36867a28d6f70acf0c3bde"
+      ]
+    },
+    "rda_dwa_real_msgs/msg/Obstacle.msg": {
+      "before_sha256": "d4090da6b657aa2e62f723c8f7901f8555bdb480726658749e7fc9500fffc5f8",
+      "after_sha256": "6359cb1cf902a4fbe1e7040adaa84636d2783c1c41dad70e11771fc9fa064143",
+      "accepted_before_sha256": [
+        "d4090da6b657aa2e62f723c8f7901f8555bdb480726658749e7fc9500fffc5f8",
+        "6359cb1cf902a4fbe1e7040adaa84636d2783c1c41dad70e11771fc9fa064143"
+      ]
+    }
+  }
+}

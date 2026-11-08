@@ -1,0 +1,15 @@
+{
+  "frozen_at": "2026-11-06 03:19:18 Asia/Shanghai",
+  "sha256": {
+    "rda_dwa_real/rda_dwa_real/vehicle_bridge.py": "2b6fa0c79cc1073e7c3a9bd8654709528767bd4b618e31ee1cb4431d1e6af1fc",
+    "rda_dwa_real/rda_dwa_real/traj_tracker_core.py": "e64ba3bd94868c47cc073194c37c7379e9af338a719b4ec869252f2eb7924422",
+    "rda_dwa_real/rda_dwa_real/traj_tracker_node.py": "6998c8f20490e567974f270096901adcc18e5f69f3b7d52f83d2059bbefb428d",
+    "control/car_ctr/src/mode_switch_guard.hpp": "e0be037919cc4b4e9a0af09eb39993da518dade09f7b283f5447ee16a812b720",
+    "control/car_ctr/src/car_ctr.cpp": "a30a785bd19a749979ad6621723be7cd10a4da080d180ca67932346c63a1b842"
+  },
+  "production_defaults": {
+    "moving_recovery_enable": false,
+    "original_confirmed_static_blocked_recovery_unchanged": true,
+    "experimental_confinement": "both goal-normal 2m fixed-yaw footprint corridors blocked"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "case": "car_0.5",
+  "baseline": true,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 4.94,
+  "goal_distance_m": 4.716460853088341,
+  "min_gap_m": -0.0006641637832954794,
+  "collision": true,
+  "switches": [],
+  "spin_count": 0,
+  "crab_count": 0,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.1298414838261682,
+  "reasons": {
+    "planning_pending": 3,
+    "motion": 9,
+    "dynamic_yield": 37,
+    "planning_result_stale": 1
+  },
+  "final_reason": "dynamic_yield",
+  "plan_p95_ms": 8.868114388315007,
+  "plan_max_ms": 9.077082970179617,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "legacy modeled 3s with truth stop gate",
+  "scope": "preserved baseline Python cores + legacy modeled driver + independent geometry; no ROS/UDP"
+}

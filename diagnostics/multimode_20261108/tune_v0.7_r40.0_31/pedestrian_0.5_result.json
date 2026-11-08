@@ -1,0 +1,35 @@
+{
+  "case": "pedestrian_0.5",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 28.02,
+  "goal_distance_m": 0.09674014673697491,
+  "min_gap_m": 0.20802283982705158,
+  "collision": false,
+  "switches": [
+    {
+      "t": 8.44,
+      "mode": 1
+    }
+  ],
+  "spin_count": 0,
+  "crab_count": 1,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.7372893188515584,
+  "reasons": {
+    "motion": 55,
+    "mode_switch_wait": 61,
+    "crab_requested": 1,
+    "crab_motion": 163,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 6.49470800999552,
+  "plan_max_ms": 15.165874996455386,
+  "worker_delay_s": 0.0,
+  "time_model": "virtual time excluding synchronous solve wall time",
+  "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+}

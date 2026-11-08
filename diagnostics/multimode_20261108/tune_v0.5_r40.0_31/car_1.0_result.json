@@ -1,0 +1,36 @@
+{
+  "case": "car_1.0",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": true,
+  "duration_s": 32.94,
+  "goal_distance_m": 0.097891760879511,
+  "min_gap_m": 0.29797000922022865,
+  "collision": false,
+  "switches": [
+    {
+      "t": 9.44,
+      "mode": 1
+    }
+  ],
+  "spin_count": 0,
+  "crab_count": 1,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.8285755793904498,
+  "reasons": {
+    "motion": 57,
+    "mode_switch_wait": 66,
+    "dynamic_wait": 3,
+    "crab_requested": 1,
+    "crab_motion": 202,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 7.408493595721671,
+  "plan_max_ms": 14.874250016873702,
+  "worker_delay_s": 0.0,
+  "time_model": "virtual time excluding synchronous solve wall time",
+  "scope": "production Python cores and C++ driver timing policy + independent actuator/geometry simulation; no ROS/UDP or real lidar"
+}

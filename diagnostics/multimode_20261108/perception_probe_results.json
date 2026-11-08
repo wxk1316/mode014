@@ -1,0 +1,2602 @@
+[
+  {
+    "true_speed": 0.4,
+    "input_label": "pedestrian",
+    "mean_speed_error_mps": 0.00497206081623642,
+    "p95_speed_error_mps": 0.012678141529549103,
+    "missed_detection_predictions": 7,
+    "rows": [
+      {
+        "t": 0.08,
+        "true_x": 3.968,
+        "estimated_x": 3.972006784215813,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.2,
+        "true_x": 3.92,
+        "estimated_x": 3.927523029427322,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.26,
+        "true_x": 3.896,
+        "estimated_x": 3.8974063232175187,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.34,
+        "true_x": 3.864,
+        "estimated_x": 3.8436263940755984,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.46,
+        "true_x": 3.816,
+        "estimated_x": 3.83378432036894,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.5800000000000001,
+        "true_x": 3.768,
+        "estimated_x": 3.759839282739134,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.7000000000000001,
+        "true_x": 3.7199999999999998,
+        "estimated_x": 3.733541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.8200000000000001,
+        "true_x": 3.6719999999999997,
+        "estimated_x": 3.733541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": true
+      },
+      {
+        "t": 0.9400000000000001,
+        "true_x": 3.624,
+        "estimated_x": 3.6175456262962498,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 1.06,
+        "true_x": 3.576,
+        "estimated_x": 3.58499964596239,
+        "estimated_speed": 0.3872327422130783,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.1800000000000002,
+        "true_x": 3.528,
+        "estimated_x": 3.537746082433065,
+        "estimated_speed": 0.3887056430329202,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.2400000000000002,
+        "true_x": 3.504,
+        "estimated_x": 3.507995164028464,
+        "estimated_speed": 0.39754001145814066,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.3600000000000003,
+        "true_x": 3.456,
+        "estimated_x": 3.4581147395122764,
+        "estimated_speed": 0.4004734351234412,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.4200000000000004,
+        "true_x": 3.432,
+        "estimated_x": 3.43531535492285,
+        "estimated_speed": 0.39866749894649495,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.5400000000000005,
+        "true_x": 3.384,
+        "estimated_x": 3.3829159144132466,
+        "estimated_speed": 0.40512947791831316,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.6600000000000006,
+        "true_x": 3.336,
+        "estimated_x": 3.340102983510123,
+        "estimated_speed": 0.3970569300183445,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.7800000000000007,
+        "true_x": 3.288,
+        "estimated_x": 3.285950125216416,
+        "estimated_speed": 0.40573568712395985,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.9000000000000008,
+        "true_x": 3.2399999999999998,
+        "estimated_x": 3.23802475802645,
+        "estimated_speed": 0.40477900066059325,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.020000000000001,
+        "true_x": 3.1919999999999997,
+        "estimated_x": 3.189459940451229,
+        "estimated_speed": 0.40477900066059325,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 2.140000000000001,
+        "true_x": 3.1439999999999997,
+        "estimated_x": 3.149503286186108,
+        "estimated_speed": 0.39357619294173585,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.220000000000001,
+        "true_x": 3.1119999999999997,
+        "estimated_x": 3.1165955182749014,
+        "estimated_speed": 0.3953947594031546,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.340000000000001,
+        "true_x": 3.0639999999999996,
+        "estimated_x": 3.0719487568525374,
+        "estimated_speed": 0.39181586950273245,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.4000000000000012,
+        "true_x": 3.0399999999999996,
+        "estimated_x": 3.0412344302999843,
+        "estimated_speed": 0.40109687202055466,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.5200000000000014,
+        "true_x": 2.991999999999999,
+        "estimated_x": 2.992742259609602,
+        "estimated_speed": 0.40158070613532565,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.6000000000000014,
+        "true_x": 2.959999999999999,
+        "estimated_x": 2.9541242522339646,
+        "estimated_speed": 0.41016796938391115,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.6600000000000015,
+        "true_x": 2.935999999999999,
+        "estimated_x": 2.931783258764428,
+        "estimated_speed": 0.4071357703796149,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.7200000000000015,
+        "true_x": 2.911999999999999,
+        "estimated_x": 2.909828920648422,
+        "estimated_speed": 0.4038026941047152,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.8400000000000016,
+        "true_x": 2.863999999999999,
+        "estimated_x": 2.8605364121621126,
+        "estimated_speed": 0.4049642977808397,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.9000000000000017,
+        "true_x": 2.839999999999999,
+        "estimated_x": 2.8414645839719492,
+        "estimated_speed": 0.3978373022991337,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.9800000000000018,
+        "true_x": 2.807999999999999,
+        "estimated_x": 2.8096436401954143,
+        "estimated_speed": 0.3978373022991337,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 3.100000000000002,
+        "true_x": 2.759999999999999,
+        "estimated_x": 2.759632627581343,
+        "estimated_speed": 0.4008420152757789,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.180000000000002,
+        "true_x": 2.727999999999999,
+        "estimated_x": 2.725477752209899,
+        "estimated_speed": 0.4036163090086384,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.300000000000002,
+        "true_x": 2.679999999999999,
+        "estimated_x": 2.6822187126095933,
+        "estimated_speed": 0.39684380153725196,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.380000000000002,
+        "true_x": 2.647999999999999,
+        "estimated_x": 2.649823283438453,
+        "estimated_speed": 0.397695097102309,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.500000000000002,
+        "true_x": 2.5999999999999988,
+        "estimated_x": 2.599079085951708,
+        "estimated_speed": 0.4016528418728238,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.5800000000000023,
+        "true_x": 2.5679999999999987,
+        "estimated_x": 2.5676381259362326,
+        "estimated_speed": 0.40075037990315554,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.6600000000000024,
+        "true_x": 2.5359999999999987,
+        "estimated_x": 2.535575674923686,
+        "estimated_speed": 0.4009279836184621,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.7200000000000024,
+        "true_x": 2.5119999999999987,
+        "estimated_x": 2.511322896766403,
+        "estimated_speed": 0.4011051595284106,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.8000000000000025,
+        "true_x": 2.4799999999999986,
+        "estimated_x": 2.4757590062611188,
+        "estimated_speed": 0.4058228613909713,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.9200000000000026,
+        "true_x": 2.4319999999999986,
+        "estimated_x": 2.4213106829597106,
+        "estimated_speed": 0.41356120368499827,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.000000000000003,
+        "true_x": 2.3999999999999986,
+        "estimated_x": 2.38822587645737,
+        "estimated_speed": 0.41356120368499827,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 4.080000000000003,
+        "true_x": 2.3679999999999986,
+        "estimated_x": 2.3592401480170344,
+        "estimated_speed": 0.40817312016471297,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.200000000000003,
+        "true_x": 2.3199999999999985,
+        "estimated_x": 2.310319320908416,
+        "estimated_speed": 0.4082062146924861,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.320000000000003,
+        "true_x": 2.2719999999999985,
+        "estimated_x": 2.2593912186012663,
+        "estimated_speed": 0.4108088562515243,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.440000000000003,
+        "true_x": 2.2239999999999984,
+        "estimated_x": 2.2066555956933644,
+        "estimated_speed": 0.41513813239419295,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.500000000000003,
+        "true_x": 2.199999999999999,
+        "estimated_x": 2.1857823212544107,
+        "estimated_speed": 0.4098160777527337,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.620000000000003,
+        "true_x": 2.151999999999999,
+        "estimated_x": 2.1391690027137864,
+        "estimated_speed": 0.40639661337504723,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.680000000000002,
+        "true_x": 2.1279999999999992,
+        "estimated_x": 2.119172922712965,
+        "estimated_speed": 0.400505788260774,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.8000000000000025,
+        "true_x": 2.079999999999999,
+        "estimated_x": 2.0719932521960143,
+        "estimated_speed": 0.39935722708358845,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.920000000000003,
+        "true_x": 2.031999999999999,
+        "estimated_x": 2.0221971396868312,
+        "estimated_speed": 0.4019278588723826,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.980000000000002,
+        "true_x": 2.007999999999999,
+        "estimated_x": 2.004311468450463,
+        "estimated_speed": 0.39351715440412494,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.060000000000002,
+        "true_x": 1.975999999999999,
+        "estimated_x": 1.9728437074708924,
+        "estimated_speed": 0.39351715440412494,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 5.140000000000002,
+        "true_x": 1.943999999999999,
+        "estimated_x": 1.93907495269914,
+        "estimated_speed": 0.3967875420404677,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.220000000000002,
+        "true_x": 1.911999999999999,
+        "estimated_x": 1.9066881966164302,
+        "estimated_speed": 0.39736609247131294,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.3400000000000025,
+        "true_x": 1.863999999999999,
+        "estimated_x": 1.862029266056471,
+        "estimated_speed": 0.3933666621117955,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.400000000000002,
+        "true_x": 1.839999999999999,
+        "estimated_x": 1.8363957026519997,
+        "estimated_speed": 0.39604527671368356,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.480000000000002,
+        "true_x": 1.807999999999999,
+        "estimated_x": 1.8032373142574774,
+        "estimated_speed": 0.397992312202451,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.540000000000002,
+        "true_x": 1.7839999999999994,
+        "estimated_x": 1.7838738169336434,
+        "estimated_speed": 0.3920557935327452,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.620000000000002,
+        "true_x": 1.7519999999999993,
+        "estimated_x": 1.7521802726950289,
+        "estimated_speed": 0.3924617567345771,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.700000000000002,
+        "true_x": 1.7199999999999993,
+        "estimated_x": 1.7221699211347872,
+        "estimated_speed": 0.3905958571020079,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.760000000000002,
+        "true_x": 1.6959999999999993,
+        "estimated_x": 1.6988713235661101,
+        "estimated_speed": 0.3903886533408999,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.880000000000002,
+        "true_x": 1.6479999999999992,
+        "estimated_x": 1.6436606676731176,
+        "estimated_speed": 0.4017458630117077,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.000000000000002,
+        "true_x": 1.5999999999999992,
+        "estimated_x": 1.5954511707224666,
+        "estimated_speed": 0.4017458630117077,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 6.060000000000001,
+        "true_x": 1.5759999999999992,
+        "estimated_x": 1.5669654596937217,
+        "estimated_speed": 0.4076932321163247,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.1800000000000015,
+        "true_x": 1.5279999999999991,
+        "estimated_x": 1.5137871836256003,
+        "estimated_speed": 0.41330123662222407,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.240000000000001,
+        "true_x": 1.5039999999999996,
+        "estimated_x": 1.494573458441591,
+        "estimated_speed": 0.40590916770885294,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.320000000000001,
+        "true_x": 1.4719999999999995,
+        "estimated_x": 1.46607820699197,
+        "estimated_speed": 0.4006413665351862,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.440000000000001,
+        "true_x": 1.4239999999999995,
+        "estimated_x": 1.4160794136014148,
+        "estimated_speed": 0.4031929049536169,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.520000000000001,
+        "true_x": 1.3919999999999995,
+        "estimated_x": 1.3894594816402064,
+        "estimated_speed": 0.39567609734155784,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.580000000000001,
+        "true_x": 1.3679999999999994,
+        "estimated_x": 1.364172084555014,
+        "estimated_speed": 0.39774186975524156,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.660000000000001,
+        "true_x": 1.3359999999999994,
+        "estimated_x": 1.3336202319972126,
+        "estimated_speed": 0.3960446535508518,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.780000000000001,
+        "true_x": 1.2879999999999994,
+        "estimated_x": 1.2866178450813328,
+        "estimated_speed": 0.3953195685102867,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.860000000000001,
+        "true_x": 1.2559999999999993,
+        "estimated_x": 1.258089783221436,
+        "estimated_speed": 0.3912121221251261,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.980000000000001,
+        "true_x": 1.2079999999999993,
+        "estimated_x": 1.2111580028693156,
+        "estimated_speed": 0.3912121221251261,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 7.040000000000001,
+        "true_x": 1.1839999999999993,
+        "estimated_x": 1.1832037617665823,
+        "estimated_speed": 0.39736264829573764,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.160000000000001,
+        "true_x": 1.1359999999999992,
+        "estimated_x": 1.1330855400338442,
+        "estimated_speed": 0.4006630316762414,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.280000000000001,
+        "true_x": 1.0879999999999992,
+        "estimated_x": 1.0859832167925076,
+        "estimated_speed": 0.39932310666493054,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.340000000000001,
+        "true_x": 1.0639999999999996,
+        "estimated_x": 1.0659176124330767,
+        "estimated_speed": 0.3943126080075733,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.420000000000001,
+        "true_x": 1.0319999999999996,
+        "estimated_x": 1.0298380949857586,
+        "estimated_speed": 0.40017094326912883,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.48,
+        "true_x": 1.0079999999999996,
+        "estimated_x": 1.0052701393415,
+        "estimated_speed": 0.4008218426881082,
+        "type": "pedestrian",
+        "missed": false
+      }
+    ],
+    "scope": "actual GlobalKFTracker with synthetic noisy rectangles; no raw lidar"
+  },
+  {
+    "true_speed": 0.5,
+    "input_label": "pedestrian",
+    "mean_speed_error_mps": 0.004977616979891012,
+    "p95_speed_error_mps": 0.012665057531326629,
+    "missed_detection_predictions": 7,
+    "rows": [
+      {
+        "t": 0.08,
+        "true_x": 3.96,
+        "estimated_x": 3.964006784215813,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.2,
+        "true_x": 3.9,
+        "estimated_x": 3.9075230294273218,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.26,
+        "true_x": 3.87,
+        "estimated_x": 3.871406323217519,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.34,
+        "true_x": 3.83,
+        "estimated_x": 3.8096263940755986,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.46,
+        "true_x": 3.77,
+        "estimated_x": 3.78778432036894,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.5800000000000001,
+        "true_x": 3.71,
+        "estimated_x": 3.701839282739134,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.7000000000000001,
+        "true_x": 3.65,
+        "estimated_x": 3.663541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.8200000000000001,
+        "true_x": 3.59,
+        "estimated_x": 3.663541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": true
+      },
+      {
+        "t": 0.9400000000000001,
+        "true_x": 3.53,
+        "estimated_x": 3.5354705313258754,
+        "estimated_speed": 0.4909459696016018,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.06,
+        "true_x": 3.4699999999999998,
+        "estimated_x": 3.479743139439731,
+        "estimated_speed": 0.48579241581983107,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.1800000000000002,
+        "true_x": 3.41,
+        "estimated_x": 3.4202854211447353,
+        "estimated_speed": 0.4877398473961201,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.2400000000000002,
+        "true_x": 3.38,
+        "estimated_x": 3.384393034636493,
+        "estimated_speed": 0.49690001138153894,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.3600000000000003,
+        "true_x": 3.32,
+        "estimated_x": 3.3224348964391557,
+        "estimated_speed": 0.5000528883722425,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.4200000000000004,
+        "true_x": 3.29,
+        "estimated_x": 3.2935654421227127,
+        "estimated_speed": 0.4984035674278454,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.5400000000000005,
+        "true_x": 3.2299999999999995,
+        "estimated_x": 3.229119052313328,
+        "estimated_speed": 0.5049116266386877,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.6600000000000006,
+        "true_x": 3.17,
+        "estimated_x": 3.174262634194252,
+        "estimated_speed": 0.49698434155616256,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.7800000000000007,
+        "true_x": 3.1099999999999994,
+        "estimated_x": 3.1080709503323707,
+        "estimated_speed": 0.5057400422903147,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 1.9000000000000008,
+        "true_x": 3.05,
+        "estimated_x": 3.048111971238762,
+        "estimated_speed": 0.5048143015503838,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.020000000000001,
+        "true_x": 2.9899999999999993,
+        "estimated_x": 2.9875412007515023,
+        "estimated_speed": 0.5048143015503838,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 2.140000000000001,
+        "true_x": 2.9299999999999997,
+        "estimated_x": 2.9355528259823416,
+        "estimated_speed": 0.4936581877881377,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.220000000000001,
+        "true_x": 2.8899999999999997,
+        "estimated_x": 2.894625720917472,
+        "estimated_speed": 0.4954938374883527,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.340000000000001,
+        "true_x": 2.829999999999999,
+        "estimated_x": 2.8379617993801665,
+        "estimated_speed": 0.49191981410764435,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.4000000000000012,
+        "true_x": 2.7999999999999994,
+        "estimated_x": 2.801239437779689,
+        "estimated_speed": 0.5012049136257839,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.5200000000000014,
+        "true_x": 2.7399999999999993,
+        "estimated_x": 2.7407363283356494,
+        "estimated_speed": 0.5016838114439367,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.6000000000000014,
+        "true_x": 2.6999999999999993,
+        "estimated_x": 2.694113330813957,
+        "estimated_speed": 0.5102681596328944,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.6600000000000015,
+        "true_x": 2.669999999999999,
+        "estimated_x": 2.6657700117252587,
+        "estimated_speed": 0.5072313759592038,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.7200000000000015,
+        "true_x": 2.6399999999999992,
+        "estimated_x": 2.6378138163500235,
+        "estimated_speed": 0.5038926938323592,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.8400000000000016,
+        "true_x": 2.579999999999999,
+        "estimated_x": 2.5765161796007945,
+        "estimated_speed": 0.5050428516815989,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.9000000000000017,
+        "true_x": 2.549999999999999,
+        "estimated_x": 2.5514445986082213,
+        "estimated_speed": 0.49789775270335773,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 2.9800000000000018,
+        "true_x": 2.509999999999999,
+        "estimated_x": 2.5116176047180674,
+        "estimated_speed": 0.49789775270335773,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 3.100000000000002,
+        "true_x": 2.4499999999999993,
+        "estimated_x": 2.4496067707148557,
+        "estimated_speed": 0.5009020694485593,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.180000000000002,
+        "true_x": 2.4099999999999993,
+        "estimated_x": 2.407454450007462,
+        "estimated_speed": 0.503667707289935,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.300000000000002,
+        "true_x": 2.3499999999999988,
+        "estimated_x": 2.352196548863595,
+        "estimated_speed": 0.4968698784370864,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.380000000000002,
+        "true_x": 2.3099999999999987,
+        "estimated_x": 2.3118037721673104,
+        "estimated_speed": 0.49771629293581626,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.500000000000002,
+        "true_x": 2.249999999999999,
+        "estimated_x": 2.2490612232060037,
+        "estimated_speed": 0.5016799474905086,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.5800000000000023,
+        "true_x": 2.209999999999999,
+        "estimated_x": 2.20962277307647,
+        "estimated_speed": 0.5007672618510433,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.6600000000000024,
+        "true_x": 2.169999999999999,
+        "estimated_x": 2.1695624706716687,
+        "estimated_speed": 0.5009053645650677,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.7200000000000024,
+        "true_x": 2.139999999999999,
+        "estimated_x": 2.1393116982580707,
+        "estimated_speed": 0.5010992539089925,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.8000000000000025,
+        "true_x": 2.0999999999999988,
+        "estimated_x": 2.0957493588229084,
+        "estimated_speed": 0.5058121965137901,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 3.9200000000000026,
+        "true_x": 2.0399999999999987,
+        "estimated_x": 2.029302382434129,
+        "estimated_speed": 0.513566270327488,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.000000000000003,
+        "true_x": 1.9999999999999987,
+        "estimated_x": 1.9882171531153654,
+        "estimated_speed": 0.513566270327488,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 4.080000000000003,
+        "true_x": 1.9599999999999986,
+        "estimated_x": 1.951233335930285,
+        "estimated_speed": 0.5081575577995333,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.200000000000003,
+        "true_x": 1.8999999999999986,
+        "estimated_x": 1.8903140852489064,
+        "estimated_speed": 0.5081690178489556,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.320000000000003,
+        "true_x": 1.8399999999999985,
+        "estimated_x": 1.8273873788346295,
+        "estimated_speed": 0.5107641082674623,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.440000000000003,
+        "true_x": 1.7799999999999985,
+        "estimated_x": 1.7626529509556788,
+        "estimated_speed": 0.5151340724400215,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.500000000000003,
+        "true_x": 1.7499999999999987,
+        "estimated_x": 1.7357804522574736,
+        "estimated_speed": 0.5098120247738551,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.620000000000003,
+        "true_x": 1.6899999999999986,
+        "estimated_x": 1.6771679586411294,
+        "estimated_speed": 0.5063920348818209,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.680000000000002,
+        "true_x": 1.6599999999999988,
+        "estimated_x": 1.6511723217110092,
+        "estimated_speed": 0.5005010559254396,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.8000000000000025,
+        "true_x": 1.5999999999999988,
+        "estimated_x": 1.5919932266982755,
+        "estimated_speed": 0.49934297509750347,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.920000000000003,
+        "true_x": 1.5399999999999987,
+        "estimated_x": 1.5301975489143695,
+        "estimated_speed": 0.5019126670375395,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 4.980000000000002,
+        "true_x": 1.509999999999999,
+        "estimated_x": 1.5063119972543801,
+        "estimated_speed": 0.4934783320332795,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.060000000000002,
+        "true_x": 1.4699999999999989,
+        "estimated_x": 1.466844584029367,
+        "estimated_speed": 0.4934783320332795,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 5.140000000000002,
+        "true_x": 1.4299999999999988,
+        "estimated_x": 1.4250758600977735,
+        "estimated_speed": 0.4967149905019772,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.220000000000002,
+        "true_x": 1.3899999999999988,
+        "estimated_x": 1.3846891210953505,
+        "estimated_speed": 0.49735717725676337,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.3400000000000025,
+        "true_x": 1.3299999999999987,
+        "estimated_x": 1.3280302764001588,
+        "estimated_speed": 0.4933609977293167,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.400000000000002,
+        "true_x": 1.299999999999999,
+        "estimated_x": 1.2963966268539253,
+        "estimated_speed": 0.49604082922944454,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.480000000000002,
+        "true_x": 1.259999999999999,
+        "estimated_x": 1.2552382063059135,
+        "estimated_speed": 0.49798988042283154,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.540000000000002,
+        "true_x": 1.229999999999999,
+        "estimated_x": 1.229874640912774,
+        "estimated_speed": 0.4920386570064345,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.620000000000002,
+        "true_x": 1.189999999999999,
+        "estimated_x": 1.1901810650171953,
+        "estimated_speed": 0.4924535092849797,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.700000000000002,
+        "true_x": 1.149999999999999,
+        "estimated_x": 1.1521706726742138,
+        "estimated_speed": 0.490588952222222,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.760000000000002,
+        "true_x": 1.1199999999999992,
+        "estimated_x": 1.1228720091000102,
+        "estimated_speed": 0.49038693378399306,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 5.880000000000002,
+        "true_x": 1.0599999999999992,
+        "estimated_x": 1.0556613404313648,
+        "estimated_speed": 0.5017447214372842,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.000000000000002,
+        "true_x": 0.9999999999999991,
+        "estimated_x": 0.9954519791521064,
+        "estimated_speed": 0.5017447214372842,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 6.060000000000001,
+        "true_x": 0.9699999999999993,
+        "estimated_x": 0.9609661133599945,
+        "estimated_speed": 0.5076826635097408,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.1800000000000015,
+        "true_x": 0.9099999999999993,
+        "estimated_x": 0.8957877416597452,
+        "estimated_speed": 0.5132987072859481,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.240000000000001,
+        "true_x": 0.8799999999999994,
+        "estimated_x": 0.8705739127015563,
+        "estimated_speed": 0.5059074872257657,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.320000000000001,
+        "true_x": 0.8399999999999994,
+        "estimated_x": 0.8340785837890984,
+        "estimated_speed": 0.5006391399084702,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.440000000000001,
+        "true_x": 0.7799999999999994,
+        "estimated_x": 0.7720797242207538,
+        "estimated_speed": 0.5031926624920656,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.520000000000001,
+        "true_x": 0.7399999999999993,
+        "estimated_x": 0.7374597294601527,
+        "estimated_speed": 0.4956719646045241,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.580000000000001,
+        "true_x": 0.7099999999999995,
+        "estimated_x": 0.7061722814530869,
+        "estimated_speed": 0.4977404921979058,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.660000000000001,
+        "true_x": 0.6699999999999995,
+        "estimated_x": 0.6676203851673154,
+        "estimated_speed": 0.49604064193385233,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.780000000000001,
+        "true_x": 0.6099999999999994,
+        "estimated_x": 0.6086179546505711,
+        "estimated_speed": 0.49531925945951555,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.860000000000001,
+        "true_x": 0.5699999999999994,
+        "estimated_x": 0.5720898599804094,
+        "estimated_speed": 0.4911890972113862,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 6.980000000000001,
+        "true_x": 0.5099999999999993,
+        "estimated_x": 0.5131580587605924,
+        "estimated_speed": 0.4911890972113862,
+        "type": "pedestrian",
+        "missed": true
+      },
+      {
+        "t": 7.040000000000001,
+        "true_x": 0.47999999999999954,
+        "estimated_x": 0.47920379535218066,
+        "estimated_speed": 0.4973159522937259,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.160000000000001,
+        "true_x": 0.4199999999999995,
+        "estimated_x": 0.4170855479800506,
+        "estimated_speed": 0.5006072039217168,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.280000000000001,
+        "true_x": 0.35999999999999943,
+        "estimated_x": 0.35798320557468394,
+        "estimated_speed": 0.4992873206508803,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.340000000000001,
+        "true_x": 0.3299999999999996,
+        "estimated_x": 0.3319175952704128,
+        "estimated_speed": 0.49425611985248635,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.420000000000001,
+        "true_x": 0.2899999999999996,
+        "estimated_x": 0.28783807051262983,
+        "estimated_speed": 0.5001504455653136,
+        "type": "pedestrian",
+        "missed": false
+      },
+      {
+        "t": 7.48,
+        "true_x": 0.2599999999999998,
+        "estimated_x": 0.25727011187922794,
+        "estimated_speed": 0.5008213787237736,
+        "type": "pedestrian",
+        "missed": false
+      }
+    ],
+    "scope": "actual GlobalKFTracker with synthetic noisy rectangles; no raw lidar"
+  },
+  {
+    "true_speed": 0.5,
+    "input_label": "vehicle",
+    "mean_speed_error_mps": 0.004977616979891012,
+    "p95_speed_error_mps": 0.012665057531326629,
+    "missed_detection_predictions": 7,
+    "rows": [
+      {
+        "t": 0.08,
+        "true_x": 3.96,
+        "estimated_x": 3.964006784215813,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.2,
+        "true_x": 3.9,
+        "estimated_x": 3.9075230294273218,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.26,
+        "true_x": 3.87,
+        "estimated_x": 3.871406323217519,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.34,
+        "true_x": 3.83,
+        "estimated_x": 3.8096263940755986,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.46,
+        "true_x": 3.77,
+        "estimated_x": 3.78778432036894,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.5800000000000001,
+        "true_x": 3.71,
+        "estimated_x": 3.701839282739134,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.7000000000000001,
+        "true_x": 3.65,
+        "estimated_x": 3.663541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.8200000000000001,
+        "true_x": 3.59,
+        "estimated_x": 3.663541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": true
+      },
+      {
+        "t": 0.9400000000000001,
+        "true_x": 3.53,
+        "estimated_x": 3.5354705313258754,
+        "estimated_speed": 0.4909459696016018,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.06,
+        "true_x": 3.4699999999999998,
+        "estimated_x": 3.479743139439731,
+        "estimated_speed": 0.48579241581983107,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.1800000000000002,
+        "true_x": 3.41,
+        "estimated_x": 3.4202854211447353,
+        "estimated_speed": 0.4877398473961201,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.2400000000000002,
+        "true_x": 3.38,
+        "estimated_x": 3.384393034636493,
+        "estimated_speed": 0.49690001138153894,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.3600000000000003,
+        "true_x": 3.32,
+        "estimated_x": 3.3224348964391557,
+        "estimated_speed": 0.5000528883722425,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.4200000000000004,
+        "true_x": 3.29,
+        "estimated_x": 3.2935654421227127,
+        "estimated_speed": 0.4984035674278454,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.5400000000000005,
+        "true_x": 3.2299999999999995,
+        "estimated_x": 3.229119052313328,
+        "estimated_speed": 0.5049116266386877,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.6600000000000006,
+        "true_x": 3.17,
+        "estimated_x": 3.174262634194252,
+        "estimated_speed": 0.49698434155616256,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.7800000000000007,
+        "true_x": 3.1099999999999994,
+        "estimated_x": 3.1080709503323707,
+        "estimated_speed": 0.5057400422903147,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.9000000000000008,
+        "true_x": 3.05,
+        "estimated_x": 3.048111971238762,
+        "estimated_speed": 0.5048143015503838,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.020000000000001,
+        "true_x": 2.9899999999999993,
+        "estimated_x": 2.9875412007515023,
+        "estimated_speed": 0.5048143015503838,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 2.140000000000001,
+        "true_x": 2.9299999999999997,
+        "estimated_x": 2.9355528259823416,
+        "estimated_speed": 0.4936581877881377,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.220000000000001,
+        "true_x": 2.8899999999999997,
+        "estimated_x": 2.894625720917472,
+        "estimated_speed": 0.4954938374883527,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.340000000000001,
+        "true_x": 2.829999999999999,
+        "estimated_x": 2.8379617993801665,
+        "estimated_speed": 0.49191981410764435,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.4000000000000012,
+        "true_x": 2.7999999999999994,
+        "estimated_x": 2.801239437779689,
+        "estimated_speed": 0.5012049136257839,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.5200000000000014,
+        "true_x": 2.7399999999999993,
+        "estimated_x": 2.7407363283356494,
+        "estimated_speed": 0.5016838114439367,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.6000000000000014,
+        "true_x": 2.6999999999999993,
+        "estimated_x": 2.694113330813957,
+        "estimated_speed": 0.5102681596328944,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.6600000000000015,
+        "true_x": 2.669999999999999,
+        "estimated_x": 2.6657700117252587,
+        "estimated_speed": 0.5072313759592038,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.7200000000000015,
+        "true_x": 2.6399999999999992,
+        "estimated_x": 2.6378138163500235,
+        "estimated_speed": 0.5038926938323592,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.8400000000000016,
+        "true_x": 2.579999999999999,
+        "estimated_x": 2.5765161796007945,
+        "estimated_speed": 0.5050428516815989,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.9000000000000017,
+        "true_x": 2.549999999999999,
+        "estimated_x": 2.5514445986082213,
+        "estimated_speed": 0.49789775270335773,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.9800000000000018,
+        "true_x": 2.509999999999999,
+        "estimated_x": 2.5116176047180674,
+        "estimated_speed": 0.49789775270335773,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 3.100000000000002,
+        "true_x": 2.4499999999999993,
+        "estimated_x": 2.4496067707148557,
+        "estimated_speed": 0.5009020694485593,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.180000000000002,
+        "true_x": 2.4099999999999993,
+        "estimated_x": 2.407454450007462,
+        "estimated_speed": 0.503667707289935,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.300000000000002,
+        "true_x": 2.3499999999999988,
+        "estimated_x": 2.352196548863595,
+        "estimated_speed": 0.4968698784370864,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.380000000000002,
+        "true_x": 2.3099999999999987,
+        "estimated_x": 2.3118037721673104,
+        "estimated_speed": 0.49771629293581626,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.500000000000002,
+        "true_x": 2.249999999999999,
+        "estimated_x": 2.2490612232060037,
+        "estimated_speed": 0.5016799474905086,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.5800000000000023,
+        "true_x": 2.209999999999999,
+        "estimated_x": 2.20962277307647,
+        "estimated_speed": 0.5007672618510433,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.6600000000000024,
+        "true_x": 2.169999999999999,
+        "estimated_x": 2.1695624706716687,
+        "estimated_speed": 0.5009053645650677,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.7200000000000024,
+        "true_x": 2.139999999999999,
+        "estimated_x": 2.1393116982580707,
+        "estimated_speed": 0.5010992539089925,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.8000000000000025,
+        "true_x": 2.0999999999999988,
+        "estimated_x": 2.0957493588229084,
+        "estimated_speed": 0.5058121965137901,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.9200000000000026,
+        "true_x": 2.0399999999999987,
+        "estimated_x": 2.029302382434129,
+        "estimated_speed": 0.513566270327488,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.000000000000003,
+        "true_x": 1.9999999999999987,
+        "estimated_x": 1.9882171531153654,
+        "estimated_speed": 0.513566270327488,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 4.080000000000003,
+        "true_x": 1.9599999999999986,
+        "estimated_x": 1.951233335930285,
+        "estimated_speed": 0.5081575577995333,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.200000000000003,
+        "true_x": 1.8999999999999986,
+        "estimated_x": 1.8903140852489064,
+        "estimated_speed": 0.5081690178489556,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.320000000000003,
+        "true_x": 1.8399999999999985,
+        "estimated_x": 1.8273873788346295,
+        "estimated_speed": 0.5107641082674623,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.440000000000003,
+        "true_x": 1.7799999999999985,
+        "estimated_x": 1.7626529509556788,
+        "estimated_speed": 0.5151340724400215,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.500000000000003,
+        "true_x": 1.7499999999999987,
+        "estimated_x": 1.7357804522574736,
+        "estimated_speed": 0.5098120247738551,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.620000000000003,
+        "true_x": 1.6899999999999986,
+        "estimated_x": 1.6771679586411294,
+        "estimated_speed": 0.5063920348818209,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.680000000000002,
+        "true_x": 1.6599999999999988,
+        "estimated_x": 1.6511723217110092,
+        "estimated_speed": 0.5005010559254396,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.8000000000000025,
+        "true_x": 1.5999999999999988,
+        "estimated_x": 1.5919932266982755,
+        "estimated_speed": 0.49934297509750347,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.920000000000003,
+        "true_x": 1.5399999999999987,
+        "estimated_x": 1.5301975489143695,
+        "estimated_speed": 0.5019126670375395,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.980000000000002,
+        "true_x": 1.509999999999999,
+        "estimated_x": 1.5063119972543801,
+        "estimated_speed": 0.4934783320332795,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.060000000000002,
+        "true_x": 1.4699999999999989,
+        "estimated_x": 1.466844584029367,
+        "estimated_speed": 0.4934783320332795,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 5.140000000000002,
+        "true_x": 1.4299999999999988,
+        "estimated_x": 1.4250758600977735,
+        "estimated_speed": 0.4967149905019772,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.220000000000002,
+        "true_x": 1.3899999999999988,
+        "estimated_x": 1.3846891210953505,
+        "estimated_speed": 0.49735717725676337,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.3400000000000025,
+        "true_x": 1.3299999999999987,
+        "estimated_x": 1.3280302764001588,
+        "estimated_speed": 0.4933609977293167,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.400000000000002,
+        "true_x": 1.299999999999999,
+        "estimated_x": 1.2963966268539253,
+        "estimated_speed": 0.49604082922944454,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.480000000000002,
+        "true_x": 1.259999999999999,
+        "estimated_x": 1.2552382063059135,
+        "estimated_speed": 0.49798988042283154,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.540000000000002,
+        "true_x": 1.229999999999999,
+        "estimated_x": 1.229874640912774,
+        "estimated_speed": 0.4920386570064345,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.620000000000002,
+        "true_x": 1.189999999999999,
+        "estimated_x": 1.1901810650171953,
+        "estimated_speed": 0.4924535092849797,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.700000000000002,
+        "true_x": 1.149999999999999,
+        "estimated_x": 1.1521706726742138,
+        "estimated_speed": 0.490588952222222,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.760000000000002,
+        "true_x": 1.1199999999999992,
+        "estimated_x": 1.1228720091000102,
+        "estimated_speed": 0.49038693378399306,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.880000000000002,
+        "true_x": 1.0599999999999992,
+        "estimated_x": 1.0556613404313648,
+        "estimated_speed": 0.5017447214372842,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.000000000000002,
+        "true_x": 0.9999999999999991,
+        "estimated_x": 0.9954519791521064,
+        "estimated_speed": 0.5017447214372842,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 6.060000000000001,
+        "true_x": 0.9699999999999993,
+        "estimated_x": 0.9609661133599945,
+        "estimated_speed": 0.5076826635097408,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.1800000000000015,
+        "true_x": 0.9099999999999993,
+        "estimated_x": 0.8957877416597452,
+        "estimated_speed": 0.5132987072859481,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.240000000000001,
+        "true_x": 0.8799999999999994,
+        "estimated_x": 0.8705739127015563,
+        "estimated_speed": 0.5059074872257657,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.320000000000001,
+        "true_x": 0.8399999999999994,
+        "estimated_x": 0.8340785837890984,
+        "estimated_speed": 0.5006391399084702,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.440000000000001,
+        "true_x": 0.7799999999999994,
+        "estimated_x": 0.7720797242207538,
+        "estimated_speed": 0.5031926624920656,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.520000000000001,
+        "true_x": 0.7399999999999993,
+        "estimated_x": 0.7374597294601527,
+        "estimated_speed": 0.4956719646045241,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.580000000000001,
+        "true_x": 0.7099999999999995,
+        "estimated_x": 0.7061722814530869,
+        "estimated_speed": 0.4977404921979058,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.660000000000001,
+        "true_x": 0.6699999999999995,
+        "estimated_x": 0.6676203851673154,
+        "estimated_speed": 0.49604064193385233,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.780000000000001,
+        "true_x": 0.6099999999999994,
+        "estimated_x": 0.6086179546505711,
+        "estimated_speed": 0.49531925945951555,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.860000000000001,
+        "true_x": 0.5699999999999994,
+        "estimated_x": 0.5720898599804094,
+        "estimated_speed": 0.4911890972113862,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.980000000000001,
+        "true_x": 0.5099999999999993,
+        "estimated_x": 0.5131580587605924,
+        "estimated_speed": 0.4911890972113862,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 7.040000000000001,
+        "true_x": 0.47999999999999954,
+        "estimated_x": 0.47920379535218066,
+        "estimated_speed": 0.4973159522937259,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.160000000000001,
+        "true_x": 0.4199999999999995,
+        "estimated_x": 0.4170855479800506,
+        "estimated_speed": 0.5006072039217168,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.280000000000001,
+        "true_x": 0.35999999999999943,
+        "estimated_x": 0.35798320557468394,
+        "estimated_speed": 0.4992873206508803,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.340000000000001,
+        "true_x": 0.3299999999999996,
+        "estimated_x": 0.3319175952704128,
+        "estimated_speed": 0.49425611985248635,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.420000000000001,
+        "true_x": 0.2899999999999996,
+        "estimated_x": 0.28783807051262983,
+        "estimated_speed": 0.5001504455653136,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.48,
+        "true_x": 0.2599999999999998,
+        "estimated_x": 0.25727011187922794,
+        "estimated_speed": 0.5008213787237736,
+        "type": "vehicle",
+        "missed": false
+      }
+    ],
+    "scope": "actual GlobalKFTracker with synthetic noisy rectangles; no raw lidar"
+  },
+  {
+    "true_speed": 1.0,
+    "input_label": "vehicle",
+    "mean_speed_error_mps": 0.0054756893032696305,
+    "p95_speed_error_mps": 0.013128614596868426,
+    "missed_detection_predictions": 7,
+    "rows": [
+      {
+        "t": 0.08,
+        "true_x": 3.92,
+        "estimated_x": 3.924006784215813,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.2,
+        "true_x": 3.8,
+        "estimated_x": 3.8075230294273217,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.26,
+        "true_x": 3.74,
+        "estimated_x": 3.741406323217519,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.34,
+        "true_x": 3.66,
+        "estimated_x": 3.6396263940755986,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.46,
+        "true_x": 3.54,
+        "estimated_x": 3.55778432036894,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.5800000000000001,
+        "true_x": 3.42,
+        "estimated_x": 3.411839282739134,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.7000000000000001,
+        "true_x": 3.3,
+        "estimated_x": 3.313541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": false
+      },
+      {
+        "t": 0.8200000000000001,
+        "true_x": 3.1799999999999997,
+        "estimated_x": 3.313541828924842,
+        "estimated_speed": 0.0,
+        "type": "unknown",
+        "missed": true
+      },
+      {
+        "t": 0.9400000000000001,
+        "true_x": 3.06,
+        "estimated_x": 3.0711025791233215,
+        "estimated_speed": 0.978586181486778,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.06,
+        "true_x": 2.94,
+        "estimated_x": 2.953460606826436,
+        "estimated_speed": 0.9788310601327026,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.1800000000000002,
+        "true_x": 2.82,
+        "estimated_x": 2.832982114703088,
+        "estimated_speed": 0.9833188729068972,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.2400000000000002,
+        "true_x": 2.76,
+        "estimated_x": 2.7663823876766385,
+        "estimated_speed": 0.993935416690407,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.3600000000000003,
+        "true_x": 2.6399999999999997,
+        "estimated_x": 2.6440356810735524,
+        "estimated_speed": 0.9981217635094329,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.4200000000000004,
+        "true_x": 2.5799999999999996,
+        "estimated_x": 2.584815878122026,
+        "estimated_speed": 0.9971602354549086,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.5400000000000005,
+        "true_x": 2.4599999999999995,
+        "estimated_x": 2.460134741813737,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.6600000000000006,
+        "true_x": 2.3399999999999994,
+        "estimated_x": 2.3454156205185988,
+        "estimated_speed": 0.9927857550013396,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.7800000000000007,
+        "true_x": 2.2199999999999993,
+        "estimated_x": 2.2192713652640146,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 1.9000000000000008,
+        "true_x": 2.099999999999999,
+        "estimated_x": 2.099482714515895,
+        "estimated_speed": 0.9997431601382205,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.020000000000001,
+        "true_x": 1.979999999999999,
+        "estimated_x": 1.979516992937546,
+        "estimated_speed": 0.9997431601382205,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 2.140000000000001,
+        "true_x": 1.859999999999999,
+        "estimated_x": 1.8672505922301594,
+        "estimated_speed": 0.9897566550982809,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.220000000000001,
+        "true_x": 1.779999999999999,
+        "estimated_x": 1.7860404793029236,
+        "estimated_speed": 0.9923563843412195,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.340000000000001,
+        "true_x": 1.6599999999999988,
+        "estimated_x": 1.6692386690608172,
+        "estimated_speed": 0.9894375796011374,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.4000000000000012,
+        "true_x": 1.5999999999999988,
+        "estimated_x": 1.6023071904536723,
+        "estimated_speed": 0.9991878889717644,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.5200000000000014,
+        "true_x": 1.4799999999999986,
+        "estimated_x": 1.4817115358300996,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.6000000000000014,
+        "true_x": 1.3999999999999986,
+        "estimated_x": 1.394956771592423,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.6600000000000015,
+        "true_x": 1.3399999999999985,
+        "estimated_x": 1.3369089690219758,
+        "estimated_speed": 0.9973921117600703,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.7200000000000015,
+        "true_x": 1.2799999999999985,
+        "estimated_x": 1.2791884213250644,
+        "estimated_speed": 0.994530879339652,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.8400000000000016,
+        "true_x": 1.1599999999999984,
+        "estimated_x": 1.1584612529417342,
+        "estimated_speed": 0.9964293608631227,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.9000000000000017,
+        "true_x": 1.0999999999999983,
+        "estimated_x": 1.1033966222757041,
+        "estimated_speed": 0.9899627488848017,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 2.9800000000000018,
+        "true_x": 1.0199999999999982,
+        "estimated_x": 1.0242020187829044,
+        "estimated_speed": 0.9899627488848017,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 3.100000000000002,
+        "true_x": 0.8999999999999981,
+        "estimated_x": 0.9022086110771892,
+        "estimated_speed": 0.9942427049012128,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.180000000000002,
+        "true_x": 0.8199999999999981,
+        "estimated_x": 0.8198170178327403,
+        "estimated_speed": 0.9980387286760124,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.300000000000002,
+        "true_x": 0.699999999999998,
+        "estimated_x": 0.7044658109273544,
+        "estimated_speed": 0.9922275444322369,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.380000000000002,
+        "true_x": 0.6199999999999979,
+        "estimated_x": 0.6238132680359508,
+        "estimated_speed": 0.9939125628820952,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.500000000000002,
+        "true_x": 0.4999999999999978,
+        "estimated_x": 0.500916092670955,
+        "estimated_speed": 0.9987112067785774,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.5800000000000023,
+        "true_x": 0.4199999999999977,
+        "estimated_x": 0.4212254704408172,
+        "estimated_speed": 0.9984439700006049,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.6600000000000024,
+        "true_x": 0.33999999999999764,
+        "estimated_x": 0.3409484989691164,
+        "estimated_speed": 0.9990519158057787,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.7200000000000024,
+        "true_x": 0.2799999999999976,
+        "estimated_x": 0.2804924475465388,
+        "estimated_speed": 0.9997067907737526,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.8000000000000025,
+        "true_x": 0.1999999999999975,
+        "estimated_x": 0.19677313336494912,
+        "estimated_speed": 0.9999999999999999,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 3.9200000000000026,
+        "true_x": 0.0799999999999974,
+        "estimated_x": 0.07063801645977778,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.000000000000003,
+        "true_x": -2.6645352591003757e-15,
+        "estimated_x": -0.009361950101261146,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 4.080000000000003,
+        "true_x": -0.08000000000000274,
+        "estimated_x": -0.08615526572797372,
+        "estimated_speed": 0.9957514957707135,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.200000000000003,
+        "true_x": -0.20000000000000284,
+        "estimated_x": -0.20665365348860368,
+        "estimated_speed": 0.9971223263991559,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.320000000000003,
+        "true_x": -0.32000000000000295,
+        "estimated_x": -0.3294049847698509,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.440000000000003,
+        "true_x": -0.44000000000000306,
+        "estimated_x": -0.4540451848156236,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.500000000000003,
+        "true_x": -0.5000000000000027,
+        "estimated_x": -0.5110052194435756,
+        "estimated_speed": 0.9959917214766102,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.620000000000003,
+        "true_x": -0.6200000000000028,
+        "estimated_x": -0.6291550865486282,
+        "estimated_speed": 0.994166182521641,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.680000000000002,
+        "true_x": -0.6800000000000024,
+        "estimated_x": -0.6854039463359868,
+        "estimated_speed": 0.9896000518458472,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.8000000000000025,
+        "true_x": -0.8000000000000025,
+        "estimated_x": -0.8043933028100818,
+        "estimated_speed": 0.9899416474490427,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.920000000000003,
+        "true_x": -0.9200000000000026,
+        "estimated_x": -0.9262332752347325,
+        "estimated_speed": 0.9941063207722312,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 4.980000000000002,
+        "true_x": -0.9800000000000022,
+        "estimated_x": -0.9805615223469142,
+        "estimated_speed": 0.9868713854031316,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.060000000000002,
+        "true_x": -1.0600000000000023,
+        "estimated_x": -1.05950578372338,
+        "estimated_speed": 0.9868713854031316,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 5.140000000000002,
+        "true_x": -1.1400000000000023,
+        "estimated_x": -1.1418314842746509,
+        "estimated_speed": 0.9914949938229874,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.220000000000002,
+        "true_x": -1.2200000000000024,
+        "estimated_x": -1.2226613081016207,
+        "estimated_speed": 0.993392713204987,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.3400000000000025,
+        "true_x": -1.3400000000000025,
+        "estimated_x": -1.339627431981222,
+        "estimated_speed": 0.9904330456327944,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.400000000000002,
+        "true_x": -1.4000000000000021,
+        "estimated_x": -1.4016565528197513,
+        "estimated_speed": 0.9938681591983394,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.480000000000002,
+        "true_x": -1.4800000000000022,
+        "estimated_x": -1.483105591764534,
+        "estimated_speed": 0.9964356719532024,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.540000000000002,
+        "true_x": -1.5400000000000018,
+        "estimated_x": -1.5387333425750656,
+        "estimated_speed": 0.9909305369279181,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.620000000000002,
+        "true_x": -1.6200000000000019,
+        "estimated_x": -1.6186391520461751,
+        "estimated_speed": 0.9917619319805121,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.700000000000002,
+        "true_x": -1.700000000000002,
+        "estimated_x": -1.6968423122958398,
+        "estimated_speed": 0.990231682568574,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.760000000000002,
+        "true_x": -1.7600000000000016,
+        "estimated_x": -1.7563121766937442,
+        "estimated_speed": 0.9902983686852375,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 5.880000000000002,
+        "true_x": -1.8800000000000017,
+        "estimated_x": -1.8836846941557424,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.000000000000002,
+        "true_x": -2.0000000000000018,
+        "estimated_x": -2.00368469149439,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 6.060000000000001,
+        "true_x": -2.0600000000000014,
+        "estimated_x": -2.0683117807571616,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.1800000000000015,
+        "true_x": -2.1800000000000015,
+        "estimated_x": -2.192996270203277,
+        "estimated_speed": 0.9999999999999999,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.240000000000001,
+        "true_x": -2.240000000000001,
+        "estimated_x": -2.2478818663132807,
+        "estimated_speed": 0.9932313613786978,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.320000000000001,
+        "true_x": -2.320000000000001,
+        "estimated_x": -2.3239356778505282,
+        "estimated_speed": 0.9887202648768735,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.440000000000001,
+        "true_x": -2.4400000000000013,
+        "estimated_x": -2.4453086870342373,
+        "estimated_speed": 0.9923481400234146,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.520000000000001,
+        "true_x": -2.5200000000000014,
+        "estimated_x": -2.519846406076732,
+        "estimated_speed": 0.9858699864581117,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.580000000000001,
+        "true_x": -2.580000000000001,
+        "estimated_x": -2.581233927338981,
+        "estimated_speed": 0.988867119236816,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.660000000000001,
+        "true_x": -2.660000000000001,
+        "estimated_x": -2.6597579319805424,
+        "estimated_speed": 0.9880823682810476,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.780000000000001,
+        "true_x": -2.780000000000001,
+        "estimated_x": -2.778600878484676,
+        "estimated_speed": 0.9884473509741529,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.860000000000001,
+        "true_x": -2.860000000000001,
+        "estimated_x": -2.8553004087972793,
+        "estimated_speed": 0.9852551747437069,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 6.980000000000001,
+        "true_x": -2.9800000000000013,
+        "estimated_x": -2.9735255689468088,
+        "estimated_speed": 0.9852551747437069,
+        "type": "vehicle",
+        "missed": true
+      },
+      {
+        "t": 7.040000000000001,
+        "true_x": -3.040000000000001,
+        "estimated_x": -3.038084902355035,
+        "estimated_speed": 0.9926224589308104,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.160000000000001,
+        "true_x": -3.160000000000001,
+        "estimated_x": -3.1605141605576588,
+        "estimated_speed": 0.9970349962630596,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.280000000000001,
+        "true_x": -3.280000000000001,
+        "estimated_x": -3.279950925029936,
+        "estimated_speed": 0.9967395654774749,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.340000000000001,
+        "true_x": -3.3400000000000007,
+        "estimated_x": -3.336394354499964,
+        "estimated_speed": 0.9923607411956699,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.420000000000001,
+        "true_x": -3.420000000000001,
+        "estimated_x": -3.420746851683689,
+        "estimated_speed": 0.9988763251117025,
+        "type": "vehicle",
+        "missed": false
+      },
+      {
+        "t": 7.48,
+        "true_x": -3.4800000000000004,
+        "estimated_x": -3.4815539993261573,
+        "estimated_speed": 1.0,
+        "type": "vehicle",
+        "missed": false
+      }
+    ],
+    "scope": "actual GlobalKFTracker with synthetic noisy rectangles; no raw lidar"
+  }
+]
