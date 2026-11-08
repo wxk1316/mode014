@@ -1,0 +1,46 @@
+{
+  "case": "u_spin_blocked",
+  "baseline": false,
+  "noise": true,
+  "seed": 37,
+  "reached": true,
+  "duration_s": 12.02,
+  "goal_distance_m": 0.14644272800805821,
+  "min_gap_m": 0.2479011154977258,
+  "collision": false,
+  "switches": [
+    {
+      "t": 1.6,
+      "mode": 1
+    }
+  ],
+  "spin_count": 0,
+  "crab_count": 1,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.0,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "planning_pending": 2,
+    "mode_switch_wait": 44,
+    "crab_requested": 1,
+    "planning_result_stale": 3,
+    "crab_motion": 66,
+    "goal_braking": 3,
+    "reached": 1
+  },
+  "final_reason": "reached",
+  "plan_p95_ms": 24.167291005142033,
+  "plan_max_ms": 45.296708995010704,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP; synthetic per-frame lidar through production clustering and KF",
+  "perception_valid_frames": 121,
+  "perception_frames": 121,
+  "perception_p95_ms": 5.640416988171637,
+  "max_detection_count": 44,
+  "mode_edges": 1,
+  "trap_edges": 0,
+  "outcome": "reached"
+}

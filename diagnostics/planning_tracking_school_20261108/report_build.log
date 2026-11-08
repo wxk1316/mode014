@@ -1,0 +1,36 @@
+{
+  "total_runs": 64,
+  "by_group": {
+    "clean": {
+      "reached": 9,
+      "collision": 2,
+      "not_reached": 4,
+      "safe_blocked": 1
+    },
+    "noise_19": {
+      "reached": 8,
+      "collision": 2,
+      "not_reached": 5,
+      "safe_blocked": 1
+    },
+    "noise_37": {
+      "reached": 10,
+      "collision": 1,
+      "not_reached": 4,
+      "safe_blocked": 1
+    },
+    "noise_71": {
+      "reached": 8,
+      "collision": 2,
+      "not_reached": 5,
+      "safe_blocked": 1
+    }
+  },
+  "max_mode_edges": 6,
+  "max_trap_edges": 2,
+  "perception_frames": 11593,
+  "perception_valid_frames": 11593,
+  "max_detection_count": 176,
+  "min_switch_interval_s": 4.6800000000000015,
+  "max_urgent_parent_s": 0.059082208026666194
+}

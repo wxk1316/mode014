@@ -13,6 +13,7 @@
 - `src/car_launch/`、`src/planning/`、`src/road_planner/`：启动入口、规划组件与项目地图。
 - `diagnostics/multimode_20261108/`：三模式仿真脚本、结果、图表和运动回放。
 - `diagnostics/road_school_suite_20261108/`：校园场景模拟测试。
+- `diagnostics/planning_tracking_school_20261108/`：合成点云、规划与跟踪完整闭环复核。
 - `src/docs/`、`implement-stage/`：设计、实验及实施记录。
 
 历史报告描述的是相应阶段的实现，以当前源码和 YAML 配置为准。

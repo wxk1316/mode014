@@ -70,3 +70,16 @@
 .env
 .env.*
 !.env.example
+
+# Synthetic point-cloud / planning / tracking school verification suite
+!/diagnostics/planning_tracking_school_20261108/**/*.json
+!/diagnostics/planning_tracking_school_20261108/**/*.jsonl
+!/diagnostics/planning_tracking_school_20261108/**/*.png
+/diagnostics/planning_tracking_school_20261108/driver_policy_test
+/diagnostics/planning_tracking_school_20261108/transition_matrix_test
+
+# Console output from real-recording replay is also kept local
+/diagnostics/**/*.log
+!/diagnostics/multimode_20261108/**/*.log
+!/diagnostics/road_school_suite_20261108/**/*.log
+!/diagnostics/planning_tracking_school_20261108/**/*.log

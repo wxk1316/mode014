@@ -132,10 +132,10 @@ report=f'''# 校园局部规划、跟踪、控制及 trap 审查（2026-11-08）
 
 1. **P1：单帧无路结果永久终止任务。** `multimode_supervisor.py:96–104` 只要 `guide_no_route` 且并非三方向都堵住，就置 `_recovery_failed=True`；下一帧在 54 行直接返回 `recovery_exhausted`，检测变好或动态对象离开也不重试。同一目标重新发布会被 `goal_replay_epsilon` 忽略，不能正常解锁。迎面车辆和加噪隔离柱的记录在约 0.5s 即出现这个锁存，随后停到失败。应把瞬时无路与终止失败分开，要求连续新鲜帧确认，并在障碍／路线发生实质变化时重新验证。
 2. **P1：SPIN 中止与超时只改变 reason。** `multimode_supervisor.py:36–43` 在安全中止或 18s 超时后保留 `_mm_desired=4`，既不请求 ACK 返回，也不标记完成失败；安全分支在超时检查之前，还可持续屏蔽超时。`state_probes.json` 分别在 19／20／25s、以及持续危险障碍下复现。应锁存同 session 的中止／超时结果，完成受控停止及机械返回，然后进入冷却或有限重试。
-3. **P1：紧急分支同步阻塞主控制回调。** `multimode_supervisor.py:73–79` 直接在父进程运行完整多模式规划；反向搜索和栅格引导没有统一 0.25s deadline，且临时把模型延迟压到 0.1s。当前样本最大紧急父进程求解 {summary['max_urgent_parent_s']:.3f}s（具体记录见 summary）。应将紧急候选也放进有预算的执行链，并按实际计算／命令延迟验证。0.25s 的 YAML 值不能解释为所有求解的硬实时保证。
+3. **P1：紧急分支同步阻塞主控制回调。** `multimode_supervisor.py:73–79` 直接在父进程运行完整多模式规划；反向搜索和栅格引导没有统一 0.25s deadline，且临时把模型延迟压到 0.1s。当前样本最大紧急父进程求解 {summary['max_urgent_parent_s']:.3f}s，监督器单次求解最大 {max(d['plan_max_ms'] for d in results)/1000:.3f}s，已超过0.25s（具体记录见 summary及逐次results）。应将紧急候选也放进有预算的执行链，并按实际计算／命令延迟验证。0.25s 的 YAML 值不能解释为所有求解的硬实时保证。
 4. **P2：部分自转入口绕过限制。** CRAB 航向偏差 >8° 的分支（52–53 行）直接增加 `_goal_requests`，没有检查上限；探针把已用 4 次增至 5 次。`route_yaw` 分支没有 `enable_trap` 门，关闭该参数仍能请求自转。应将所有自转入口统一到同一仲裁函数，统一检查使能、次数、冷却、停止和扫掠安全。
 5. **P2：感知 OBB 变化与规划几何对通道敏感。** 近方形物体的 PCA 主轴在小噪声下可显著转动，包围框会变宽；固定世界格分块又可能让动态物体的检测片数量／身份变化。`has_empty_box_area()` 仅凭盒内空面积可能把有外表面回波的实体物体判为凹形。加噪隔离柱失败、车辆出现片段检测是合成证据；真实稀疏回波需补 bag 对照。当前凹形分解已允许 U 形退出，旧报告“全部 U 被一个框封死”不再适用于当前源码。
-6. **P2：安全停止破坏全程平滑上界。** 普通 ACK／CRAB 的 `speed_step` 和 `steering_step` 有加速度／jerk 限制，但 MULTIMODE_SAFETY、EXECUTION_GUARD、REVERSE_GUARD 可直接速度归零。规划 pending／stale 会被节点 healthy 白名单判为停止，容易起停。应区分紧急碰撞制动与短暂求解等待，保持可验证的停车轨迹；不能把普通运动段的 jerk 限制当作全程保证。
+6. **P2：安全停止破坏全程平滑上界。** 普通 ACK／CRAB 的 `speed_step` 和 `steering_step` 有加速度／jerk 限制，但 MULTIMODE_SAFETY、EXECUTION_GUARD、REVERSE_GUARD 可直接速度归零。规划 pending／stale 会被节点 healthy 白名单判为停止，容易起停。记录中同一 ACK 模式下曾从0.9935m/s指令在20ms内变成0，对应指令差分49.675m/s²；这是指令阶跃，车辆物理响应仍受模型减速限制。应区分紧急碰撞制动与短暂求解等待，保持可验证的停车轨迹；不能把普通运动段的 jerk 限制当作全程保证。
 
 这些问题已经在当前代码或记录中复现，未为提高通过率修改 unknown 策略、缩小车身或降低间距标准。第 5 项的外推范围限于本次合成表面模型。
 
@@ -168,7 +168,7 @@ report=f'''# 校园局部规划、跟踪、控制及 trap 审查（2026-11-08）
 
 ## 验证与复现
 
-现有 `src/rda_dwa_real/test`：120 passed，1 xfailed，10 subtests passed。xfail 是项目已有“未确认运动目标按静态框输出导致迎面接触”的压力案例，不能视为该能力通过。新增测试车辆积分／独立间距／点云坐标与地面基准：3 passed。状态机5类探针均复现；C++策略测试及0／1／4六方向切换矩阵通过。
+现有 `src/rda_dwa_real/test`：120 passed，1 xfailed，10 subtests passed。xfail 是项目已有“未确认运动目标按静态框输出导致迎面接触”的压力案例，不能视为该能力通过。新增测试车辆积分／独立间距／点云坐标与地面基准：3 passed。状态机5类探针均复现；C++策略测试及0／1／4六方向切换矩阵通过；实际 multiprocessing spawn 的 ACK／CRAB 工人交付检查通过。
 
 运行依赖记录在metadata.json（本次关联使用SciPy匈牙利分支）。在工程根目录执行：
 
@@ -183,7 +183,7 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 "$PY" diagnostics/planning_tracking_sch
 "$PY" diagnostics/planning_tracking_school_20261108/build_report.py
 ```
 
-其他平台的C++共享库后缀／编译选项需适配。 source_sha256 用于核对当前代码，原有诊断文件和生产代码保持原样。
+其他平台的C++共享库后缀／编译选项需适配。 source_sha256 用于核对当前代码；生产代码未修改。本次真实工人 smoke 同时刷新了原 multimode 诊断目录的该项结果，新目录内保存了副本。
 '''
 (OUT/'审查与测试报告.md').write_text(report)
 print(json.dumps({k:v for k,v in summary.items() if k!='metrics'},indent=2))

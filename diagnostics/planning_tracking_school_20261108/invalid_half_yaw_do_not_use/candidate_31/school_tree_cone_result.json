@@ -1,0 +1,65 @@
+{
+  "case": "school_tree_cone",
+  "baseline": false,
+  "noise": false,
+  "seed": 31,
+  "reached": false,
+  "duration_s": 50.0,
+  "goal_distance_m": 4.091100488175836,
+  "min_gap_m": 0.24176882416130926,
+  "collision": false,
+  "switches": [
+    {
+      "t": 6.76,
+      "mode": 1
+    },
+    {
+      "t": 19.28,
+      "mode": 4
+    },
+    {
+      "t": 27.04,
+      "mode": 0
+    },
+    {
+      "t": 31.84,
+      "mode": 1
+    }
+  ],
+  "spin_count": 1,
+  "crab_count": 2,
+  "trap_ticks": 0,
+  "exit_at_s": null,
+  "max_abs_yaw_rad": 0.20115199616876644,
+  "reasons": {
+    "obstacle_timeout": 1,
+    "mode_switch_wait": 141,
+    "planning_pending": 3,
+    "motion": 33,
+    "execution_collision_guard": 1,
+    "goal_braking": 20,
+    "crab_requested": 2,
+    "planning_result_stale": 9,
+    "crab_prepare": 18,
+    "crab_motion": 57,
+    "blocked": 12,
+    "spin_requested": 2,
+    "spin_active": 89,
+    "spin_safety_abort": 111,
+    "spin_reached": 1
+  },
+  "final_reason": "spin_safety_abort",
+  "plan_p95_ms": 31.368824382661753,
+  "plan_max_ms": 248.5154580208473,
+  "worker_delay_s": 0.25,
+  "time_model": "virtual time with delayed AsyncPlanner result delivery",
+  "driver_model": "compiled C++ policy with localization-estimated stop gate",
+  "scope": "production Python cores + compiled C++ policy + independent actuator/geometry; no ROS/UDP; synthetic per-frame lidar through production clustering and KF",
+  "perception_valid_frames": 500,
+  "perception_frames": 500,
+  "perception_p95_ms": 4.056088961078785,
+  "max_detection_count": 30,
+  "mode_edges": 4,
+  "trap_edges": 0,
+  "outcome": "not_reached"
+}

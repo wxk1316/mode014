@@ -1,0 +1,95 @@
+[
+  {
+    "mode": 0,
+    "ok": true,
+    "telemetry": {
+      "candidates": 153,
+      "feasible": 153,
+      "motion_feasible": true,
+      "obstacle_count": 0,
+      "unknown_count": 0,
+      "moving_count": 0,
+      "best_gap": null,
+      "encounter_id": null,
+      "avoidance_side": 0,
+      "staged_feasible": 0,
+      "unknown_policy": "stationary",
+      "reason": "motion",
+      "duration_s": 0.005184541048947722,
+      "min_gap": null,
+      "guide_target": [
+        5.0,
+        0.0
+      ],
+      "selected_delta": 0.0,
+      "staged_selected": false,
+      "static_motion_feasible": true,
+      "forecast_progress": 1.5702793923225489,
+      "cruise": 0.7,
+      "motion_mode": "ACK",
+      "worker_duration_s": 0.005980417015962303,
+      "worker_queue_delay_s": 0.000538958003744483,
+      "sampled_control_dt_s": 0.1,
+      "sampled_pose": [
+        -0.345,
+        0.0,
+        0.0
+      ],
+      "sampled_velocity": 0.0,
+      "sampled_steer": 0.0,
+      "sampled_obstacle_age_s": 0.0,
+      "worker_reason": "motion",
+      "result_age_s": 0.0354397080373019,
+      "max_result_age_s": 0.8,
+      "sequence": 1,
+      "goal_changed": false,
+      "pose_displacement_m": 0.0,
+      "yaw_change_rad": 0.0,
+      "path_deviation_m": 0.0,
+      "path_heading_error_rad": 0.0,
+      "path_progress_time_s": 0.0,
+      "pending": true,
+      "stale_causes": []
+    }
+  },
+  {
+    "mode": 1,
+    "ok": true,
+    "telemetry": {
+      "reason": "crab_motion",
+      "motion_mode": "CRAB",
+      "crab_reverse": false,
+      "guide_target": [
+        0.0,
+        1.2
+      ],
+      "selected_beta": 1.5707963267948966,
+      "forecast_progress": 1.175613257472565,
+      "min_gap": null,
+      "candidates": 28,
+      "worker_duration_s": 0.002034707984421402,
+      "worker_queue_delay_s": 0.00023374997545033693,
+      "sampled_control_dt_s": 0.1,
+      "sampled_pose": [
+        -0.345,
+        0.0,
+        0.0
+      ],
+      "sampled_velocity": 0.0,
+      "sampled_steer": 1.5707963267948966,
+      "sampled_obstacle_age_s": 0.0,
+      "worker_reason": "crab_motion",
+      "result_age_s": 0.03417445800732821,
+      "max_result_age_s": 0.8,
+      "sequence": 3,
+      "goal_changed": false,
+      "pose_displacement_m": 0.0,
+      "yaw_change_rad": 0.0,
+      "path_deviation_m": 0.0,
+      "path_heading_error_rad": 0.0,
+      "path_progress_time_s": 0.0,
+      "pending": true,
+      "stale_causes": []
+    }
+  }
+]

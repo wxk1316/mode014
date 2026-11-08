@@ -1,0 +1,63 @@
+[
+  {
+    "probe": "spin_timeout",
+    "t": 19.0,
+    "reason": "spin_request_timeout",
+    "desired_mode": 4,
+    "recovery_failed": false
+  },
+  {
+    "probe": "spin_timeout",
+    "t": 20.0,
+    "reason": "spin_request_timeout",
+    "desired_mode": 4,
+    "recovery_failed": false
+  },
+  {
+    "probe": "spin_timeout",
+    "t": 25.0,
+    "reason": "spin_request_timeout",
+    "desired_mode": 4,
+    "recovery_failed": false
+  },
+  {
+    "probe": "spin_safety_abort",
+    "t": 1.0,
+    "reason": "spin_safety_abort",
+    "desired_mode": 4,
+    "recovery_failed": false
+  },
+  {
+    "probe": "spin_safety_abort",
+    "t": 2.0,
+    "reason": "spin_safety_abort",
+    "desired_mode": 4,
+    "recovery_failed": false
+  },
+  {
+    "probe": "spin_safety_abort",
+    "t": 20.0,
+    "reason": "spin_safety_abort",
+    "desired_mode": 4,
+    "recovery_failed": false
+  },
+  {
+    "probe": "enable_trap_false_route_yaw",
+    "reason": "spin_requested",
+    "desired_mode": 4,
+    "spin_requests": 1
+  },
+  {
+    "probe": "crab_yaw_over_spin_limit",
+    "reason": "spin_requested",
+    "desired_mode": 4,
+    "spin_requests": 5,
+    "configured_max": 4
+  },
+  {
+    "probe": "one_frame_no_route_latched",
+    "first": "bounded_static_no_route",
+    "next": "recovery_exhausted",
+    "recovery_failed": true
+  }
+]
